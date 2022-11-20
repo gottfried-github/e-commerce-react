@@ -58,12 +58,6 @@ function Signup(props) {
 
     const clickCb = () => {
         signup(name, password, ({res, body}, name, password) => {
-            // Signup/response, in docs
-            if (201 !== res.status) {
-                console.log('Signup - signup response, body:', res, body)
-                return alert('dont know how to handle this response')
-            }
-
             login(name, password, ({res, body}) => {
                 // Login/response, in docs
                 if (200 !== res.status) {
