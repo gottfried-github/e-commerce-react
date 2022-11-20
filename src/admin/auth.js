@@ -59,12 +59,6 @@ function Signup(props) {
     const clickCb = () => {
         signup(name, password, ({res, body}, name, password) => {
             login(name, password, ({res, body}) => {
-                // Login/response, in docs
-                if (200 !== res.status) {
-                    console.log('Signup, login response, body:', res, body)
-                    return alert('consequent login response: dont know how to handle this response')
-                }
-
                 props.successCb(); return navigate('../')
             }, ({res, body}) => {
                 console.log('Signup, login response, body:', res, body)
