@@ -14,6 +14,12 @@ function Signin(props) {
 }
 
 function Dash(props) {
+    const navigate = useNavigate()
+    
+    useEffect(() => {
+        if (!props.isLoggedIn) navigate('../signin')
+    }, [])
+
     return (
         <div className="admin">
             <nav>
@@ -34,14 +40,6 @@ function Dash(props) {
     )
 }
 
-function AuthSwitch(props) {
-    return (
-        props.isLoggedIn
-            ? <Dash />
-            : <Signin />
-        )
-}
-
 function App(props) {
     const [isLoggedIn, setIsLoggedIn] = useState(null)
 
@@ -60,7 +58,8 @@ function App(props) {
             <Routes>
                 <Route path="/">
                     <Route index element={<Navigate to="dash"/>} />
-                    <Route path="dash/*" element={<AuthSwitch isLoggedIn={isLoggedIn}/>} />
+                    <Route path="dash/*" element={<Dash isLoggedIn={isLoggedIn}/>} />
+                    <Route path="signin" element={<Signin />}/>
                     <Route path="login" element={<Login successCb={authSuccessCb}/>} />
                     <Route path="signup" element={<Signup successCb={authSuccessCb}/>} />
                 </Route>
