@@ -19,15 +19,6 @@ function useIsLoggedIn() {
     return isLoggedIn
 }
 
-function Signin(props) {
-    return (
-        <div>
-            <Link to="/login">{'login'}</Link>
-            <Link to="/signup">{'signup'}</Link>
-        </div>
-    )
-}
-
 function Dash(props) {
     const navigate = useNavigate()
 
@@ -53,6 +44,15 @@ function Dash(props) {
                     <Route path="product/:id" element={<div className="product">product</div>} />
                 </Routes>
             </section>
+        </div>
+    )
+}
+
+function Signin(props) {
+    return (
+        <div>
+            <Link to="/login">{'login'}</Link>
+            <Link to="/signup">{'signup'}</Link>
         </div>
     )
 }
