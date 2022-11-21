@@ -4,6 +4,21 @@ import { BrowserRouter, Routes, Route, Link, Navigate, useParams, useNavigate } 
 
 import {Signup, Login} from './admin/auth.js'
 
+function useIsLoggedIn() {
+    const [isLoggedIn, setIsLoggedIn] = useState(null)
+
+    useEffect(() => {
+        fetch('/api/admin/auth/is-authenticated', {method: 'GET'}).then(async (res) => {
+            const body = await res.json()
+            console.log('App, /api/admin/auth/is-authenticated response body:', body);
+            setIsLoggedIn(body)
+        })
+
+    }, [])
+
+    return isLoggedIn
+}
+
 function Signin(props) {
     return (
         <div>
@@ -15,10 +30,12 @@ function Signin(props) {
 
 function Dash(props) {
     const navigate = useNavigate()
+
+    const isLoggedIn = useIsLoggedIn()
     
     useEffect(() => {
-        if (!props.isLoggedIn) navigate('../signin')
-    }, [])
+        if (!isLoggedIn) navigate('../signin')
+    }, [isLoggedIn])
 
     return (
         <div className="admin">
@@ -41,27 +58,15 @@ function Dash(props) {
 }
 
 function App(props) {
-    const [isLoggedIn, setIsLoggedIn] = useState(null)
-
-    useEffect(() => {
-        fetch('/api/admin/auth/is-authenticated', {method: 'GET'}).then(async (res) => {
-            const body = await res.json()
-            console.log('App, /api/admin/auth/is-authenticated response body:', body);
-            setIsLoggedIn(body)
-        })
-    }, [])
-
-    const authSuccessCb = () => setIsLoggedIn(true)
-
     return (
         <div className="app">
             <Routes>
                 <Route path="/">
                     <Route index element={<Navigate to="dash"/>} />
-                    <Route path="dash/*" element={<Dash isLoggedIn={isLoggedIn}/>} />
+                    <Route path="dash/*" element={<Dash />} />
                     <Route path="signin" element={<Signin />}/>
-                    <Route path="login" element={<Login successCb={authSuccessCb}/>} />
-                    <Route path="signup" element={<Signup successCb={authSuccessCb}/>} />
+                    <Route path="login" element={<Login />} />
+                    <Route path="signup" element={<Signup />} />
                 </Route>
             </Routes>
         </div>

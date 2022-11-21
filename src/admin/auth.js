@@ -61,7 +61,7 @@ function Signup(props) {
     const clickCb = () => {
         signup(name, password, ({res, body}, name, password) => {
             login(name, password, ({res, body}) => {
-                props.successCb(); return navigate('../')
+                return navigate('../')
             }, ({res, body}) => {
                 // console.log('Signup, login response, body:', res, body)
                 
@@ -135,7 +135,7 @@ function Login(props) {
 
     const clickCb = () => {
         login(name, password, ({res, body}, name, password) => {
-            props.successCb(); return navigate('../')
+            return navigate('../')
         }, ({res, body}, name, password) => {
             if (res.status >= 500) {
                 console.log(`signup, internal error - res, body`, res, body)
