@@ -1,6 +1,3 @@
-import './admin.html'
-import './admin.scss'
-
 import React, {Component, useState, useEffect} from "react"
 import ReactDOM from "react-dom"
 import { BrowserRouter, Routes, Route, Link, Navigate, useParams, useNavigate } from "react-router-dom" // , useNavigate
@@ -64,4 +61,8 @@ function App(props) {
     )
 }
 
-ReactDOM.render(<BrowserRouter basename="/admin"><App /></BrowserRouter>, document.querySelector('#main'))
+function main(container) {
+    ReactDOM.render(<BrowserRouter basename="/admin"><App /></BrowserRouter>, container)
+}
+
+export default main
