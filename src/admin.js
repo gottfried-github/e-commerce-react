@@ -4,7 +4,16 @@ import { BrowserRouter, Routes, Route, Link, Navigate, useParams, useNavigate } 
 
 import {Signup, Login} from './admin/auth.js'
 
-function Admin(props) {
+function Signin(props) {
+    return (
+        <div>
+            <Link to="/login">{'login'}</Link>
+            <Link to="/signup">{'signup'}</Link>
+        </div>
+    )
+}
+
+function Dash(props) {
     return (
         <div className="admin">
             <nav>
@@ -25,13 +34,12 @@ function Admin(props) {
     )
 }
 
-function AdminWrap(props) {
-    return (props.isLoggedIn
-        ? <Admin />
-        : <div>
-            <Link to="/login">{'login'}</Link>
-            <Link to="/signup">{'signup'}</Link>
-        </div>)
+function AuthSwitch(props) {
+    return (
+        props.isLoggedIn
+            ? <Dash />
+            : <Signin />
+        )
 }
 
 function App(props) {
@@ -52,7 +60,7 @@ function App(props) {
             <Routes>
                 <Route path="/">
                     <Route index element={<Navigate to="dash"/>} />
-                    <Route path="dash/*" element={<AdminWrap isLoggedIn={isLoggedIn}/>} />
+                    <Route path="dash/*" element={<AuthSwitch isLoggedIn={isLoggedIn}/>} />
                     <Route path="login" element={<Login successCb={authSuccessCb}/>} />
                     <Route path="signup" element={<Signup successCb={authSuccessCb}/>} />
                 </Route>
