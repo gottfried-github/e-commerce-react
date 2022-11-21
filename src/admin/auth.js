@@ -1,4 +1,4 @@
-import * as m from '../../messages.js'
+import * as m from '../../../fi-common/messages.js'
 
 // import {useState} from "react"
 import React, {Component, useState} from "react"
@@ -54,6 +54,8 @@ function Signup(props) {
     const [password, setPassword] = useState('a')
     const [nameMsgs, setNameMsgs] = useState([]);
     const [passwordMsgs, setPasswordMsgs] = useState([]);
+    const [msg, setMsg] = useState('')
+
     const navigate = useNavigate()
 
     const clickCb = () => {
@@ -61,61 +63,52 @@ function Signup(props) {
             login(name, password, ({res, body}) => {
                 props.successCb(); return navigate('../')
             }, ({res, body}) => {
-                console.log('Signup, login response, body:', res, body)
-                return alert('something went wrong when trying to login with newly created user data')
+                // console.log('Signup, login response, body:', res, body)
+                
+                if (res.status >= 500) {
+                    console.log(`signup, internal error when logging in - res, body`, res, body)
+                    return alert(`Something's wrong on the server, please consult a technician`)
+                }
+
+                if (!body.message) {
+                    console.log(`signup, response not ok when logging in - res, body:`, res, body);
+                    return setMsg(`Some fields are filled incorrectly`)
+                }
+
+                setMsg(body.message)
             }).catch((e) => {
-                console.log('Signup - consequent login rejected, error:', e)
-                alert('Signup - consequent login rejected')
+                console.log('signup, login rejected - error:', e)
+                alert(`Something is wrong with the program, please consult a technician`)
             })
         }, ({res, body}, name, password) => {
-            console.log('Signup, fetch res:', res, body);
-            if (500 === res.status) return alert("500: Internal Error")
-            if (400 === res.status) {
+            // console.log('Signup, fetch res:', res, body);
 
-                const o = [['name', setNameMsgs], ['password', setPasswordMsgs]].reduce((o, [k, setter]) => {
-                    if (!(k in body)) {o.keys.splice(o.keys.indexOf(k), 1); return o}
-                    const v = body[k]
+            if (res.status >= 500) {
+                console.log(`signup, internal error - res, body`, res, body)
+                return alert(`Something's wrong on the server, please consult a technician`)
+            }
 
-                    if (m.FieldMissing.code === v.code || m.TypeErrorMsg.code === v.code) {
-                        // reset possible displayed violations from previous requests
-                        setNameMsgs([]); setPasswordMsgs([])
+            if (body.tree) {
+                if (body.tree.node.name) setNameMsgs([...body.tree.node.name.errors.reduce((msgs, e) => {
+                    if (e.message) msgs.push(e.message)
+                }, [])])
 
-                        // alert(`${v.message}: please contact tech support`)
-                        o.alertMsg += `\n${v.message}`
-                        o.keys.splice(o.keys.indexOf(k), 1)
-                        return o
-                    }
-
-                    if (m.EmptyError.code === v.code) {
-                        setter([v.message])
-                        o.keys.splice(o.keys.indexOf(k), 1)
-                        return o
-                    }
-
-                    if (m.ValidationErrors.code === v.code) {
-                        setter(v.errors.map(e => e.message))
-                        o.keys.splice(o.keys.indexOf(k), 1)
-                        return o
-                    }
-                }, {keys: ['name', 'password'], alertMsg: ''})
-
-                if (o.keys.length) {
-                    const msg = "errors detected, the handling of which isn't implemented yet"
-                    return alert(o.alertMsg.length ? `${o.alertMsg};\nAlso, ${msg}` : msg)
-                }
+                if (body.tree.node.password) setPasswordMsgs([...body.tree.node.password.errors.reduce((msgs, e) => {
+                    if (e.message) msgs.push(e.message)
+                }, [])])
 
                 return
             }
 
-            if (409 === res.status) {
-                if (m.NotUnique.code === body.code) return alert(body.message)
+            if (!body.message) {
+                console.log(`signup, response not ok - res, body:`, res, body);
+                return setMsg(`Some fields are filled incorrectly`)
             }
 
-            return alert("handling other errors except FieldMissing, Type, Empty, Validation and Internal errors is not implemented yet")
-
+            setMsg(body.message)
         }).catch((e) => {
-            console.log('Signup - signup rejected, error:', e)
-            alert('Signup - signup rejected')
+            console.log('signup rejected - error:', e)
+            alert(`Something is wrong with the program, please consult a technician`)
         })
     }
 
@@ -125,6 +118,7 @@ function Signup(props) {
             <p>{nameMsgs.map(v => <span>{v}</span>)}</p>
             <input onInput={(ev) => {setPassword(ev.target.value); setPasswordMsgs([])}} value={password} type="text" name="password"/>
             <p>{passwordMsgs.map(v => <span>{v}</span>)}</p>
+            <p><span>{msg}</span></p>
             <button onClick={clickCb}></button>
         </form>
     )
