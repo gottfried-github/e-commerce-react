@@ -29,6 +29,9 @@ function Dash(props) {
     }, [isLoggedIn])
 
     return (
+        isLoggedIn 
+        
+        ?  
         <div className="admin">
             <nav>
                 <Link to="orders">orders</Link>
@@ -45,6 +48,9 @@ function Dash(props) {
                 </Routes>
             </section>
         </div>
+        
+        : 
+        null
     )
 }
 
