@@ -19,6 +19,23 @@ function useIsLoggedIn() {
     return isLoggedIn
 }
 
+function Logout() {
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        fetch('/api/admin/auth/logout', {method: 'GET'}).then(res => {
+            if (!res.ok) {
+                console.log("logout response not ok - res:", res);
+                return alert("something is wrong with the program, please consult a technician")
+            }
+
+            navigate('../')
+        })
+    }, [])
+
+    return (<div>{'logging out'}</div>)
+}
+
 function Dash(props) {
     const navigate = useNavigate()
 
@@ -45,6 +62,7 @@ function Dash(props) {
                     <Route path="products" element={<div className="products">products</div>} />
                     <Route path="product" element={<div className="product-create">create product</div>} />
                     <Route path="product/:id" element={<div className="product">product</div>} />
+                    <Route path="logout" element={<Logout />}/>
                 </Routes>
             </section>
         </div>
