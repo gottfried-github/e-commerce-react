@@ -1,5 +1,5 @@
 import React, {Component, useState, useEffect} from "react"
-import ReactDOM from "react-dom"
+import ReactDOM from "react-dom/client"
 import { BrowserRouter, Routes, Route, Link, Navigate, useParams, useNavigate } from "react-router-dom" // , useNavigate
 
 import {Signup, Login} from './admin/auth.js'
@@ -98,7 +98,8 @@ function App(props) {
 }
 
 function main(container) {
-    ReactDOM.render(<BrowserRouter basename="/admin"><App /></BrowserRouter>, container)
+    const root = ReactDOM.createRoot(container)
+    root.render(<BrowserRouter basename="/admin"><App /></BrowserRouter>)
 }
 
 export default main
