@@ -8,12 +8,11 @@ function useIsLoggedIn() {
     const [isLoggedIn, setIsLoggedIn] = useState(null)
 
     useEffect(() => {
-        fetch('/api/admin/auth/is-authenticated', {method: 'GET'}).then(async (res) => {
-            const body = await res.json()
-            console.log('App, /api/admin/auth/is-authenticated response body:', body);
-            setIsLoggedIn(body)
+        fetch('/api/admin/auth/is-authenticated', {method: 'GET'}).then((res) => {
+            res.json().then((body) => {
+                setIsLoggedIn(body)
+            })
         })
-
     }, [])
 
     return isLoggedIn
@@ -42,6 +41,7 @@ function Dash(props) {
     const isLoggedIn = useIsLoggedIn()
     
     useEffect(() => {
+        if (null === isLoggedIn) return
         if (!isLoggedIn) navigate('../signin')
     }, [isLoggedIn])
 
