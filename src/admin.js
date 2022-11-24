@@ -22,7 +22,7 @@ function Logout() {
     const navigate = useNavigate()
 
     useEffect(() => {
-        fetch('/api/admin/auth/logout', {method: 'GET'}).then(res => {
+        fetch('/api/admin/user/logout', {method: 'GET'}).then(res => {
             if (!res.ok) {
                 console.log("logout response not ok - res:", res);
                 return alert("something is wrong with the program, please consult a technician")
@@ -54,6 +54,7 @@ function Dash(props) {
                 <Link to="orders">orders</Link>
                 <Link to="products">products</Link>
                 <Link to="product">product</Link>
+                <Link to="logout">logout</Link>
             </nav>
             <section>
                 <Routes>
