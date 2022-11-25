@@ -82,6 +82,10 @@ function Signin(props) {
     )
 }
 
+function Blank(props) {
+    return (<div>{"route doesn't exist"}</div>)
+}
+
 function App(props) {
     return (
         <div className="app">
@@ -93,6 +97,7 @@ function App(props) {
                     <Route path="login" element={<Login />} />
                     <Route path="signup" element={<Signup />} />
                 </Route>
+                <Route path="/*" element={<Blank />} />
             </Routes>
         </div>
     )
