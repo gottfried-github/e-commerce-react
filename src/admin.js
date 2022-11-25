@@ -28,7 +28,7 @@ function Logout() {
                 return alert("something is wrong with the program, please consult a technician")
             }
 
-            navigate('../')
+            navigate('/')
         })
     }, [])
 
@@ -42,7 +42,8 @@ function Dash(props) {
     
     useEffect(() => {
         if (null === isLoggedIn) return
-        if (!isLoggedIn) navigate('../signin')
+
+        if (!isLoggedIn) navigate('/signin')
     }, [isLoggedIn])
 
     return (

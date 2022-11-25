@@ -1,0 +1,2 @@
+# Logout: navigate to root
+Navigating to root (`/`) from `Logout` makes sure that `Dash` gets re-rendered thus auth-checks itself. Once that's happened, it's impossible to access `Dash` routes unauthenticated.
