@@ -14,8 +14,8 @@ function main(api) {
         const [msg, setMsg] = useState('')
     
         const clickCb = () => {
-            api.signup(name, password, (body, res, name, password) => {
-                api.login(name, password, (body, res) => {
+            api.auth.signup(name, password, (body, res, name, password) => {
+                api.auth.login(name, password, (body, res) => {
                     return navigate('../')
                 }, (body, res) => {
                     // console.log('Signup, login response, body:', res, body)
@@ -83,7 +83,7 @@ function main(api) {
         const navigate = useNavigate()
     
         const clickCb = () => {
-            api.login(name, password, (body, res) => {
+            api.auth.login(name, password, (body, res) => {
                 return navigate('../')
             }, (body, res) => {
                 if (res.status >= 500) {

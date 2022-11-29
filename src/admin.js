@@ -11,7 +11,7 @@ function main(container, api) {
         const [isLoggedIn, setIsLoggedIn] = useState(null)
     
         useEffect(() => {
-            api.isAuthenticated((body) => {
+            api.auth.isAuthenticated((body) => {
                 setIsLoggedIn(body)
             }, () => {})
         }, [])
@@ -23,7 +23,7 @@ function main(container, api) {
         const navigate = useNavigate()
     
         useEffect(() => {
-            api.logout(() => {
+            api.user.logout(() => {
                 navigate('/')
             }, (body, res) => {
                 console.log("logout response not ok - res, body:", res, body);
