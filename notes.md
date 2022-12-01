@@ -5,7 +5,7 @@ Javascript calculates floating point numbers imprecisely. E.g.,
 ```
  `1`. 
  
-In fi I need to deal with `hrn`. Here the solution is to represent `hrn` in `kopiyka`s, which is 1/100th of 1 `hrn`. E.g., `1.55 hrn` becomes `155 kopiyka`s.
+In fi I need to deal with `hrn`. Here the solution is to represent `hrn` in `kopiyka`s, which is 1/100th of `1` `hrn`. E.g., `1.55 hrn` becomes `155 kopiyka`s.
 
 ## Front-end input
 Have two separate inputs for `hrn` and `kopiyka`. Then 
