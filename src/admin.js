@@ -2,10 +2,12 @@ import React, {Component, useState, useEffect} from "react"
 import ReactDOM from "react-dom/client"
 import { BrowserRouter, Routes, Route, Link, Navigate, useParams, useNavigate } from "react-router-dom" // , useNavigate
 
-import auth from './admin/auth.js'
+import Auth from './admin/auth.js'
+import Product from './admin/product.js'
 
 function main(container, api) {
-    const {Signup, Login} = auth(api)
+    const auth = Auth(api)
+    const product = Product(api)
 
     function useIsLoggedIn() {
         const [isLoggedIn, setIsLoggedIn] = useState(null)
@@ -61,8 +63,8 @@ function main(container, api) {
                         <Route index element={<Navigate to="orders"/>}></Route>
                         <Route path="orders" element={<div className="orders">orders</div>} />
                         <Route path="products" element={<div className="products">products</div>} />
-                        <Route path="product" element={<div className="product-create">create product</div>} />
-                        <Route path="product/:id" element={<div className="product">product</div>} />
+                        <Route path="product" element={<div className="product-create"><product.ProductCreate /></div>} />
+                        <Route path="product/:id" element={<div className="product"><product.Product /></div>} />
                         <Route path="logout" element={<Logout />}/>
                     </Routes>
                 </section>
@@ -94,8 +96,8 @@ function main(container, api) {
                         <Route index element={<Navigate to="dash"/>} />
                         <Route path="dash/*" element={<Dash />} />
                         <Route path="signin" element={<Signin />}/>
-                        <Route path="login" element={<Login />} />
-                        <Route path="signup" element={<Signup />} />
+                        <Route path="login" element={<auth.Login />} />
+                        <Route path="signup" element={<auth.Signup />} />
                     </Route>
                     <Route path="/*" element={<Blank />} />
                 </Routes>
