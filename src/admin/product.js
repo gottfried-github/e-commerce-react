@@ -40,7 +40,7 @@ function main(api) {
         const params = useParams()
 
         const upload = (ev) => {
-            api.product.upload(params.id, files.current.files)
+            api.product.upload(params.id, files.current.files, () => {})
         }
 
         return (
