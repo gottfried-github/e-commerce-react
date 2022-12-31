@@ -4,10 +4,12 @@ import { BrowserRouter, Routes, Route, Link, Navigate, useParams, useNavigate } 
 
 import Auth from './admin/auth.js'
 import Product from './admin/product.js'
+import Products from './admin/products.js'
 
 function main(container, api) {
     const auth = Auth(api)
     const product = Product(api)
+    const _Products = Products(api)
 
     function useIsLoggedIn() {
         const [isLoggedIn, setIsLoggedIn] = useState(null)
@@ -62,7 +64,7 @@ function main(container, api) {
                     <Routes>
                         <Route index element={<Navigate to="orders"/>}></Route>
                         <Route path="orders" element={<div className="orders">orders</div>} />
-                        <Route path="products" element={<div className="products">products</div>} />
+                        <Route path="products" element={<_Products />} />
                         <Route path="product" element={<div className="product-create"><product.ProductCreate /></div>} />
                         <Route path="product/:id/*" element={<div className="product"><product.Product /></div>} />
                         <Route path="logout" element={<Logout />}/>
