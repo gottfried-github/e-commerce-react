@@ -2,6 +2,36 @@ import React, {Component, useState, useEffect, useRef} from "react"
 import {useNavigate, useParams, redirect} from 'react-router-dom'
 
 function main(api) {
+
+    function kopToHrn(kop) {
+        return {
+            hrn: Number(kop.toString().slice(0, kop.toString().length-2)),
+            kop: Number(kop.toString().slice(kop.toString().length-2))
+        }
+    }
+    
+    function fieldsToState(fields) {
+        const state = {
+            name: fields.name || '',
+            expose: fields.expose || false,
+            is_in_stock: fields.is_in_stock || false,
+            photos: fields.photos || [],
+            cover_photo: fields.cover_photo || '',
+            description: fields.description || ''
+        }
+
+        const price = kopToHrn(fields.price)
+
+        state.priceHrn = price.hrn
+        state.priceKop = price.kop
+
+        return state
+    }
+
+    function stateToFields(state) {
+
+    }
+
     function ProductCreate() {
         const navigate = useNavigate()
 
@@ -25,30 +55,115 @@ function main(api) {
     }
 
     function Product() {
-        // const [state, setState] = useState({
-        //     name: '', 
-        //     priceHrn: 0, priceKop: 0, 
-        //     expose: false,
-        //     is_in_stock: false,
-        //     photos_all: [],
-        //     photos: [],
-        //     cover_photo: '',
-        //     description: ''
-        // })
-
-        const files = useRef()
         const params = useParams()
 
-        const upload = (ev) => {
-            api.product.upload(params.id, files.current.files, () => {})
+        const [state, setState] = useState({
+            name: '', 
+            priceHrn: 0, priceKop: 0, 
+            expose: false,
+            is_in_stock: false,
+            photos: [],
+            cover_photo: '',
+            description: ''
+        })
+        const [photos_all, setPhotosAll] = useState([])
+        const [photosActive, setPhotosActive] = useState(false)
+
+        useEffect(() => {
+            api.product.get(params.id, (body) => {
+                setPhotosAll(body.photos_all)
+                setState(fieldsToState(body))
+            })
+        }, [])
+
+        const photosUpload = (files) => {
+            api.product.upload(params.id, files, (body) => {
+                setPhotosAll(body.photos_all)
+                setState(fieldsToState(body))
+            })
+        }
+
+        const photosUpdCb = (photos) => {
+            api.product.update(stateToFields({...state, photos}), (body) => {
+                setState(fieldsToState(body))
+            })
+        }
+
+        const photosBtn = () => {
+            setPhotosActive(!photosActive)
         }
 
         return (
-            <form onSubmit={e => e.preventDefault()}>
-                <input ref={files} type='file' accept="image/*" multiple />
-                <button onClick={upload}>upload</button>
+            <form className="edit-main">
+                <label>name</label><input id="name" className="input" type="text" />
+                <label>hrn</label><input id="price-hrn" className="input-text" type="number" />
+                <label>kop</label><input id="price-kop" className="input-text" type="number" />
+                <label>expose</label><input id="expose" className="input" type="checkbox" />
+                <label>in stock</label><input id="is-in-stock" className="input" type="checkbox" />
+                <label>description</label><input id="description" className="input-text" type="text" />
+                <label>photos</label>
+                <PhotosAll 
+                    active={photosActive} 
+                    photosAll={photos_all} photos={state.photos} 
+                    upload={photosUpload} photosUpdCb={photosUpdCb}
+                />
+                <Photos photos={state.photos} />
+                <button clickCb={photosBtn}>add photos</button>
             </form>
         )
+    }
+
+    function PhotosAll({active, photosAll, photos, photosUpdCb, upload}) {
+        const files = useRef()
+
+        const pickCb = (picked, photo) => {
+            if (!picked) {
+                const photosPicked = [...photos]
+
+                photosPicked.splice(photos.indexOf(photo.id), 1)
+                
+                photosUpdCb(photosPicked)
+            }
+
+            photosUpdCb([photos, photo])
+        }
+
+        return (
+            active
+            
+            ? 
+            <div>
+                {photosAll.map(photo => <PhotoPickable photo={photo} pickCb={pickCb}/>)}
+                <form onSubmit={e => e.preventDefault()}>
+                    <input ref={files} type='file' accept="image/*" multiple />
+                    <button onClick={upload}>upload</button>
+                </form>
+            </div>
+            
+            :
+            null
+        )
+    }
+
+    function PhotoPickable({photo, pickCb}) {
+        const _pickCb = (ev) => {
+          pickCb(ev.target.checked, photo)
+        }
+
+        return (
+          <div className="photo-pickable">
+              <img src={photo.path} />
+              <input type="checkbox" onClick={_pickCb}></input>
+          </div>
+        )
+    }
+
+    function Photos({photos}) {
+        return (<div>{photos.map(photo => (
+            <div className="photo">
+                <img src={photo.path} />
+            </div>
+        ))}</div>)
     }
 
     return {ProductCreate, Product}

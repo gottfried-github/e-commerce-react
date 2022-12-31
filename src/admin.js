@@ -64,7 +64,7 @@ function main(container, api) {
                         <Route path="orders" element={<div className="orders">orders</div>} />
                         <Route path="products" element={<div className="products">products</div>} />
                         <Route path="product" element={<div className="product-create"><product.ProductCreate /></div>} />
-                        <Route path="product/:id" element={<div className="product"><product.Product /></div>} />
+                        <Route path="product/:id/*" element={<div className="product"><product.Product /></div>} />
                         <Route path="logout" element={<Logout />}/>
                     </Routes>
                 </section>
