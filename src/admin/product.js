@@ -101,7 +101,7 @@ function main(api) {
         }
 
         return (
-            <form className="edit-main">
+            <form onSubmit={ev => ev.preventDefault()} className="edit-main">
                 <label>name</label><input id="name" className="input" type="text" />
                 <label>hrn</label><input id="price-hrn" className="input-text" type="number" />
                 <label>kop</label><input id="price-kop" className="input-text" type="number" />
@@ -141,10 +141,10 @@ function main(api) {
             ? 
             <div>
                 {photosAll.map(photo => <PhotoPickable photo={photo} pickCb={pickCb}/>)}
-                <form onSubmit={e => e.preventDefault()}>
+                <div>
                     <input ref={files} type='file' accept="image/*" multiple />
                     <button onClick={upload}>upload</button>
-                </form>
+                </div>
             </div>
             
             :
