@@ -20,6 +20,13 @@ function main(api) {
             description: fields.description || ''
         }
 
+        if (undefined === fields.price) {
+            state.priceHrn = null
+            state.priceKop = null
+
+            return state
+        }
+        
         const price = kopToHrn(fields.price)
 
         state.priceHrn = price.hrn
@@ -59,7 +66,7 @@ function main(api) {
 
         const [state, setState] = useState({
             name: '', 
-            priceHrn: 0, priceKop: 0, 
+            priceHrn: null, priceKop: null, 
             expose: false,
             is_in_stock: false,
             photos: [],
@@ -108,7 +115,7 @@ function main(api) {
                     upload={photosUpload} photosUpdCb={photosUpdCb}
                 />
                 <Photos photos={state.photos} />
-                <button clickCb={photosBtn}>add photos</button>
+                <button onClick={photosBtn}>add photos</button>
             </form>
         )
     }
