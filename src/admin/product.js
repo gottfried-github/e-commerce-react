@@ -150,7 +150,7 @@ function main(api) {
 
                 photosPicked.splice(photosPicked.map(photo => photo.id).indexOf(photo.id), 1)
                 
-                photosUpdCb(photosPicked)
+                return photosUpdCb(photosPicked)
             }
 
             photosUpdCb([...photos, photo])
