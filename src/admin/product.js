@@ -167,7 +167,7 @@ function main(api) {
             
             ? 
             <div>
-                {photosAll.map(photo => <PhotoPickable photo={photo} pickCb={pickCb}/>)}
+                {photosAll.map((photo, i) => <PhotoPickable key={i} photo={photo} pickCb={pickCb}/>)}
                 <div>
                     <input ref={files} type='file' accept="image/*" multiple />
                     <button onClick={upload}>upload</button>
@@ -193,8 +193,8 @@ function main(api) {
     }
 
     function Photos({photos}) {
-        return (<div>{photos.map(photo => (
-            <div className="photo">
+        return (<div>{photos.map((photo, i) => (
+            <div key={i} className="photo">
                 <img src={photo.path} />
             </div>
         ))}</div>)
