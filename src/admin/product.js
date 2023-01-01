@@ -127,12 +127,12 @@ function main(api) {
             if (!picked) {
                 const photosPicked = [...photos]
 
-                photosPicked.splice(photos.indexOf(photo.id), 1)
+                photosPicked.splice(photosPicked.map(photo => photo.id).indexOf(photo.id), 1)
                 
                 photosUpdCb(photosPicked)
             }
 
-            photosUpdCb([photos, photo])
+            photosUpdCb([...photos, photo])
         }
 
         return (
