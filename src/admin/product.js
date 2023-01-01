@@ -50,12 +50,12 @@ function main(api) {
                     : hrnToKop(state.priceHrn, state.priceKop)
         }
 
-        if (undefined !== state.name) fields.name = state.name
+        if (undefined !== state.name && state.name) fields.name = state.name
         if (undefined !== state.expose) fields.expose = state.expose
         if (undefined !== state.is_in_stock) fields.is_in_stock = state.is_in_stock
         if (undefined !== state.photos) fields.photos = state.photos
-        if (undefined !== state.cover_photo) fields.cover_photo = state.cover_photo
-        if (undefined !== state.description) fields.description = state.name
+        if (undefined !== state.cover_photo && state.cover_photo) fields.cover_photo = state.cover_photo
+        if (undefined !== state.description && state.description) fields.description = state.name
 
         return fields
     }
