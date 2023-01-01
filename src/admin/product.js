@@ -112,9 +112,15 @@ function main(api) {
         }
 
         const photosUpdCb = (photos) => {
-            api.product.update(stateToFields({...state, photos}), (body) => {
-                setState(fieldsToState(body))
-            })
+            console.log('Product, photosUpdCb', photos);
+            console.log('Product, photosUpdCb, stateToFields:', stateToFields({...state, photos}))
+
+            setState(fieldsToState(stateToFields({...state, photos})))
+
+            // api.product.update(stateToFields({...state, photos}), (body) => {
+            //     setPhotosAll(body.photos_all)
+            //     setState(fieldsToState(body))
+            // })
         }
 
         const photosBtn = () => {
