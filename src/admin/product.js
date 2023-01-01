@@ -9,6 +9,10 @@ function main(api) {
             kop: Number(kop.toString().slice(kop.toString().length-2))
         }
     }
+
+    function hrnToKop(hrn, kop) {
+        return hrn * 100 + kop
+    }
     
     function fieldsToState(fields) {
         const state = {
@@ -36,7 +40,24 @@ function main(api) {
     }
 
     function stateToFields(state) {
+        const fields = {}
 
+        if (null !== state.priceHrn || null !== state.priceKop) {
+            fields.price = null === state.priceHrn 
+                ? hrnToKop(0, state.priceKop)
+                : null === state.priceKop 
+                    ? hrnToKop(state.priceHrn, 0)
+                    : hrnToKop(state.priceHrn, state.priceKop)
+        }
+
+        if (undefined !== state.name) fields.name = state.name
+        if (undefined !== state.expose) fields.expose = state.expose
+        if (undefined !== state.is_in_stock) fields.is_in_stock = state.is_in_stock
+        if (undefined !== state.photos) fields.photos = state.photos
+        if (undefined !== state.cover_photo) fields.cover_photo = state.cover_photo
+        if (undefined !== state.description) fields.description = state.name
+
+        return fields
     }
 
     function ProductCreate() {
