@@ -164,7 +164,10 @@ function main(api) {
             
             ? 
             <div>
-                {photosAll.map((photo, i) => <PhotoPickable key={i} photo={photo} pickCb={pickCb}/>)}
+                {
+                photosAll.map((photo, i) => <PhotoPickable key={i} photo={photo} 
+                    picked={photos.map(photo => photo.id).includes(photo.id)} pickCb={pickCb}/>)
+                }
                 <div>
                     <input ref={files} type='file' accept="image/*" multiple />
                     <button onClick={upload}>upload</button>
@@ -176,7 +179,7 @@ function main(api) {
         )
     }
 
-    function PhotoPickable({photo, pickCb}) {
+    function PhotoPickable({photo, picked, pickCb}) {
         const _pickCb = (ev) => {
           pickCb(ev.target.checked, photo)
         }
@@ -184,7 +187,15 @@ function main(api) {
         return (
           <div className="photo-pickable">
               <img src={photo.path} />
-              <input type="checkbox" onClick={_pickCb}></input>
+              
+              {
+              picked 
+              ? 
+              <input type="checkbox" onChange={_pickCb} defaultChecked></input>
+
+              :
+              <input type="checkbox" onChange={_pickCb}></input>
+              }
           </div>
         )
     }
