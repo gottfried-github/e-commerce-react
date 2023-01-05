@@ -53,7 +53,7 @@ function main(api) {
         if (undefined !== state.name && state.name) fields.name = state.name
         if (undefined !== state.expose) fields.expose = state.expose
         if (undefined !== state.is_in_stock) fields.is_in_stock = state.is_in_stock
-        if (undefined !== state.photos) fields.photos = state.photos
+        if (state.photos) fields.photos = state.photos.map(photo => photo.id)
         if (undefined !== state.cover_photo && state.cover_photo) fields.cover_photo = state.cover_photo
         if (undefined !== state.description && state.description) fields.description = state.name
 
@@ -90,7 +90,7 @@ function main(api) {
             priceHrn: null, priceKop: null, 
             expose: false,
             is_in_stock: false,
-            photos: [],
+            photos: null,
             cover_photo: '',
             description: ''
         })
@@ -135,10 +135,10 @@ function main(api) {
                 <label>photos</label>
                 <PhotosAll 
                     active={photosActive} 
-                    photosAll={photos_all} photos={state.photos} 
+                    photosAll={photos_all ? photos_all : []} photos={state.photos ? state.photos : []} 
                     upload={photosUpload} photosUpdCb={photosUpdCb}
                 />
-                <Photos photos={state.photos} />
+                <Photos photos={state.photos ? state.photos : []} />
                 <button onClick={photosBtn}>add photos</button>
             </form>
         )
@@ -153,7 +153,7 @@ function main(api) {
 
                 photosPicked.splice(photosPicked.map(photo => photo.id).indexOf(photo.id), 1)
                 
-                return photosUpdCb(photosPicked)
+                return photosUpdCb((photosPicked.length) ? photosPicked : null)
             }
 
             photosUpdCb([...photos, photo])
