@@ -113,7 +113,16 @@ function main(api) {
 
         const photosUpdCb = (photos) => {
             console.log('Product, photosUpdCb - photos:', photos);
-            api.product.update(params.id, stateToFields({...state, photos}), (body) => {
+
+            if (!photos) {
+                return api.product.update(params.id, stateToFields({...state, photos}), ['photos'], (body) => {
+                    console.log('Product, product.update successCb - body:', body);
+                    setPhotosAll(body.photos_all)
+                    setState(fieldsToState(body))
+                })
+            }
+
+            api.product.update(params.id, stateToFields({...state, photos}), null, (body) => {
                 console.log('Product, product.update successCb - body:', body);
                 setPhotosAll(body.photos_all)
                 setState(fieldsToState(body))
