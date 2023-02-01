@@ -113,7 +113,7 @@ function main(api) {
         })
         const [photos_all, setPhotosAll] = useState([])
 
-        // conditionally render `PhotosAll` content
+        // conditionally render `PhotosAll`
         const [photosActive, setPhotosActive] = useState(false)
 
         useEffect(() => {
@@ -163,18 +163,22 @@ function main(api) {
                 <label>in stock</label><input id="is-in-stock" className="input" type="checkbox" />
                 <label>description</label><input id="description" className="input-text" type="text" />
                 <label>photos</label>
-                <PhotosAll 
-                    active={photosActive} 
-                    photosAll={photos_all ? photos_all : []} photos={state.photos ? state.photos : []} 
-                    upload={photosUpload} photosUpdCb={photosUpdCb}
-                />
+                {photosActive 
+                    ? 
+                    <PhotosAll 
+                        photosAll={photos_all ? photos_all : []} photos={state.photos ? state.photos : []} 
+                        upload={photosUpload} photosUpdCb={photosUpdCb}
+                    />
+                    
+                    : 
+                    null}
                 <Photos photos={state.photos ? state.photos : []} />
                 <button onClick={photosBtn}>add photos</button>
             </form>
         )
     }
 
-    function PhotosAll({active, photosAll, photos, photosUpdCb, upload}) {
+    function PhotosAll({photosAll, photos, photosUpdCb, upload}) {
         const files = useRef()
 
         // add or remove a photo from `photos` based on whether it's checked or not
@@ -191,9 +195,6 @@ function main(api) {
         }
 
         return (
-            active
-            
-            ? 
             <div>
                 {
                 photosAll.map((photo, i) => <PhotoPickable key={i} photo={photo} 
@@ -204,9 +205,6 @@ function main(api) {
                     <button onClick={upload}>upload</button>
                 </div>
             </div>
-            
-            :
-            null
         )
     }
 
