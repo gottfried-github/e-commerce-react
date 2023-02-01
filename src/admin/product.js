@@ -188,6 +188,14 @@ function main(api) {
         )
     }
 
+    function Photos({photos}) {
+        return (<div>{photos.map((photo, i) => (
+            <div key={i} className="photo">
+                <img src={photo.path} />
+            </div>
+        ))}</div>)
+    }
+
     function PhotoPickable({photo, picked, pickCb}) {
         const _pickCb = (ev) => {
           pickCb(ev.target.checked, photo)
@@ -207,14 +215,6 @@ function main(api) {
               }
           </div>
         )
-    }
-
-    function Photos({photos}) {
-        return (<div>{photos.map((photo, i) => (
-            <div key={i} className="photo">
-                <img src={photo.path} />
-            </div>
-        ))}</div>)
     }
 
     return {ProductCreate, Product}
