@@ -11,6 +11,7 @@ function main(container, api) {
     const product = Product(api)
     const _Products = Products(api)
 
+    // check the api for whether the client is authenticated
     function useIsLoggedIn() {
         const [isLoggedIn, setIsLoggedIn] = useState(null)
     
@@ -23,6 +24,16 @@ function main(container, api) {
         return isLoggedIn
     }
     
+    function Signin(props) {
+        return (
+            <div>
+                <Link to="/login">{'login'}</Link>
+                <Link to="/signup">{'signup'}</Link>
+            </div>
+        )
+    }
+    
+    // log out over the api and navigate to the root
     function Logout() {
         const navigate = useNavigate()
     
@@ -36,6 +47,10 @@ function main(container, api) {
         }, [])
     
         return (<div>{'logging out'}</div>)
+    }
+    
+    function Blank(props) {
+        return (<div>{"route doesn't exist"}</div>)
     }
     
     function Dash() {
@@ -61,6 +76,7 @@ function main(container, api) {
         )
     }
 
+    // render Dash only if client is authenticated, otherwise - navigate to sign in page
     function DashController(props) {
         const navigate = useNavigate()
     
@@ -82,20 +98,8 @@ function main(container, api) {
             null
         )
     }
-    
-    function Signin(props) {
-        return (
-            <div>
-                <Link to="/login">{'login'}</Link>
-                <Link to="/signup">{'signup'}</Link>
-            </div>
-        )
-    }
-    
-    function Blank(props) {
-        return (<div>{"route doesn't exist"}</div>)
-    }
 
+    // create routes for login, sign up, sign in and dash. Navigate to dash.
     function App(props) {
         return (
             <div className="app">
