@@ -131,19 +131,25 @@ function main(api) {
             })
         }
 
-        // make api request to update the `photos` field
-        const photosUpdCb = (photos) => {
-            console.log('Product, photosUpdCb - photos:', photos);
+        // add or remove a photo from `photos` based on whether it's checked or not and make api request to update the `photos` field
+        const pickCb = (picked, photo) => {
+            const photosPicked = state.photos ? [...state.photos] : []
 
-            if (!photos) {
-                return api.product.update(params.id, stateToFields({...state, photos}), ['photos'], (body) => {
+            if (!picked) {
+                photosPicked.splice(photosPicked.map(photo => photo.id).indexOf(photo.id), 1)
+            } else {
+                photosPicked.push(photo)
+            }
+
+            if (!photosPicked.length) {
+                return api.product.update(params.id, stateToFields({...state, photos: null}), ['photos'], (body) => {
                     console.log('Product, product.update successCb - body:', body);
                     setPhotosAll(body.photos_all)
                     setState(fieldsToState(body))
                 })
             }
 
-            api.product.update(params.id, stateToFields({...state, photos}), null, (body) => {
+            api.product.update(params.id, stateToFields({...state, photos: photosPicked}), null, (body) => {
                 console.log('Product, product.update successCb - body:', body);
                 setPhotosAll(body.photos_all)
                 setState(fieldsToState(body))
@@ -167,7 +173,7 @@ function main(api) {
                     ? 
                     <PhotosAll 
                         photosAll={photos_all ? photos_all : []} photos={state.photos ? state.photos : []} 
-                        upload={photosUpload} photosUpdCb={photosUpdCb}
+                        upload={photosUpload} pickCb={pickCb}
                     />
                     
                     : 
@@ -178,27 +184,16 @@ function main(api) {
         )
     }
 
-    function PhotosAll({photosAll, photos, photosUpdCb, upload}) {
+    function PhotosAll({photosAll, photos, pickCb, upload}) {
         const files = useRef()
-
-        // add or remove a photo from `photos` based on whether it's checked or not
-        const pickCb = (picked, photo) => {
-            if (!picked) {
-                const photosPicked = [...photos]
-
-                photosPicked.splice(photosPicked.map(photo => photo.id).indexOf(photo.id), 1)
-                
-                return photosUpdCb((photosPicked.length) ? photosPicked : null)
-            }
-
-            photosUpdCb([...photos, photo])
-        }
 
         return (
             <div>
                 {
-                photosAll.map((photo, i) => <PhotoPickable key={i} photo={photo} 
-                    picked={photos.map(photo => photo.id).includes(photo.id)} pickCb={pickCb}/>)
+                photosAll.map((photo, i) => {
+                    return (<PhotoPickable key={photo.id} photo={photo} 
+                    picked={photos.map(photo => photo.id).includes(photo.id)} pickCb={pickCb}/>
+                )})
                 }
                 <div>
                     <input ref={files} type='file' accept="image/*" multiple />
