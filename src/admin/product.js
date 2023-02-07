@@ -3,6 +3,10 @@ import {useNavigate, useParams, redirect} from 'react-router-dom'
 
 function main(api) {
 
+    /**
+     * @param {Number} kop
+     * @description express kopiykas as hryvnias with kopiykas
+    */
     function kopToHrn(kop) {
         return {
             hrn: Number(kop.toString().slice(0, kop.toString().length-2)),
@@ -10,10 +14,19 @@ function main(api) {
         }
     }
 
+    /**
+     * @param {Number} hrn 
+     * @param {Number} kop
+     * @description express hryvnias with kopiykas as kopiykas 
+    */ 
     function hrnToKop(hrn, kop) {
         return hrn * 100 + kop
     }
     
+    /**
+     * @param {Object} fields
+     * @description convert api response to Product's state
+    */
     function fieldsToState(fields) {
         const state = {
             name: fields.name || '',
@@ -39,6 +52,10 @@ function main(api) {
         return state
     }
 
+    /**
+     * @param {Object} state
+     * @description convert Product's state to api request
+    */
     function stateToFields(state) {
         const fields = {}
 
@@ -95,6 +112,8 @@ function main(api) {
             description: ''
         })
         const [photos_all, setPhotosAll] = useState([])
+
+        // conditionally render `PhotosAll`
         const [photosActive, setPhotosActive] = useState(false)
 
         useEffect(() => {
@@ -104,6 +123,7 @@ function main(api) {
             })
         }, [])
 
+        // make api request to upload photos
         const photosUpload = (files) => {
             api.product.upload(params.id, files, (body) => {
                 setPhotosAll(body.photos_all)
@@ -111,6 +131,7 @@ function main(api) {
             })
         }
 
+        // make api request to update the `photos` field
         const photosUpdCb = (photos) => {
             console.log('Product, photosUpdCb - photos:', photos);
 
@@ -142,20 +163,25 @@ function main(api) {
                 <label>in stock</label><input id="is-in-stock" className="input" type="checkbox" />
                 <label>description</label><input id="description" className="input-text" type="text" />
                 <label>photos</label>
-                <PhotosAll 
-                    active={photosActive} 
-                    photosAll={photos_all ? photos_all : []} photos={state.photos ? state.photos : []} 
-                    upload={photosUpload} photosUpdCb={photosUpdCb}
-                />
+                {photosActive 
+                    ? 
+                    <PhotosAll 
+                        photosAll={photos_all ? photos_all : []} photos={state.photos ? state.photos : []} 
+                        upload={photosUpload} photosUpdCb={photosUpdCb}
+                    />
+                    
+                    : 
+                    null}
                 <Photos photos={state.photos ? state.photos : []} />
                 <button onClick={photosBtn}>add photos</button>
             </form>
         )
     }
 
-    function PhotosAll({active, photosAll, photos, photosUpdCb, upload}) {
+    function PhotosAll({photosAll, photos, photosUpdCb, upload}) {
         const files = useRef()
 
+        // add or remove a photo from `photos` based on whether it's checked or not
         const pickCb = (picked, photo) => {
             if (!picked) {
                 const photosPicked = [...photos]
@@ -169,9 +195,6 @@ function main(api) {
         }
 
         return (
-            active
-            
-            ? 
             <div>
                 {
                 photosAll.map((photo, i) => <PhotoPickable key={i} photo={photo} 
@@ -182,10 +205,15 @@ function main(api) {
                     <button onClick={upload}>upload</button>
                 </div>
             </div>
-            
-            :
-            null
         )
+    }
+
+    function Photos({photos}) {
+        return (<div>{photos.map((photo, i) => (
+            <div key={i} className="photo">
+                <img src={photo.path} />
+            </div>
+        ))}</div>)
     }
 
     function PhotoPickable({photo, picked, pickCb}) {
@@ -207,14 +235,6 @@ function main(api) {
               }
           </div>
         )
-    }
-
-    function Photos({photos}) {
-        return (<div>{photos.map((photo, i) => (
-            <div key={i} className="photo">
-                <img src={photo.path} />
-            </div>
-        ))}</div>)
     }
 
     return {ProductCreate, Product}
