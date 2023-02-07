@@ -38,21 +38,8 @@ function main(container, api) {
         return (<div>{'logging out'}</div>)
     }
     
-    function Dash(props) {
-        const navigate = useNavigate()
-    
-        const isLoggedIn = useIsLoggedIn()
-        
-        useEffect(() => {
-            if (null === isLoggedIn) return
-    
-            if (!isLoggedIn) navigate('/signin')
-        }, [isLoggedIn])
-    
+    function Dash() {
         return (
-            isLoggedIn 
-            
-            ?  
             <div className="admin">
                 <nav>
                     <Link to="orders">orders</Link>
@@ -71,6 +58,25 @@ function main(container, api) {
                     </Routes>
                 </section>
             </div>
+        )
+    }
+
+    function DashController(props) {
+        const navigate = useNavigate()
+    
+        const isLoggedIn = useIsLoggedIn()
+        
+        useEffect(() => {
+            if (null === isLoggedIn) return
+    
+            if (!isLoggedIn) navigate('/signin')
+        }, [isLoggedIn])
+    
+        return (
+            isLoggedIn 
+            
+            ?  
+            <Dash />
             
             : 
             null
@@ -89,14 +95,14 @@ function main(container, api) {
     function Blank(props) {
         return (<div>{"route doesn't exist"}</div>)
     }
-    
+
     function App(props) {
         return (
             <div className="app">
                 <Routes>
                     <Route path="/">
                         <Route index element={<Navigate to="dash"/>} />
-                        <Route path="dash/*" element={<Dash />} />
+                        <Route path="dash/*" element={<DashController />} />
                         <Route path="signin" element={<Signin />}/>
                         <Route path="login" element={<auth.Login />} />
                         <Route path="signup" element={<auth.Signup />} />
