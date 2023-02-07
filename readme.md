@@ -2,4 +2,18 @@
 The front end for [the e-commerce project](e-commerce-app).
 
 # Overview
+## App
+The [`App`]() defines routes for sign up, log in, sign in and dash. It instantly navigates to `/dash`.
+
+## Dash
 The main route in the admin is `/dash`. [`DashController`](), which is rendered on this route, makes sure that the client is authenticated before rendering the actual [`Dash`](). Otherwise, it navigates the browser to the sign in page.
+
+## Product
+### Price
+In the UI, price is represented as two values: one for hryvnias and one for kopiykas. In the data, price is represented in kopyikas. [`hrnToKop`]() and [`kopToHrn`]() provide a mapping between the two representations.
+
+### State vs. api data
+The component's state has default values for the fields. The api data simply doesn't contain the fields for which there's no value. [`stateToFields`]() and [`fieldsToState`]() implement a mapping between the two representations as well as integrating price conversion (see [Price](#price)).
+
+### Photos
+[`PhotosAll`]() renders the `photos_all` field (see [`photos_all` and `photos`](e-commerce#photos_all-and-photos)) with checkboxes on each photo that add or remove the given photo from the `photos` field (see [`pickCb`]()). It also provides a mechanism to upload photos. It is rendered conditionally depending on whether user clicks the 'add photos' button.
