@@ -16,4 +16,4 @@ In the UI, price is represented as two values: one for hryvnias and one for kopi
 The component's state has default values for the fields. The api data simply doesn't contain the fields for which there's no value. [`stateToFields`]() and [`fieldsToState`]() implement a mapping between the two representations as well as integrating price conversion (see [Price](#price)).
 
 ### Photos
-[`PhotosAll`]() renders the `photos_all` field (see [`photos_all` and `photos`](e-commerce#photos_all-and-photos)) with checkboxes on each photo that add or remove the given photo from the `photos` field (see [`pickCb`]()). It also provides a mechanism to upload photos. It is rendered conditionally depending on whether user clicks the 'add photos' button.
+[`pickCb`]() adds or removes photos from `photos` (see [`photos_all` and `photos`](e-commerce#photos_all-and-photos)) based on whether the photos are checked in [`PhotosAll`](). `PhotosAll` renders `photos_all` with checkboxes. It is rendered conditionally depending on whether user clicks the 'add photos' button.
