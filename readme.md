@@ -9,6 +9,8 @@ The [`App`]() defines routes for sign up, log in, sign in and dash. It instantly
 The main route in the admin is `/dash`. [`DashController`](), which is rendered on this route, makes sure that the client is authenticated before rendering the actual [`Dash`](). Otherwise, it navigates the browser to the sign in page.
 
 ## Product
+[`Product`]() is the main controller. It modifies data and makes requests to the server. The other components are views. They lift data up to `Product` through callbacks.
+
 ### Price
 In the UI, price is represented as two values: one for hryvnias and one for kopiykas. In the data, price is represented in kopyikas. [`hrnToKop`]() and [`kopToHrn`]() provide a mapping between the two representations.
 
