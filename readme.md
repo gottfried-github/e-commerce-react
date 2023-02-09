@@ -1,5 +1,5 @@
 # Description
-The front end for [the e-commerce project](e-commerce-app). Work in progress, only some admin routes are implemented.
+The front end for [the e-commerce project](). Work in progress, only some admin routes are implemented.
 
 # Overview
 ## App
