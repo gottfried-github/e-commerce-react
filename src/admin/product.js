@@ -197,7 +197,9 @@ function main(api) {
                 }
                 <div>
                     <input ref={files} type='file' accept="image/*" multiple />
-                    <button onClick={upload}>upload</button>
+                    <button onClick={() => {
+                        upload(files.current.files)
+                    }}>upload</button>
                 </div>
             </div>
         )
