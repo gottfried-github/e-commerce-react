@@ -171,7 +171,7 @@ function main(api) {
                 <label>photos</label>
                 {photosActive 
                     ? 
-                    <PhotosAll 
+                    <PhotosUpload 
                         photosAll={photos_all ? photos_all : []} photos={state.photos ? state.photos : []} 
                         upload={photosUpload} pickCb={pickCb}
                     />
@@ -184,17 +184,17 @@ function main(api) {
         )
     }
 
-    function PhotosAll({photosAll, photos, pickCb, upload}) {
+    function PhotosUpload({photosAll, photos, pickCb, upload}) {
         const files = useRef()
 
         return (
             <div>
-                {
-                photosAll.map((photo, i) => {
-                    return (<PhotoPickable key={photo.id} photo={photo} 
-                    picked={photos.map(photo => photo.id).includes(photo.id)} pickCb={pickCb}/>
-                )})
-                }
+                {<PhotosPickable 
+                    photos={photosAll.map(photo => 
+                        Object.assign({picked: photos.map(photo => photo.id).includes(photo.id)}, photo)
+                    )} 
+                    pickCb={pickCb} 
+                />}
                 <div>
                     <input ref={files} type='file' accept="image/*" multiple />
                     <button onClick={() => {
@@ -202,6 +202,24 @@ function main(api) {
                     }}>upload</button>
                 </div>
             </div>
+        )
+    }
+
+    /**
+     * @param {Array} photos photos to pick from
+     * @param {Function} pickCb callback to pass to PhotoPicked
+     * @description renders `photos` using PhotoPickable
+    */
+    function PhotosPickable({photos, pickCb}) {
+        return (
+            <div>{
+                photos.map(photo => <PhotoPickable 
+                    key={photo.id} 
+                    photo={photo} 
+                    pickCb={pickCb}
+                    picked={photo.picked}
+                />)
+            }</div>
         )
     }
 
@@ -213,6 +231,11 @@ function main(api) {
         ))}</div>)
     }
 
+    /**
+     * @param {Object} photo photo to render
+     * @param {Boolean} picked whether to render the photo checkmarked
+     * @param {Function} pickCb callback for when photo gets checked or unchecked
+    */
     function PhotoPickable({photo, picked, pickCb}) {
         const _pickCb = (ev) => {
           pickCb(ev.target.checked, photo)
