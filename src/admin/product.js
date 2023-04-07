@@ -156,18 +156,67 @@ function main(api) {
             })
         }
 
+        const inputChange = (_state) => {
+            api.product.update(params.id, stateToFields(_state), null, (body) => {
+                setPhotosAll(body.photos_all)
+                setState(fieldsToState(body))
+            })
+        }
+
+        const inputKeydown = (ev) => {
+            // if key is Enter
+            if (13 === ev.keyCode) return ev.preventDefault()
+        }
+
         const photosBtn = () => {
             setPhotosActive(!photosActive)
         }
 
         return (
             <form onSubmit={ev => ev.preventDefault()} className="edit-main">
-                <label>name</label><input id="name" className="input" type="text" />
-                <label>hrn</label><input id="price-hrn" className="input-text" type="number" />
-                <label>kop</label><input id="price-kop" className="input-text" type="number" />
-                <label>expose</label><input id="expose" className="input" type="checkbox" />
-                <label>in stock</label><input id="is-in-stock" className="input" type="checkbox" />
-                <label>description</label><input id="description" className="input-text" type="text" />
+                <label>name</label>
+                <input id="name" className="input" type="text" 
+                    defaultValue={state.name}
+                    onBlur={(ev) => inputChange(Object.assign(state, {name: ev.target.value}))}
+                    onKeyDown={inputKeydown}
+                />
+
+                <label>hrn</label>
+                <input id="price-hrn" className="input-text" type="number" 
+                    defaultValue={state.priceHrn}
+                    onBlur={(ev) => inputChange(Object.assign(state, {priceHrn: ev.target.value}))} 
+                    onKeyDown={inputKeydown}
+                />
+
+                <label>kop</label>
+                <input id="price-kop" className="input-text" type="number" 
+                    defaultValue={state.priceKop}
+                    onBlur={(ev) => inputChange(Object.assign(state, {priceKop: ev.target.value}))}
+                    onKeyDown={inputKeydown}
+                />
+
+                <label>expose</label>
+                <input id="expose" className="input" type="checkbox" 
+                    defaultValue={state.expose}
+                    // todo: don't check if any of the other fields are not filled
+                    onChange={(ev) => inputChange(Object.assign(state, {expose: ev.target.checked}))}
+                    onKeyDown={inputKeydown}
+                />
+
+                <label>in stock</label>
+                <input id="is-in-stock" className="input" type="checkbox"
+                    defaultValue={state.is_in_stock}
+                    onChange={(ev) => inputChange(Object.assign(state, {is_in_stock: ev.target.checked}))}
+                    onKeyDown={inputKeydown}
+                />
+
+                <label>description</label>
+                <input id="description" className="input-text" type="text" 
+                    defaultValue={state.description}
+                    onBlur={(ev) => inputChange(Object.assign(state, {description: ev.target.value}))}
+                    onKeyDown={inputKeydown}
+                />
+
                 <label>photos</label>
                 {photosActive 
                     ? 
