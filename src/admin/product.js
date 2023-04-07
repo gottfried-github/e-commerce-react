@@ -106,30 +106,30 @@ function main(api) {
         }
 
         return (
-            <form onSubmit={ev => ev.preventDefault()} className="edit-main">
-                <label>name</label>
-                <input id="name" className="input" type="text" 
+            <form onSubmit={ev => ev.preventDefault()} className="form">
+                <label className="label" htmlFor="name">name</label>
+                <input id="name" className="input-text" type="text" 
                     defaultValue={product.state.name}
                     onBlur={(ev) => product.inputChange(Object.assign(product.state, {name: ev.target.value}))}
                     onKeyDown={inputKeydown}
                 />
 
-                <label>hrn</label>
-                <input id="price-hrn" className="input-text" type="number" 
+                <label className="label" htmlFor="price-hrn">hrn</label>
+                <input id="price-hrn" className="input-number" type="number" 
                     defaultValue={product.state.priceHrn}
                     onBlur={(ev) => product.inputChange(Object.assign(product.state, {priceHrn: parseInt(ev.target.value, 10)}))} 
                     onKeyDown={inputKeydown}
                 />
 
-                <label>kop</label>
-                <input id="price-kop" className="input-text" type="number" 
+                <label className="label" htmlFor="price-kop">kop</label>
+                <input id="price-kop" className="input-number" type="number" 
                     defaultValue={product.state.priceKop}
                     onBlur={(ev) => product.inputChange(Object.assign(product.state, {priceKop: parseInt(ev.target.value, 10)}))}
                     onKeyDown={inputKeydown}
                 />
 
-                <label>expose</label>
-                <input id="expose" className="input" type="checkbox" 
+                <label className="label" htmlFor="expose">expose</label>
+                <input id="expose" className="input-checkbox" type="checkbox" 
                     defaultValue={product.state.expose}
                     onChange={(ev) => {
                         /* don't check if any of the other fields are not filled */
@@ -153,21 +153,21 @@ function main(api) {
                     onKeyDown={inputKeydown}
                 />
 
-                <label>in stock</label>
-                <input id="is-in-stock" className="input" type="checkbox"
+                <label className="label" htmlFor="is-in-stock">in stock</label>
+                <input id="is-in-stock" className="input-checkbox" type="checkbox"
                     defaultValue={product.state.is_in_stock}
                     onChange={(ev) => product.inputChange(Object.assign(product.state, {is_in_stock: ev.target.checked}))}
                     onKeyDown={inputKeydown}
                 />
 
-                <label>description</label>
+                <label className="label" htmlFor="description">description</label>
                 <input id="description" className="input-text" type="text" 
                     defaultValue={product.state.description}
                     onBlur={(ev) => product.inputChange(Object.assign(product.state, {description: ev.target.value}))}
                     onKeyDown={inputKeydown}
                 />
 
-                <label>photos</label>
+                <span className="label">photos</span>
                 {photosActive 
                     ? 
                     <PhotosUpload 
@@ -178,7 +178,7 @@ function main(api) {
                     : 
                     null}
                 <Photos photos={product.state.photos ? product.state.photos : []} />
-                <button onClick={photosBtn}>add photos</button>
+                <button className="control" onClick={photosBtn}>add photos</button>
             </form>
         )
     }
@@ -187,7 +187,7 @@ function main(api) {
         const files = useRef()
 
         return (
-            <div>
+            <div className="photos-container">
                 {<PhotosPickable 
                     photos={photosAll.map(photo => 
                         Object.assign({picked: photos.map(photo => photo.id).includes(photo.id)}, photo)
@@ -195,7 +195,7 @@ function main(api) {
                     pickCb={pickCb} 
                 />}
                 <div>
-                    <input ref={files} type='file' accept="image/*" multiple />
+                    <input id="photos-upload" ref={files} type='file' accept="image/*" multiple />
                     <button onClick={() => {
                         upload(files.current.files)
                     }}>upload</button>
@@ -211,7 +211,7 @@ function main(api) {
     */
     function PhotosPickable({photos, pickCb}) {
         return (
-            <div>{
+            <div className="photos">{
                 photos.map(photo => <PhotoPickable 
                     key={photo.id} 
                     photo={photo} 
@@ -223,7 +223,7 @@ function main(api) {
     }
 
     function Photos({photos}) {
-        return (<div>{photos.map((photo, i) => (
+        return (<div className="photos">{photos.map((photo, i) => (
             <div key={i} className="photo">
                 <img src={photo.path} />
             </div>
