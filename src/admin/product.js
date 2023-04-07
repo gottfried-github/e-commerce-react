@@ -20,6 +20,7 @@ function main(api) {
      * @description express hryvnias with kopiykas as kopiykas 
     */ 
     function hrnToKop(hrn, kop) {
+        console.log('hrnToKop - hrn, kop:', hrn, kop)
         return hrn * 100 + kop
     }
     
@@ -99,7 +100,7 @@ function main(api) {
         return (<div>{msg}</div>)
     }
 
-    function Product() {
+    function useProduct() {
         const params = useParams()
 
         const [state, setState] = useState({
@@ -112,9 +113,6 @@ function main(api) {
             description: ''
         })
         const [photos_all, setPhotosAll] = useState([])
-
-        // conditionally render `PhotosAll`
-        const [photosActive, setPhotosActive] = useState(false)
 
         useEffect(() => {
             api.product.get(params.id, (body) => {
@@ -163,6 +161,15 @@ function main(api) {
             })
         }
 
+        return {state, photos_all, photosUpload, pickCb, inputChange}
+    }
+
+    function Product() {
+        const product = useProduct()
+
+        // conditionally render `PhotosAll`
+        const [photosActive, setPhotosActive] = useState(false)
+
         const inputKeydown = (ev) => {
             // if key is Enter
             if (13 === ev.keyCode) return ev.preventDefault()
@@ -176,28 +183,28 @@ function main(api) {
             <form onSubmit={ev => ev.preventDefault()} className="edit-main">
                 <label>name</label>
                 <input id="name" className="input" type="text" 
-                    defaultValue={state.name}
-                    onBlur={(ev) => inputChange(Object.assign(state, {name: ev.target.value}))}
+                    defaultValue={product.state.name}
+                    onBlur={(ev) => product.inputChange(Object.assign(product.state, {name: ev.target.value}))}
                     onKeyDown={inputKeydown}
                 />
 
                 <label>hrn</label>
                 <input id="price-hrn" className="input-text" type="number" 
-                    defaultValue={state.priceHrn}
-                    onBlur={(ev) => inputChange(Object.assign(state, {priceHrn: ev.target.value}))} 
+                    defaultValue={product.state.priceHrn}
+                    onBlur={(ev) => product.inputChange(Object.assign(product.state, {priceHrn: parseInt(ev.target.value, 10)}))} 
                     onKeyDown={inputKeydown}
                 />
 
                 <label>kop</label>
                 <input id="price-kop" className="input-text" type="number" 
-                    defaultValue={state.priceKop}
-                    onBlur={(ev) => inputChange(Object.assign(state, {priceKop: ev.target.value}))}
+                    defaultValue={product.state.priceKop}
+                    onBlur={(ev) => product.inputChange(Object.assign(product.state, {priceKop: parseInt(ev.target.value, 10)}))}
                     onKeyDown={inputKeydown}
                 />
 
                 <label>expose</label>
                 <input id="expose" className="input" type="checkbox" 
-                    defaultValue={state.expose}
+                    defaultValue={product.state.expose}
                     onChange={(ev) => {
                         /* don't check if any of the other fields are not filled */
                         if (ev.target.checked) {
@@ -209,28 +216,28 @@ function main(api) {
                                 state.photos !== null &&
                                 state.cover_photo.length &&
                                 state.description.length
-                            ) return inputChange(Object.assign(state, {expose: ev.target.checked}))
+                            ) return product.inputChange(Object.assign(product.state, {expose: ev.target.checked}))
 
                             ev.target.checked = false
                             return
                         }
 
-                        return inputChange(Object.assign(state, {expose: ev.target.checked}))
+                        return product.inputChange(Object.assign(product.state, {expose: ev.target.checked}))
                     }}
                     onKeyDown={inputKeydown}
                 />
 
                 <label>in stock</label>
                 <input id="is-in-stock" className="input" type="checkbox"
-                    defaultValue={state.is_in_stock}
-                    onChange={(ev) => inputChange(Object.assign(state, {is_in_stock: ev.target.checked}))}
+                    defaultValue={product.state.is_in_stock}
+                    onChange={(ev) => product.inputChange(Object.assign(product.state, {is_in_stock: ev.target.checked}))}
                     onKeyDown={inputKeydown}
                 />
 
                 <label>description</label>
                 <input id="description" className="input-text" type="text" 
-                    defaultValue={state.description}
-                    onBlur={(ev) => inputChange(Object.assign(state, {description: ev.target.value}))}
+                    defaultValue={product.state.description}
+                    onBlur={(ev) => product.inputChange(Object.assign(product.state, {description: ev.target.value}))}
                     onKeyDown={inputKeydown}
                 />
 
@@ -238,13 +245,13 @@ function main(api) {
                 {photosActive 
                     ? 
                     <PhotosUpload 
-                        photosAll={photos_all ? photos_all : []} photos={state.photos ? state.photos : []} 
-                        upload={photosUpload} pickCb={pickCb}
+                        photosAll={product.photos_all ? product.photos_all : []} photos={product.state.photos ? product.state.photos : []} 
+                        upload={product.photosUpload} pickCb={product.pickCb}
                     />
                     
                     : 
                     null}
-                <Photos photos={state.photos ? state.photos : []} />
+                <Photos photos={product.state.photos ? product.state.photos : []} />
                 <button onClick={photosBtn}>add photos</button>
             </form>
         )
