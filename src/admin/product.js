@@ -1,82 +1,9 @@
 import React, {Component, useState, useEffect, useRef} from "react"
 import {useNavigate, useParams, redirect} from 'react-router-dom'
 
+import * as data from './product-data.js'
+
 function main(api) {
-
-    /**
-     * @param {Number} kop
-     * @description express kopiykas as hryvnias with kopiykas
-    */
-    function kopToHrn(kop) {
-        return {
-            hrn: Number(kop.toString().slice(0, kop.toString().length-2)),
-            kop: Number(kop.toString().slice(kop.toString().length-2))
-        }
-    }
-
-    /**
-     * @param {Number} hrn 
-     * @param {Number} kop
-     * @description express hryvnias with kopiykas as kopiykas 
-    */ 
-    function hrnToKop(hrn, kop) {
-        return hrn * 100 + kop
-    }
-    
-    /**
-     * @param {Object} fields
-     * @description convert api response to Product's state
-    */
-    function fieldsToState(fields) {
-        const state = {
-            name: fields.name || '',
-            expose: fields.expose || false,
-            is_in_stock: fields.is_in_stock || false,
-            photos: fields.photos || [],
-            cover_photo: fields.cover_photo || '',
-            description: fields.description || ''
-        }
-
-        if (undefined === fields.price) {
-            state.priceHrn = null
-            state.priceKop = null
-
-            return state
-        }
-        
-        const price = kopToHrn(fields.price)
-
-        state.priceHrn = price.hrn
-        state.priceKop = price.kop
-
-        return state
-    }
-
-    /**
-     * @param {Object} state
-     * @description convert Product's state to api request
-    */
-    function stateToFields(state) {
-        const fields = {}
-
-        if (null !== state.priceHrn || null !== state.priceKop) {
-            fields.price = null === state.priceHrn 
-                ? hrnToKop(0, state.priceKop)
-                : null === state.priceKop 
-                    ? hrnToKop(state.priceHrn, 0)
-                    : hrnToKop(state.priceHrn, state.priceKop)
-        }
-
-        if (undefined !== state.name && state.name) fields.name = state.name
-        if (undefined !== state.expose) fields.expose = state.expose
-        if (undefined !== state.is_in_stock) fields.is_in_stock = state.is_in_stock
-        if (state.photos) fields.photos = state.photos.map(photo => photo.id)
-        if (undefined !== state.cover_photo && state.cover_photo) fields.cover_photo = state.cover_photo
-        if (undefined !== state.description && state.description) fields.description = state.name
-
-        return fields
-    }
-
     function ProductCreate() {
         const navigate = useNavigate()
 
@@ -99,7 +26,7 @@ function main(api) {
         return (<div>{msg}</div>)
     }
 
-    function Product() {
+    function useProduct() {
         const params = useParams()
 
         const [state, setState] = useState({
@@ -113,13 +40,10 @@ function main(api) {
         })
         const [photos_all, setPhotosAll] = useState([])
 
-        // conditionally render `PhotosAll`
-        const [photosActive, setPhotosActive] = useState(false)
-
         useEffect(() => {
             api.product.get(params.id, (body) => {
                 setPhotosAll(body.photos_all)
-                setState(fieldsToState(body))
+                setState(data.dataToState(body))
             })
         }, [])
 
@@ -127,7 +51,7 @@ function main(api) {
         const photosUpload = (files) => {
             api.product.upload(params.id, files, (body) => {
                 setPhotosAll(body.photos_all)
-                setState(fieldsToState(body))
+                setState(data.dataToState(body))
             })
         }
 
@@ -142,18 +66,39 @@ function main(api) {
             }
 
             if (!photosPicked.length) {
-                return api.product.update(params.id, stateToFields({...state, photos: null}), ['photos'], (body) => {
+                return api.product.update(params.id, data.stateToData({...state, photos: null}), ['photos'], (body) => {
                     console.log('Product, product.update successCb - body:', body);
                     setPhotosAll(body.photos_all)
-                    setState(fieldsToState(body))
+                    setState(data.dataToState(body))
                 })
             }
 
-            api.product.update(params.id, stateToFields({...state, photos: photosPicked}), null, (body) => {
+            api.product.update(params.id, data.stateToData({...state, photos: photosPicked}), null, (body) => {
                 console.log('Product, product.update successCb - body:', body);
                 setPhotosAll(body.photos_all)
-                setState(fieldsToState(body))
+                setState(data.dataToState(body))
             })
+        }
+
+        const inputChange = (_state) => {
+            api.product.update(params.id, data.stateToData(_state), null, (body) => {
+                setPhotosAll(body.photos_all)
+                setState(data.dataToState(body))
+            })
+        }
+
+        return {state, photos_all, photosUpload, pickCb, inputChange}
+    }
+
+    function Product() {
+        const product = useProduct()
+
+        // conditionally render `PhotosAll`
+        const [photosActive, setPhotosActive] = useState(false)
+
+        const inputKeydown = (ev) => {
+            // if key is Enter
+            if (13 === ev.keyCode) return ev.preventDefault()
         }
 
         const photosBtn = () => {
@@ -162,23 +107,77 @@ function main(api) {
 
         return (
             <form onSubmit={ev => ev.preventDefault()} className="edit-main">
-                <label>name</label><input id="name" className="input" type="text" />
-                <label>hrn</label><input id="price-hrn" className="input-text" type="number" />
-                <label>kop</label><input id="price-kop" className="input-text" type="number" />
-                <label>expose</label><input id="expose" className="input" type="checkbox" />
-                <label>in stock</label><input id="is-in-stock" className="input" type="checkbox" />
-                <label>description</label><input id="description" className="input-text" type="text" />
+                <label>name</label>
+                <input id="name" className="input" type="text" 
+                    defaultValue={product.state.name}
+                    onBlur={(ev) => product.inputChange(Object.assign(product.state, {name: ev.target.value}))}
+                    onKeyDown={inputKeydown}
+                />
+
+                <label>hrn</label>
+                <input id="price-hrn" className="input-text" type="number" 
+                    defaultValue={product.state.priceHrn}
+                    onBlur={(ev) => product.inputChange(Object.assign(product.state, {priceHrn: parseInt(ev.target.value, 10)}))} 
+                    onKeyDown={inputKeydown}
+                />
+
+                <label>kop</label>
+                <input id="price-kop" className="input-text" type="number" 
+                    defaultValue={product.state.priceKop}
+                    onBlur={(ev) => product.inputChange(Object.assign(product.state, {priceKop: parseInt(ev.target.value, 10)}))}
+                    onKeyDown={inputKeydown}
+                />
+
+                <label>expose</label>
+                <input id="expose" className="input" type="checkbox" 
+                    defaultValue={product.state.expose}
+                    onChange={(ev) => {
+                        /* don't check if any of the other fields are not filled */
+                        if (ev.target.checked) {
+                            if (
+                                state.name.length &&
+                                state.priceHrn !== null &&
+                                state.priceKop !== null &&
+                                typeof(is_in_stock) === 'boolean' &&
+                                state.photos !== null &&
+                                state.cover_photo.length &&
+                                state.description.length
+                            ) return product.inputChange(Object.assign(product.state, {expose: ev.target.checked}))
+
+                            ev.target.checked = false
+                            return
+                        }
+
+                        return product.inputChange(Object.assign(product.state, {expose: ev.target.checked}))
+                    }}
+                    onKeyDown={inputKeydown}
+                />
+
+                <label>in stock</label>
+                <input id="is-in-stock" className="input" type="checkbox"
+                    defaultValue={product.state.is_in_stock}
+                    onChange={(ev) => product.inputChange(Object.assign(product.state, {is_in_stock: ev.target.checked}))}
+                    onKeyDown={inputKeydown}
+                />
+
+                <label>description</label>
+                <input id="description" className="input-text" type="text" 
+                    defaultValue={product.state.description}
+                    onBlur={(ev) => product.inputChange(Object.assign(product.state, {description: ev.target.value}))}
+                    onKeyDown={inputKeydown}
+                />
+
                 <label>photos</label>
                 {photosActive 
                     ? 
                     <PhotosUpload 
-                        photosAll={photos_all ? photos_all : []} photos={state.photos ? state.photos : []} 
-                        upload={photosUpload} pickCb={pickCb}
+                        photosAll={product.photos_all ? product.photos_all : []} photos={product.state.photos ? product.state.photos : []} 
+                        upload={product.photosUpload} pickCb={product.pickCb}
                     />
                     
                     : 
                     null}
-                <Photos photos={state.photos ? state.photos : []} />
+                <Photos photos={product.state.photos ? product.state.photos : []} />
                 <button onClick={photosBtn}>add photos</button>
             </form>
         )
