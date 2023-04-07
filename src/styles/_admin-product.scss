@@ -25,18 +25,18 @@
     }
 
     @media (min-width: 500px) {
-        grid-template-columns: 1fr max-content 1fr 1fr;
+        grid-template-columns: 1fr 0.5fr max-content 0.5fr 1fr 1fr;
 
         .label, .control {
-            grid-column: 2;
-        }
-    
-        .input-text, .input-number, .input-checkbox {
             grid-column: 3;
         }
     
+        .input-text, .input-number, .input-checkbox {
+            grid-column: 4;
+        }
+    
         .photos-container, .photos {
-            grid-column: 1 / 5;
+            grid-column: 2 / 6;
         }
     }
 }
