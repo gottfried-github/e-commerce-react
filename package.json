@@ -1,6 +1,6 @@
 {
   "name": "fi-front-end",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "front-end for fi-site",
   "main": "index.js",
   "type": "module",
