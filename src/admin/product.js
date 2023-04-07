@@ -198,8 +198,25 @@ function main(api) {
                 <label>expose</label>
                 <input id="expose" className="input" type="checkbox" 
                     defaultValue={state.expose}
-                    // todo: don't check if any of the other fields are not filled
-                    onChange={(ev) => inputChange(Object.assign(state, {expose: ev.target.checked}))}
+                    onChange={(ev) => {
+                        /* don't check if any of the other fields are not filled */
+                        if (ev.target.checked) {
+                            if (
+                                state.name.length &&
+                                state.priceHrn !== null &&
+                                state.priceKop !== null &&
+                                typeof(is_in_stock) === 'boolean' &&
+                                state.photos !== null &&
+                                state.cover_photo.length &&
+                                state.description.length
+                            ) return inputChange(Object.assign(state, {expose: ev.target.checked}))
+
+                            ev.target.checked = false
+                            return
+                        }
+
+                        return inputChange(Object.assign(state, {expose: ev.target.checked}))
+                    }}
                     onKeyDown={inputKeydown}
                 />
 
