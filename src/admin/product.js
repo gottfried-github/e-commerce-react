@@ -1,9 +1,17 @@
 import React, {Component, useState, useEffect, useRef} from "react"
 import {useNavigate, useParams, redirect} from 'react-router-dom'
 
+import {DndProvider} from 'react-dnd'
+import {HTML5Backend} from 'react-dnd-html5-backend'
+import {useDrag, useDrop} from 'react-dnd'
+
 import * as data from './product-data.js'
 
 function main(api) {
+    const DndTypes = {
+        item: 'ITEM'
+    }
+
     function ProductCreate() {
         const navigate = useNavigate()
 
@@ -80,6 +88,14 @@ function main(api) {
             })
         }
 
+        const photosReorderCb = (photos) => {
+            console.log('photosReorderCb - photos, state.photos:', photos, state.photos)
+            api.product.update(params.id, data.stateToData({...state, photos}), null, (body) => {
+                setPhotosAll(body.photos_all)
+                setState(data.dataToState(body))
+            })
+        }
+
         const inputChange = (_state) => {
             api.product.update(params.id, data.stateToData(_state), null, (body) => {
                 setPhotosAll(body.photos_all)
@@ -87,7 +103,7 @@ function main(api) {
             })
         }
 
-        return {state, photos_all, photosUpload, pickCb, inputChange}
+        return {state, photos_all, photosUpload, pickCb, photosReorderCb, inputChange}
     }
 
     function Product() {
@@ -177,7 +193,12 @@ function main(api) {
                     
                     : 
                     null}
-                <Photos photos={product.state.photos ? product.state.photos : []} />
+                <DndProvider backend={HTML5Backend}>
+                    <PhotosSortable 
+                        photos={product.state.photos ? product.state.photos : []} 
+                        reorderCb={product.photosReorderCb}
+                    />
+                </DndProvider>
                 <button className="control" onClick={photosBtn}>add photos</button>
             </form>
         )
@@ -222,14 +243,6 @@ function main(api) {
         )
     }
 
-    function Photos({photos}) {
-        return (<div className="photos">{photos.map((photo, i) => (
-            <div key={i} className="photo">
-                <img src={photo.path} />
-            </div>
-        ))}</div>)
-    }
-
     /**
      * @param {Object} photo photo to render
      * @param {Boolean} picked whether to render the photo checkmarked
@@ -253,6 +266,68 @@ function main(api) {
               <input type="checkbox" onChange={_pickCb}></input>
               }
           </div>
+        )
+    }
+
+    /**
+     * @param {Array} photos photos to render
+     * @param {Function} reorderCb callback to fire on reorder
+     * @description uses react-dnd to reorder rendered photos
+    */
+    function PhotosSortable({photos, reorderCb}) {
+        const dropCb = (target, source) => {
+            const _photos = [...photos]
+
+            const tI = _photos.map(photo => photo.id).indexOf(target)
+            const sI = _photos.map(photo => photo.id).indexOf(source)
+
+            // insert source before target
+            _photos.splice(tI, 0, _photos.splice(sI, 1)[0])
+
+            reorderCb(_photos)
+        }
+
+        return (
+            <div className="photos">
+                {photos.map(photo => <PhotoSortable 
+                    key={photo.id}
+                    id={photo.id} 
+                    photo={photo} 
+                    dropCb={dropCb}
+                />)}
+            </div>
+        )
+    }
+
+    /**
+     * @param {String} id the photo's id as it is in the array of photos at the level above
+     * @param {Object} photo the photo
+     * @param {Function} dropCb callback to fire when a photo is dropped on the photo
+     * @description uses react-dnd to implement draggable and droppable photos
+    */
+    function PhotoSortable({id, photo, dropCb}) {
+        const [collectedDrop, drop] = useDrop({
+            accept: DndTypes.item,
+            // hover: (item, monitor) => {
+            //     console.log('Item, hover - item:', item)
+            // },
+            drop: (item, monitor) => {
+                dropCb(id, item.id)
+            }
+        })
+    
+        const [collectedDrag, drag, dragPreview] = useDrag(() => ({
+            type: DndTypes.item,
+            item: {id},
+        }))
+    
+        const ref = useRef()
+        drag(drop(ref))
+
+        return (
+            <div className='photo' ref={ref}>
+                <img src={photo.path} />
+            </div>
         )
     }
 
