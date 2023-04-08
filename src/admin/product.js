@@ -201,7 +201,7 @@ function main(api) {
                     product.state.cover_photo 
                     
                     ? 
-                    <div className="photo">
+                    <div className="photo cover-photo">
                         <img src={product.state.cover_photo.path}/>
                     </div>
 
