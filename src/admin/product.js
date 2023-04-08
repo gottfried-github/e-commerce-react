@@ -88,6 +88,14 @@ function main(api) {
             })
         }
 
+        const coverPickCb = (photo) => {
+            console.log('coverPickCb, photo:', photo)
+            api.product.update(params.id, data.stateToData({...state, cover_photo: photo.id}), null, (body) => {
+                setPhotosAll(body.photos_all)
+                setState(data.dataToState(body))
+            })
+        }
+
         const photosReorderCb = (photos) => {
             console.log('photosReorderCb - photos, state.photos:', photos, state.photos)
             api.product.update(params.id, data.stateToData({...state, photos}), null, (body) => {
@@ -103,7 +111,7 @@ function main(api) {
             })
         }
 
-        return {state, photos_all, photosUpload, pickCb, photosReorderCb, inputChange}
+        return {state, photos_all, photosUpload, pickCb, coverPickCb, photosReorderCb, inputChange}
     }
 
     function Product() {
@@ -111,6 +119,7 @@ function main(api) {
 
         // conditionally render `PhotosAll`
         const [photosActive, setPhotosActive] = useState(false)
+        const [photoActive, setPhotoActive] = useState(false)
 
         const inputKeydown = (ev) => {
             // if key is Enter
@@ -119,6 +128,10 @@ function main(api) {
 
         const photosBtn = () => {
             setPhotosActive(!photosActive)
+        }
+
+        const photoBtn = () => {
+            setPhotoActive(!photoActive)
         }
 
         return (
@@ -183,6 +196,35 @@ function main(api) {
                     onKeyDown={inputKeydown}
                 />
 
+                <span className="label">cover photo</span>
+                {
+                    product.state.cover_photo 
+                    
+                    ? 
+                    <div className="photo">
+                        <img src={product.state.cover_photo.path}/>
+                    </div>
+
+                    :
+                    null
+                }
+
+                <button className="control" onClick={photoBtn}>pick photo</button>
+                {
+                    photoActive
+
+                    ?
+                    <PhotoPicker 
+                        photosAll={product.photos_all ? product.photos_all : []}
+                        photo={product.state.cover_photo ? product.state.cover_photo : null}
+                        pickCb={product.coverPickCb}
+                        upload={product.photosUpload}
+                    />
+
+                    : 
+                    null
+                }
+
                 <span className="label">photos</span>
                 {photosActive 
                     ? 
@@ -204,6 +246,23 @@ function main(api) {
         )
     }
 
+    function PhotoPicker({photosAll, photo, pickCb, upload}) {
+        return (
+            <div className="photos-container">
+                <PhotosRadios
+                    photos={photosAll.map(_photo => 
+                        ({
+                            ..._photo, 
+                            picked: photo ? photo.id === _photo.id : false
+                        })
+                    )}
+                    pickCb={pickCb}
+                />
+                <PhotosUpload upload={upload} />
+            </div>
+        )
+    }
+
     function PhotosPicker({photosAll, photos, pickCb, upload}) {
         return (
             <div className="photos-container">
@@ -218,17 +277,41 @@ function main(api) {
         )
     }
 
-    function PhotosUpload({upload}) {
-        const files = useRef()
-
+    function PhotosRadios({photos, pickCb}) {
         return (
-            <div>
-                <input id="photos-upload" ref={files} type='file' accept="image/*" multiple />
-                <button onClick={() => {
-                    upload(files.current.files)
-                }}>upload</button>
-            </div>
+            <div>{
+                photos.map(photo => <PhotoRadio 
+                    key={photo.id}
+                    photo={photo}
+                    picked={photo.picked}
+                    pickCb={pickCb}
+                    name={"photos-radios"}
+                />)
+            }</div>
         )
+    }
+
+    function PhotoRadio({photo, picked, pickCb, name}) {
+        const _pickCb = (ev) => {
+            if (!ev.target.checked) return
+            
+            pickCb(photo)
+          }
+  
+          return (
+            <div className="photo photo-pickable">
+                <img src={photo.path} />
+                
+                {
+                picked 
+                ? 
+                <input type="radio" name={name} onChange={_pickCb} defaultChecked></input>
+  
+                :
+                <input type="radio" name={name} onChange={_pickCb}></input>
+                }
+            </div>
+          )
     }
 
     /**
@@ -333,6 +416,19 @@ function main(api) {
         return (
             <div className='photo photo-sortable' ref={ref}>
                 <img src={photo.path} />
+            </div>
+        )
+    }
+
+    function PhotosUpload({upload}) {
+        const files = useRef()
+
+        return (
+            <div>
+                <input id="photos-upload" ref={files} type='file' accept="image/*" multiple />
+                <button onClick={() => {
+                    upload(files.current.files)
+                }}>upload</button>
             </div>
         )
     }
