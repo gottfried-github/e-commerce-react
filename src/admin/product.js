@@ -226,6 +226,12 @@ function main(api) {
                 }
 
                 <span className="label">photos</span>
+                <DndProvider backend={HTML5Backend}>
+                    <PhotosSortable 
+                        photos={product.state.photos ? product.state.photos : []} 
+                        reorderCb={product.photosReorderCb}
+                    />
+                </DndProvider>
                 {photosActive 
                     ? 
                     <PhotosPicker 
@@ -235,12 +241,6 @@ function main(api) {
                     
                     : 
                     null}
-                <DndProvider backend={HTML5Backend}>
-                    <PhotosSortable 
-                        photos={product.state.photos ? product.state.photos : []} 
-                        reorderCb={product.photosReorderCb}
-                    />
-                </DndProvider>
                 <button className="control" onClick={photosBtn}>add photos</button>
             </form>
         )
