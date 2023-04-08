@@ -67,7 +67,7 @@ function stateToData(state) {
     if (undefined !== state.expose) fields.expose = state.expose
     if (undefined !== state.is_in_stock) fields.is_in_stock = state.is_in_stock
     if (state.photos) fields.photos = state.photos.map(photo => photo.id)
-    if (undefined !== state.cover_photo && state.cover_photo) fields.cover_photo = state.cover_photo
+    if (undefined !== state.cover_photo && state.cover_photo) fields.cover_photo = state.cover_photo.id
     if (undefined !== state.description && state.description) fields.description = state.name
 
     return fields

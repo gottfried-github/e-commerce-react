@@ -90,7 +90,7 @@ function main(api) {
 
         const coverPickCb = (photo) => {
             console.log('coverPickCb, photo:', photo)
-            api.product.update(params.id, data.stateToData({...state, cover_photo: photo.id}), null, (body) => {
+            api.product.update(params.id, data.stateToData({...state, cover_photo: photo}), null, (body) => {
                 setPhotosAll(body.photos_all)
                 setState(data.dataToState(body))
             })
