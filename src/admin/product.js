@@ -232,15 +232,20 @@ function main(api) {
                         reorderCb={product.photosReorderCb}
                     />
                 </DndProvider>
-                {photosActive 
+                {
+                    photosActive 
+                    
                     ? 
                     <PhotosPicker 
-                        photosAll={product.photos_all ? product.photos_all : []} photos={product.state.photos ? product.state.photos : []} 
-                        upload={product.photosUpload} pickCb={product.pickCb}
+                        photosAll={product.photos_all ? product.photos_all : []} 
+                        photos={product.state.photos ? product.state.photos : []} 
+                        upload={product.photosUpload} 
+                        pickCb={product.pickCb}
                     />
                     
                     : 
-                    null}
+                    null
+                }
                 <button className="control" onClick={photosBtn}>add photos</button>
             </form>
         )
@@ -268,7 +273,10 @@ function main(api) {
             <div className="photos-container">
                 <PhotosPickable 
                     photos={photosAll.map(photo => 
-                        Object.assign({picked: photos.map(photo => photo.id).includes(photo.id)}, photo)
+                        ({
+                            ...photo, 
+                            picked: photos.map(photo => photo.id).includes(photo.id)
+                        })
                     )} 
                     pickCb={pickCb} 
                 />
