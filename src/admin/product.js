@@ -252,6 +252,14 @@ function main(api) {
         )
     }
 
+    /**
+     * 
+     * @param {Array} photosAll photos to pick from
+     * @param {Object || Null} photo the photo that's currently picked 
+     * @param {Function} pickCb fire when a photo gets picked
+     * @param {Function} upload fire when uploading files
+     * @description picks a single photo from photosAll
+     */ 
     function PhotoPicker({photosAll, photo, pickCb, upload}) {
         return (
             <div className="photos-container">
@@ -286,6 +294,11 @@ function main(api) {
         )
     }
 
+    /**
+     * @param {Array} photos photos to pick from
+     * @param {Function} pickCb fire when a photo gets picked
+     * @description use HTML input of type 'radio' to pick a single photo from a list
+    */
     function PhotosRadios({photos, pickCb}) {
         return (
             <div>{
@@ -300,6 +313,13 @@ function main(api) {
         )
     }
 
+    /**
+     * @param {Object} photo the photo to render
+     * @param {Boolean} picked whether the 'radio' should be checked
+     * @param {Function} pickCb fire when the 'radio' is checked (but not when it's unchecked)
+     * @param {String} name HTML input 'name' attribute
+     * @description uses HTML input type 'radio' to render a pickable photo. Only fires when element is picked (but not when it is unpicked)
+    */
     function PhotoRadio({photo, picked, pickCb, name}) {
         const _pickCb = (ev) => {
             if (!ev.target.checked) return
