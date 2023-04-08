@@ -186,7 +186,7 @@ function main(api) {
                 <span className="label">photos</span>
                 {photosActive 
                     ? 
-                    <PhotosUpload 
+                    <PhotosPicker 
                         photosAll={product.photos_all ? product.photos_all : []} photos={product.state.photos ? product.state.photos : []} 
                         upload={product.photosUpload} pickCb={product.pickCb}
                     />
@@ -204,23 +204,29 @@ function main(api) {
         )
     }
 
-    function PhotosUpload({photosAll, photos, pickCb, upload}) {
-        const files = useRef()
-
+    function PhotosPicker({photosAll, photos, pickCb, upload}) {
         return (
             <div className="photos-container">
-                {<PhotosPickable 
+                <PhotosPickable 
                     photos={photosAll.map(photo => 
                         Object.assign({picked: photos.map(photo => photo.id).includes(photo.id)}, photo)
                     )} 
                     pickCb={pickCb} 
-                />}
-                <div>
-                    <input id="photos-upload" ref={files} type='file' accept="image/*" multiple />
-                    <button onClick={() => {
-                        upload(files.current.files)
-                    }}>upload</button>
-                </div>
+                />
+                <PhotosUpload upload={upload}/>
+            </div>
+        )
+    }
+
+    function PhotosUpload({upload}) {
+        const files = useRef()
+
+        return (
+            <div>
+                <input id="photos-upload" ref={files} type='file' accept="image/*" multiple />
+                <button onClick={() => {
+                    upload(files.current.files)
+                }}>upload</button>
             </div>
         )
     }
