@@ -254,7 +254,7 @@ function main(api) {
         }
 
         return (
-          <div className="photo-pickable">
+          <div className="photo photo-pickable">
               <img src={photo.path} />
               
               {
@@ -325,7 +325,7 @@ function main(api) {
         drag(drop(ref))
 
         return (
-            <div className='photo' ref={ref}>
+            <div className='photo photo-sortable' ref={ref}>
                 <img src={photo.path} />
             </div>
         )
