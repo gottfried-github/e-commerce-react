@@ -13,7 +13,7 @@
     .input-text, .input-number, .input-checkbox {
         grid-column: 2;
     }
-    .photos-container, .photos {
+    .photos-container, .photos, .cover-photo {
         grid-column: 1 / 3;
     }
 
@@ -42,7 +42,7 @@
         .input-text, .input-number, .input-checkbox {
             grid-column: 4;
         }
-        .photos-container, .photos {
+        .photos-container, .photos, .cover-photo {
             grid-column: 2 / 6;
         }
     }
