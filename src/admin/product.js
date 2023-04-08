@@ -105,6 +105,7 @@ function main(api) {
         }
 
         const inputChange = (_state) => {
+            console.log('inputChange, _state:', _state)
             api.product.update(params.id, data.stateToData(_state), null, (body) => {
                 setPhotosAll(body.photos_all)
                 setState(data.dataToState(body))
@@ -164,13 +165,13 @@ function main(api) {
                         /* don't check if any of the other fields are not filled */
                         if (ev.target.checked) {
                             if (
-                                state.name.length &&
-                                state.priceHrn !== null &&
-                                state.priceKop !== null &&
-                                typeof(is_in_stock) === 'boolean' &&
-                                state.photos !== null &&
-                                state.cover_photo.length &&
-                                state.description.length
+                                product.state.name.length &&
+                                product.state.priceHrn !== null &&
+                                product.state.priceKop !== null &&
+                                typeof(product.state.is_in_stock) === 'boolean' &&
+                                product.state.photos !== null &&
+                                product.state.cover_photo &&
+                                product.state.description.length
                             ) return product.inputChange(Object.assign(product.state, {expose: ev.target.checked}))
 
                             ev.target.checked = false
