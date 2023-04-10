@@ -277,6 +277,13 @@ function main(api) {
         )
     }
 
+    /**
+     * @param {Array} photosAll photos to pick from
+     * @param {Array} photos the photos that are already picked
+     * @param {Function} pickCb fire when a photo gets checked or unchecked
+     * @param {Function} upload fire when files are chosen for upload
+     * @description picks one or multiple photos from photosAll
+    */
     function PhotosPicker({photosAll, photos, pickCb, upload}) {
         return (
             <div className="photos-container">
