@@ -105,6 +105,7 @@ function main(api) {
         }
 
         const inputChange = (_state) => {
+            console.log('inputChange, _state:', _state)
             api.product.update(params.id, data.stateToData(_state), null, (body) => {
                 setPhotosAll(body.photos_all)
                 setState(data.dataToState(body))
@@ -164,13 +165,13 @@ function main(api) {
                         /* don't check if any of the other fields are not filled */
                         if (ev.target.checked) {
                             if (
-                                state.name.length &&
-                                state.priceHrn !== null &&
-                                state.priceKop !== null &&
-                                typeof(is_in_stock) === 'boolean' &&
-                                state.photos !== null &&
-                                state.cover_photo.length &&
-                                state.description.length
+                                product.state.name.length &&
+                                product.state.priceHrn !== null &&
+                                product.state.priceKop !== null &&
+                                typeof(product.state.is_in_stock) === 'boolean' &&
+                                product.state.photos !== null &&
+                                product.state.cover_photo &&
+                                product.state.description.length
                             ) return product.inputChange(Object.assign(product.state, {expose: ev.target.checked}))
 
                             ev.target.checked = false
@@ -226,26 +227,39 @@ function main(api) {
                 }
 
                 <span className="label">photos</span>
-                {photosActive 
-                    ? 
-                    <PhotosPicker 
-                        photosAll={product.photos_all ? product.photos_all : []} photos={product.state.photos ? product.state.photos : []} 
-                        upload={product.photosUpload} pickCb={product.pickCb}
-                    />
-                    
-                    : 
-                    null}
                 <DndProvider backend={HTML5Backend}>
                     <PhotosSortable 
                         photos={product.state.photos ? product.state.photos : []} 
                         reorderCb={product.photosReorderCb}
                     />
                 </DndProvider>
+                {
+                    photosActive 
+                    
+                    ? 
+                    <PhotosPicker 
+                        photosAll={product.photos_all ? product.photos_all : []} 
+                        photos={product.state.photos ? product.state.photos : []} 
+                        upload={product.photosUpload} 
+                        pickCb={product.pickCb}
+                    />
+                    
+                    : 
+                    null
+                }
                 <button className="control" onClick={photosBtn}>add photos</button>
             </form>
         )
     }
 
+    /**
+     * 
+     * @param {Array} photosAll photos to pick from
+     * @param {Object || Null} photo the photo that's currently picked 
+     * @param {Function} pickCb fire when a photo gets picked
+     * @param {Function} upload fire when uploading files
+     * @description picks a single photo from photosAll
+     */ 
     function PhotoPicker({photosAll, photo, pickCb, upload}) {
         return (
             <div className="photos-container">
@@ -268,7 +282,10 @@ function main(api) {
             <div className="photos-container">
                 <PhotosPickable 
                     photos={photosAll.map(photo => 
-                        Object.assign({picked: photos.map(photo => photo.id).includes(photo.id)}, photo)
+                        ({
+                            ...photo, 
+                            picked: photos.map(photo => photo.id).includes(photo.id)
+                        })
                     )} 
                     pickCb={pickCb} 
                 />
@@ -277,6 +294,11 @@ function main(api) {
         )
     }
 
+    /**
+     * @param {Array} photos photos to pick from
+     * @param {Function} pickCb fire when a photo gets picked
+     * @description use HTML input of type 'radio' to pick a single photo from a list
+    */
     function PhotosRadios({photos, pickCb}) {
         return (
             <div>{
@@ -291,6 +313,13 @@ function main(api) {
         )
     }
 
+    /**
+     * @param {Object} photo the photo to render
+     * @param {Boolean} picked whether the 'radio' should be checked
+     * @param {Function} pickCb fire when the 'radio' is checked (but not when it's unchecked)
+     * @param {String} name HTML input 'name' attribute
+     * @description uses HTML input type 'radio' to render a pickable photo. Only fires when element is picked (but not when it is unpicked)
+    */
     function PhotoRadio({photo, picked, pickCb, name}) {
         const _pickCb = (ev) => {
             if (!ev.target.checked) return
