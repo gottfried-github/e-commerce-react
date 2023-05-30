@@ -21,3 +21,6 @@ The component's state has default values for the fields. The api data simply doe
 
 ### Photos
 [`pickCb`](https://github.com/gottfried-github/e-commerce-react/blob/master/src/admin/product.js#L65) adds or removes photos from `photos` (see [`photos_all` and `photos`](https://github.com/gottfried-github/e-commerce-api#photos_all-and-photos)) based on whether the photos are checked in [`PhotosPicker`](https://github.com/gottfried-github/e-commerce-react/blob/master/src/admin/photos-picker.js#L84). [`PhotosPicker`](https://github.com/gottfried-github/e-commerce-react/blob/master/src/admin/photos-picker.js#L84) renders `photos_all` with checkboxes. It is rendered conditionally depending on whether user clicks the 'add photos' button.
+
+### Time
+The [e-commerce project specification](https://github.com/gottfried-github/e-commerce-api#specification) says that time is stored as UTC in the application. `Date`'s `now` and `getTime` methods produce time in UTC, without accounting for timezone difference.

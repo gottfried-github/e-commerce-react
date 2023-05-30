@@ -16,7 +16,11 @@ function main(api) {
         const [msg, setMsg] = useState('')
 
         useEffect(() => {
-            api.product.create({expose: false}, (body, res) => {
+            api.product.create({
+                expose: false,
+                // see Time in readme
+                time: Date.now()
+            }, (body, res) => {
                 console.log("ProductCreate api success cb, body:", body)
                 return navigate(`${body}`)
             }, (body, res) => {
