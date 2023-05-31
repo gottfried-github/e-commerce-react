@@ -70,7 +70,7 @@ function stateToData(state) {
     if (state.photos) fields.photos = state.photos.map(photo => photo.id)
     if (undefined !== state.cover_photo && state.cover_photo) fields.cover_photo = state.cover_photo.id
     if (undefined !== state.description && state.description) fields.description = state.description
-    if ('number' === typeof(fields.time)) fields.time = state.time
+    if ('number' === typeof(state.time)) fields.time = state.time
 
     return fields
 }

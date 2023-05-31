@@ -148,6 +148,9 @@ function main(api) {
             time = parseIsoTime(_time.toISOString())
         }
 
+        const dateRef = useRef()
+        const timeRef = useRef()
+
         return (
             <form onSubmit={ev => ev.preventDefault()} className="form">
                 <label className="label" htmlFor="name">name</label>
@@ -213,12 +216,29 @@ function main(api) {
 
                 <label className="label" htmlFor="date">date</label>
                 <input id="date" type="date"
+                    ref={dateRef}
                     defaultValue={time ? time.date : ''}
+                    onBlur={(ev) => {
+                        product.inputChange({
+                            ...product.state,
+                            // see Sending time in readme
+                            time: new Date(`${ev.target.value}T${timeRef.current.value || '00:00'}`).getTime()
+                        })
+                    }}
                 />
 
                 <label className="label" htmlFor="time">time</label>
                 <input id="time" type="time"
+                    ref={timeRef}
                     defaultValue={time ? time.time : ''}
+                    onBlur={(ev) => {
+                        if (!dateRef.current.value) return 
+                        
+                        product.inputChange({
+                            ...product.state,
+                            time: new Date(`${dateRef.current.value}T${ev.target.value}`).getTime()
+                        })
+                    }}
                 />
 
                 <span className="label">cover photo</span>
