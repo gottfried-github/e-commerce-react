@@ -23,4 +23,21 @@ The component's state has default values for the fields. The api data simply doe
 [`pickCb`](https://github.com/gottfried-github/e-commerce-react/blob/master/src/admin/product.js#L65) adds or removes photos from `photos` (see [`photos_all` and `photos`](https://github.com/gottfried-github/e-commerce-api#photos_all-and-photos)) based on whether the photos are checked in [`PhotosPicker`](https://github.com/gottfried-github/e-commerce-react/blob/master/src/admin/photos-picker.js#L84). [`PhotosPicker`](https://github.com/gottfried-github/e-commerce-react/blob/master/src/admin/photos-picker.js#L84) renders `photos_all` with checkboxes. It is rendered conditionally depending on whether user clicks the 'add photos' button.
 
 ### Time
+#### Sending time
 The [e-commerce project specification](https://github.com/gottfried-github/e-commerce-api#specification) says that time is stored as UTC in the application. `Date`'s `now` and `getTime` methods produce time in UTC, without accounting for timezone difference.
+
+#### Reading time
+##### Converting the value from the REST API into javascript Date object
+[The expected format of the value is the ISO format](https://github.com/gottfried-github/e-commerce-api#data-structure), specifying that the time is specified without a timezone: i.e., specifying the trailing `Z` - e.g., `2023-01-01T22:00Z`. This format is interpreted by the `Date` constructor literally: the resulting `Date` object has it's time set to the time, specified in the fed string. 
+##### Converting javascript Date object to HTML date/time inputs
+HTML `date` and `time` inputs accept values in an ISO format: `YYYY-MM-DD` for `date` and `HH:MM:SS.MMMM` for `time` [`1`]. A `Date` object's `toISOString` method returns global (UTC) time but in the HTML inputs I need local time. 
+
+To convert global time to local, I set the `Date` object's time via `setTime`, passing it it's `getTime` value subtracted from it's `getTimezoneOffset` value, which is `getTimezoneOffset() * 60000` (`getTimezoneOffset` returns the offset in minutes [`2`] and I need it in milliseconds, hence the multiplication by `60000`): the new value has it's global time set to local time of the original date - now I can use `toISOString` and will get the local time of the original date.
+
+###### Notes
+1. [`1`]
+2. [`2`]
+
+###### Refs
+1. https://developer.mozilla.org/en-US/docs/Web/HTML/Date_and_time_formats
+2. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date

@@ -4,6 +4,8 @@ import {useNavigate, useParams, redirect} from 'react-router-dom'
 import {DndProvider} from 'react-dnd'
 import {HTML5Backend} from 'react-dnd-html5-backend'
 
+import parseIsoTime from 'parseisotime'
+
 import * as data from './product-data.js'
 import {PhotoPicker, PhotosPicker} from './photos-picker.js'
 import {PhotosSortable} from './photos-sortable.js'
@@ -138,6 +140,14 @@ function main(api) {
             setPhotoActive(!photoActive)
         }
 
+        let time = null
+        if (product.state.time) {
+            const _time = new Date(product.state.time)
+            // see Converting javascript Date object to HTML date/time inputs, in readme
+            _time.setTime(_time.getTime() - _time.getTimezoneOffset() * 60000)
+            time = parseIsoTime(_time.toISOString())
+        }
+
         return (
             <form onSubmit={ev => ev.preventDefault()} className="form">
                 <label className="label" htmlFor="name">name</label>
@@ -199,6 +209,16 @@ function main(api) {
                     defaultValue={product.state.description}
                     onBlur={(ev) => product.inputChange(Object.assign(product.state, {description: ev.target.value}))}
                     onKeyDown={inputKeydown}
+                />
+
+                <label className="label" htmlFor="date">date</label>
+                <input id="date" type="date"
+                    defaultValue={time ? time.date : ''}
+                />
+
+                <label className="label" htmlFor="time">time</label>
+                <input id="time" type="time"
+                    defaultValue={time ? time.time : ''}
                 />
 
                 <span className="label">cover photo</span>
