@@ -28,9 +28,10 @@ function dataToState(fields) {
         name: fields.name || '',
         expose: fields.expose || false,
         is_in_stock: fields.is_in_stock || false,
-        photos: fields.photos || [],
+        photos: fields.photos?.length || null,
         cover_photo: fields.cover_photo || '',
-        description: fields.description || ''
+        description: fields.description || '',
+        time: fields.time ? new Date(fields.time).getTime() : null
     }
 
     if (undefined === fields.price) {
@@ -69,6 +70,7 @@ function stateToData(state) {
     if (state.photos) fields.photos = state.photos.map(photo => photo.id)
     if (undefined !== state.cover_photo && state.cover_photo) fields.cover_photo = state.cover_photo.id
     if (undefined !== state.description && state.description) fields.description = state.description
+    if ('number' === typeof(state.time)) fields.time = state.time
 
     return fields
 }

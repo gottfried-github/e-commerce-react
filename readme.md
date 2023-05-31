@@ -24,14 +24,14 @@ The component's state has default values for the fields. The api data simply doe
 
 ### Time
 #### Sending time
-The [e-commerce project specification](https://github.com/gottfried-github/e-commerce-api#the-time-field) says that time is stored as UTC in the application. 
+The [e-commerce project specification](https://github.com/gottfried-github/e-commerce-api#specification) says that time is stored as UTC in the application. 
 `Date`'s `now` and `getTime` methods produce time in UTC, without accounting for timezone difference: in `CreateProduct`, I use one of them to add a `time` representing the moment the product is created.
 When passed an ISO string to the `Date` constructor, if the timezone information is not included in the string but time information (the info after the `T`) is included (e.g., `2023-01-01T00:00`), the time in the string will be interpreted as local time. In the `Product` view, I read the information on time from the HTML inputs and create a `Date` object with it, which results in it's time being set to the time in UTC, corresponding to the time, specified to the constructor, which is what the API expects.
 If no date is set in the date HTML input, but time is set, in the HTML input, I do not send anything to the server.
 
 #### Reading time
 ##### Converting the value from the REST API into javascript Date object
-[The expected format of the value is the ISO format](https://github.com/gottfried-github/e-commerce-api#implementation-note), specifying that the time is specified without a timezone: i.e., specifying the trailing `Z` - e.g., `2023-01-01T22:00Z`. This format is interpreted by the `Date` constructor literally: the resulting `Date` object has it's time set to the time, specified in the fed string. 
+[The expected format of the value is the ISO format](https://github.com/gottfried-github/e-commerce-api#data-structure), specifying that the time is specified without a timezone: i.e., specifying the trailing `Z` - e.g., `2023-01-01T22:00Z`. This format is interpreted by the `Date` constructor literally: the resulting `Date` object has it's time set to the time, specified in the fed string. 
 
 ##### Time representation in the Product controller
 `time` has to be sent to the REST API as a number, representing the milliseconds. Hence, the controller should represent it in this format. I thus convert `time` from the string, received from the API into the number in `dataToState`, before it enters the controller.

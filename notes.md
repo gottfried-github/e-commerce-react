@@ -1,3 +1,17 @@
+# Dates
+## Converting javascript Date object to HTML date/time inputs
+HTML `date` and `time` inputs accept values in an ISO format: `YYYY-MM-DD` for `date` and `HH:MM:SS.MMMM` for `time` [`1`]. A `Date` object's `toISOString` method returns global (UTC) time but in the HTML inputs I need local time. 
+
+To convert global time to local, I set the `Date` object's time via `setTime`, passing it it's `getTime` value subtracted from it's `getTimezoneOffset` value, which is `getTimezoneOffset() * 60000` (`getTimezoneOffset` returns the offset in minutes [`2`] and I need it in milliseconds, hence the multiplication by `60000`): the new value has it's global time set to local time of the original date - now I can use `toISOString` and will get the local time of the original date.
+
+## Notes
+1. [`1`]
+2. [`2`]
+
+## Refs
+1. https://developer.mozilla.org/en-US/docs/Web/HTML/Date_and_time_formats
+2. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
+
 # Money UI: interpreting user input
 For `kopiyka`s input the following seems an intuitive interpretation (though, the input's units, `kopiyka`s, are explicitly stated to the user):
 if user inputs `5` they mean `50`. If they mean `5` they should input `05`. 
