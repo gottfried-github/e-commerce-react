@@ -46,7 +46,8 @@ function main(api) {
             is_in_stock: false,
             photos: null,
             cover_photo: '',
-            description: ''
+            description: '',
+            time: ''
         })
         const [photos_all, setPhotosAll] = useState([])
 
@@ -173,7 +174,8 @@ function main(api) {
                                 typeof(product.state.is_in_stock) === 'boolean' &&
                                 product.state.photos !== null &&
                                 product.state.cover_photo &&
-                                product.state.description.length
+                                product.state.description.length &&
+                                product.state.time.length
                             ) return product.inputChange(Object.assign(product.state, {expose: ev.target.checked}))
 
                             ev.target.checked = false
