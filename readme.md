@@ -26,6 +26,7 @@ The component's state has default values for the fields. The api data simply doe
 #### Sending time
 The [e-commerce project specification](https://github.com/gottfried-github/e-commerce-api#specification) says that time is stored as UTC in the application. 
 `Date`'s `now` and `getTime` methods produce time in UTC, without accounting for timezone difference: in `CreateProduct`, I use one of them to add a `time` representing the moment the product is created.
+
 When passed an ISO string to the `Date` constructor, if the timezone information is not included in the string but time information (the info after the `T`) is included (e.g., `2023-01-01T00:00`), the time in the string will be interpreted as local time. In the `Product` view, I read the information on time from the HTML inputs and create a `Date` object with it, which results in it's time being set to the time in UTC, corresponding to the time, specified to the constructor, which is what the API expects.
 If no date is set in the date HTML input, but time is set, in the HTML input, I do not send anything to the server.
 
