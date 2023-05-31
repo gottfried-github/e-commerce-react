@@ -4,6 +4,8 @@ import {useNavigate, useParams, redirect} from 'react-router-dom'
 import {DndProvider} from 'react-dnd'
 import {HTML5Backend} from 'react-dnd-html5-backend'
 
+import parseIsoTime from 'parseisotime'
+
 import * as data from './product-data.js'
 import {PhotoPicker, PhotosPicker} from './photos-picker.js'
 import {PhotosSortable} from './photos-sortable.js'
@@ -47,7 +49,7 @@ function main(api) {
             photos: null,
             cover_photo: '',
             description: '',
-            time: ''
+            time: null
         })
         const [photos_all, setPhotosAll] = useState([])
 
@@ -138,6 +140,17 @@ function main(api) {
             setPhotoActive(!photoActive)
         }
 
+        let time = null
+        if (product.state.time) {
+            const _time = new Date(product.state.time)
+            // see Converting javascript Date object to HTML date/time inputs, in readme
+            _time.setTime(_time.getTime() - _time.getTimezoneOffset() * 60000)
+            time = parseIsoTime(_time.toISOString())
+        }
+
+        const dateRef = useRef()
+        const timeRef = useRef()
+
         return (
             <form onSubmit={ev => ev.preventDefault()} className="form">
                 <label className="label" htmlFor="name">name</label>
@@ -175,7 +188,7 @@ function main(api) {
                                 product.state.photos !== null &&
                                 product.state.cover_photo &&
                                 product.state.description.length &&
-                                product.state.time.length
+                                product.state.time !== null
                             ) return product.inputChange(Object.assign(product.state, {expose: ev.target.checked}))
 
                             ev.target.checked = false
@@ -199,6 +212,33 @@ function main(api) {
                     defaultValue={product.state.description}
                     onBlur={(ev) => product.inputChange(Object.assign(product.state, {description: ev.target.value}))}
                     onKeyDown={inputKeydown}
+                />
+
+                <label className="label" htmlFor="date">date</label>
+                <input id="date" type="date"
+                    ref={dateRef}
+                    defaultValue={time ? time.date : ''}
+                    onBlur={(ev) => {
+                        product.inputChange({
+                            ...product.state,
+                            // see Sending time in readme
+                            time: new Date(`${ev.target.value}T${timeRef.current.value || '00:00'}`).getTime()
+                        })
+                    }}
+                />
+
+                <label className="label" htmlFor="time">time</label>
+                <input id="time" type="time"
+                    ref={timeRef}
+                    defaultValue={time ? time.time : ''}
+                    onBlur={(ev) => {
+                        if (!dateRef.current.value) return 
+                        
+                        product.inputChange({
+                            ...product.state,
+                            time: new Date(`${dateRef.current.value}T${ev.target.value}`).getTime()
+                        })
+                    }}
                 />
 
                 <span className="label">cover photo</span>
