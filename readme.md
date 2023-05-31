@@ -29,6 +29,10 @@ The [e-commerce project specification](https://github.com/gottfried-github/e-com
 #### Reading time
 ##### Converting the value from the REST API into javascript Date object
 [The expected format of the value is the ISO format](https://github.com/gottfried-github/e-commerce-api#data-structure), specifying that the time is specified without a timezone: i.e., specifying the trailing `Z` - e.g., `2023-01-01T22:00Z`. This format is interpreted by the `Date` constructor literally: the resulting `Date` object has it's time set to the time, specified in the fed string. 
+
+##### Time representation in the Product controller
+`time` has to be sent to the REST API as a number, representing the milliseconds. Hence, the controller should represent it in this format. I thus convert `time` from the string, received from the API into the number in `dataToState`, before it enters the controller.
+
 ##### Converting javascript Date object to HTML date/time inputs
 HTML `date` and `time` inputs accept values in an ISO format: `YYYY-MM-DD` for `date` and `HH:MM:SS.MMMM` for `time` [`1`]. A `Date` object's `toISOString` method returns global (UTC) time but in the HTML inputs I need local time. 
 

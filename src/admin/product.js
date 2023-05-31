@@ -49,7 +49,7 @@ function main(api) {
             photos: null,
             cover_photo: '',
             description: '',
-            time: ''
+            time: null
         })
         const [photos_all, setPhotosAll] = useState([])
 
@@ -185,7 +185,7 @@ function main(api) {
                                 product.state.photos !== null &&
                                 product.state.cover_photo &&
                                 product.state.description.length &&
-                                product.state.time.length
+                                product.state.time !== null
                             ) return product.inputChange(Object.assign(product.state, {expose: ev.target.checked}))
 
                             ev.target.checked = false
