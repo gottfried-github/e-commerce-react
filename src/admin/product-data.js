@@ -28,7 +28,7 @@ function dataToState(fields) {
         name: fields.name || '',
         expose: fields.expose || false,
         is_in_stock: fields.is_in_stock || false,
-        photos: fields.photos?.length || null,
+        photos: fields.photos?.length ? fields.photos : null,
         cover_photo: fields.cover_photo || '',
         description: fields.description || '',
         time: fields.time ? new Date(fields.time).getTime() : null
