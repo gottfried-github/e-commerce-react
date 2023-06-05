@@ -1,0 +1,35 @@
+import React, {useState, useEffect} from "react"
+
+function Header() {
+    const [isOpen, setIsOpen] = useState(false)
+
+    return (
+        <header className={`header-main${isOpen ? ' header-main_opened' : ''}`}>
+            <div id="logo"></div>
+            <nav className="nav-main">
+                <ul className="nav-links">
+                    <li className="nav-link">Вироби</li>
+                    <li className="nav-link">Послуги</li>
+                    <li className="nav-link">Про мене</li>
+                </ul>
+
+                <ul className="social-links">
+                    <li id="instagram" className="social-link"></li>
+                    <li id="facebook" className="social-link"></li>
+                </ul>
+            </nav>
+            <div id="menu-open" 
+                onClick={() => {
+                    setIsOpen(true)
+                }
+            }></div>
+            <div id="menu-close" 
+                onClick={() => {
+                    setIsOpen(false)
+                }
+            }></div>
+        </header>
+    )
+}
+
+export default Header
