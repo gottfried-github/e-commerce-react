@@ -67,6 +67,8 @@
         overflow-y: scroll;
 
         .nav-main {
+            justify-self: flex-start;
+            
             display: flex;
             flex-direction: column;
             row-gap: 50px;
