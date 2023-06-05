@@ -56,6 +56,10 @@
         display: none;
     }
 
+    #timestamp {
+        display: none;
+    }
+
     &.header-main_opened {
         position: fixed;
         width: 100vw;
@@ -127,6 +131,14 @@
             background-position: center;
             background-size: contain;
             background-repeat: no-repeat;
+        }
+
+        #timestamp {
+            display: block;
+            grid-row: 3;
+            grid-column: 2;
+
+            margin: 20px 0 30px 0;
         }
     }
 

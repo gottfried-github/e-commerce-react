@@ -28,6 +28,7 @@ function Header() {
                     setIsOpen(false)
                 }
             }></div>
+            <p id="timestamp">{`fi-jewelry.com.ua, ${new Date().getFullYear()}. ©`}</p>
         </header>
     )
 }
