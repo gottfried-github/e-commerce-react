@@ -14,8 +14,8 @@ function Header() {
                 </ul>
 
                 <ul className="social-links">
-                    <li id="instagram" className="social-link"></li>
-                    <li id="facebook" className="social-link"></li>
+                    <li className="social-link instagram"></li>
+                    <li className="social-link facebook"></li>
                 </ul>
             </nav>
             <div id="menu-open" 
