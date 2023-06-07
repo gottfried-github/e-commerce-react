@@ -8,9 +8,11 @@ export default (api) => {
         }, () => {
             console.log('api.product.getMany, failureCb - body:', body)
         })
-        
+
         return (
-            <div id="works">Works</div>
+            <div id="products">
+                Works
+            </div>
         )
     }
 }

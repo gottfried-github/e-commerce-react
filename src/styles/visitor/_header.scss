@@ -139,14 +139,14 @@
     }
 }
 
-.page_works .header-main {
+.page_home .header-main {
     // 1616px (320px (product-card width) * 5) + 16px (horizontal margin) * 2
     @media (min-width: 1648px) {
         grid-template-columns: 1fr 1616px 1fr;
     }
 }
 
-.page_work .header-main, .page_about .header-main, .page_services .header-main {
+.page_product .header-main {
     // 1440px + 16px * 2
     @media (min-width: 1472px) {
         grid-template-columns: 1fr 1440px 1fr;

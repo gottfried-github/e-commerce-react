@@ -5,28 +5,20 @@ import { BrowserRouter, Routes, Route, Outlet, Link, Navigate, useParams, useNav
 import Header from './visitor/header.js'
 import Footer from './visitor/footer.js'
 
-import works from './visitor/works.js'
-import services from './visitor/services.js'
-import about from './visitor/about.js'
+import home from './visitor/home.js'
 import product from './visitor/product.js'
 
 function main(container, api) {
     function Index() {
-        const matchWorks = useMatch('/works')
-        const matchWork = useMatch('/works/:id')
-        const matchServices = useMatch('/services')
-        const matchAbout = useMatch('/about')
+        const matchHome = useMatch('/home')
+        const matchProduct = useMatch('/product/:id')
         
         const page = 
-            matchWorks 
-                ? 'page_works'
-                : matchWork 
-                    ? 'page_work'
-                    : matchServices 
-                        ? 'page_services'
-                        : matchAbout 
-                            ? 'page_about'
-                            : null
+            matchHome 
+                ? 'page_home'
+                : matchProduct 
+                    ? 'page_product'
+                    : null
 
         return (
             <div className={`wrapper ${page ? ` ${page}` : ''}`}>
@@ -39,20 +31,16 @@ function main(container, api) {
         )
     }
 
-    const Works = works(api)
-    const Services = services(api)
-    const About = about(api)
+    const Home = home(api)
     const Product = product(api)
 
     function App() {
         return (
             <Routes>
                 <Route element={<Index />}>
-                    <Route index element={<Navigate to="works" />}></Route>
-                    <Route path="works" element={<Works />} />
-                    <Route path="works/:id" element={<Product />} />
-                    <Route path="services" element={<Services />} />
-                    <Route path="about" element={<About />} />
+                    <Route index element={<Navigate to="home" />}></Route>
+                    <Route path="home" element={<Home />} />
+                    <Route path="product/:id" element={<Product />} />
                 </Route>
             </Routes>
         )

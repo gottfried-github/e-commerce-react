@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from "react"
+import {Link} from 'react-router-dom'
 
 function Header() {
     const [isOpen, setIsOpen] = useState(false)
@@ -8,9 +9,9 @@ function Header() {
             <div id="logo"></div>
             <nav className="nav-main">
                 <ul className="nav-links">
-                    <li className="nav-link">Вироби</li>
-                    <li className="nav-link">Послуги</li>
-                    <li className="nav-link">Про мене</li>
+                    <li className="nav-link-container"><Link className="nav-link" to="#products">Вироби</Link></li>
+                    <li className="nav-link-container"><Link className="nav-link" to="#services">Послуги</Link></li>
+                    <li className="nav-link-container"><Link className="nav-link" to="#about">Про мене</Link></li>
                 </ul>
 
                 <ul className="social-links">
