@@ -45,12 +45,6 @@ function main(container, api) {
     const Product = product(api)
 
     function App() {
-        api.product.getMany('name', 1, false, (body) => {
-            console.log('api.product.getMany, successCb - body:', body)
-        }, () => {
-            console.log('api.product.getMany, failureCb - body:', body)
-        })
-
         return (
             <Routes>
                 <Route element={<Index />}>
