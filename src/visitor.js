@@ -1,5 +1,8 @@
-import React, {Component, useState, useEffect} from "react"
+import React, {useState, useEffect} from "react"
 import ReactDOM from "react-dom/client"
+
+import Header from './visitor/header.js'
+import Footer from './visitor/footer.js'
 
 function main(container, api) {
     function App() {
@@ -9,7 +12,12 @@ function main(container, api) {
             console.log('api.product.getMany, failureCb - body:', body)
         })
 
-        return <div></div>
+        return (
+            <div className="app">
+                <Header />
+                <Footer />
+            </div>
+        )
     }
 
     const root = ReactDOM.createRoot(container)

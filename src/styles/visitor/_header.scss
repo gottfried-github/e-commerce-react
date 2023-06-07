@@ -1,0 +1,143 @@
+.header-main {
+    display: grid;
+    grid-template-columns: 16px 1fr 16px;
+    align-items: center;
+
+    height: 75px;
+
+    background-color: $primary;
+    color: $accent;
+    
+    #logo {
+        grid-column: 2;
+        grid-row: 1;
+
+        width: 32px;
+        height: 32px;
+
+        background-image: url('../assets/images/logo.svg');
+        background-position: center;
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+
+    .nav-main {
+        display: none;
+
+        .nav-links {
+            display: flex;
+
+            margin: 0;
+            padding: 0px;
+
+            list-style-type: none;
+        }
+
+        .social-links {
+            display: none;
+        }
+    }
+
+    #menu-open {
+        grid-column: 2;
+        grid-row: 1;
+        justify-self: flex-end;
+
+        width: 24px;
+        height: 24px;
+
+        background-image: url('../assets/images/menu-open.svg');
+        background-position: center;
+        // background-size: contain;
+        background-repeat: no-repeat;
+    }
+
+    #menu-close {
+        display: none;
+    }
+
+    #timestamp {
+        display: none;
+    }
+
+    &.header-main_opened {
+        position: fixed;
+        width: 100vw;
+        height: 100vh;
+
+        grid-template-rows: 75px 1fr;
+
+        // see Mobile menu view in product spec
+        overflow-y: scroll;
+
+        .nav-main {
+            justify-self: flex-start;
+            
+            display: flex;
+            flex-direction: column;
+            row-gap: 20px;
+
+            grid-column: 2;
+            grid-row: 2;
+
+            .nav-links {
+                flex-direction: column;
+                row-gap: 8px;
+            }
+
+            .social-links {
+                display: flex;
+            }
+        }
+
+        #menu-open {
+            display: none;
+        }
+
+        #menu-close {
+            display: block;
+
+            grid-column: 2;
+            grid-row: 1;
+            justify-self: flex-end;
+
+            width: 24px;
+            height: 24px;
+
+            background-image: url('../assets/images/cross.svg');
+            background-position: center;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        #timestamp {
+            display: block;
+            grid-row: 3;
+            grid-column: 2;
+
+            margin: 20px 0 30px 0;
+        }
+    }
+
+    @media (min-width: 325px) {
+        .nav-main {
+            display: block;
+            grid-column: 2;
+            grid-row: 1;
+            justify-self: flex-end;
+
+            .nav-links {
+                column-gap: 24px;
+            }
+        }
+
+        #menu-open {
+            display: none;
+        }
+    }
+
+    // 1616px (320px (product-card width) * 5) + 16px (horizontal margin) * 2
+    @media (min-width: 1648px) {
+        grid-template-columns: 1fr 1616px 1fr;
+    }
+}
