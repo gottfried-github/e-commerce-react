@@ -1,6 +1,6 @@
 .footer-main {
     display: grid;
-    grid-template-columns: 16px 1fr 16px;
+    grid-template-columns: 8px 1fr 8px;
 
     padding: 150px 0px;
 
@@ -9,6 +9,10 @@
 
     .footer-main__content {
         grid-column: 2;
+    }
+
+    @media (min-width: 325px) {
+        grid-template-columns: 16px 1fr 16px;
     }
 }
 
