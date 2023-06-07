@@ -1,6 +1,6 @@
 .header-main {
     display: grid;
-    grid-template-columns: 16px 1fr 16px;
+    grid-template-columns: 8px 1fr 8px;
     align-items: center;
 
     height: 75px;
@@ -120,6 +120,8 @@
     }
 
     @media (min-width: 325px) {
+        grid-template-columns: 16px 1fr 16px;
+
         .nav-main {
             display: block;
             grid-column: 2;
@@ -135,9 +137,18 @@
             display: none;
         }
     }
+}
 
+.page_home .header-main {
     // 1616px (320px (product-card width) * 5) + 16px (horizontal margin) * 2
     @media (min-width: 1648px) {
         grid-template-columns: 1fr 1616px 1fr;
+    }
+}
+
+.page_product .header-main {
+    // 1440px + 16px * 2
+    @media (min-width: 1472px) {
+        grid-template-columns: 1fr 1440px 1fr;
     }
 }
