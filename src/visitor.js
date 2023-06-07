@@ -12,8 +12,24 @@ import product from './visitor/product.js'
 
 function main(container, api) {
     function Index() {
+        const matchWorks = useMatch('/works')
+        const matchWork = useMatch('/works/:id')
+        const matchServices = useMatch('/services')
+        const matchAbout = useMatch('/about')
+        
+        const page = 
+            matchWorks 
+                ? 'page_works'
+                : matchWork 
+                    ? 'page_work'
+                    : matchServices 
+                        ? 'page_services'
+                        : matchAbout 
+                            ? 'page_about'
+                            : null
+
         return (
-            <div className={`wrapper`}>
+            <div className={`wrapper ${page ? ` ${page}` : ''}`}>
                 <Header />
                 <main id="main">
                     <Outlet></Outlet>

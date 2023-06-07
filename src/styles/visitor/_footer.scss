@@ -10,9 +10,18 @@
     .footer-main__content {
         grid-column: 2;
     }
-    
+}
+
+.page_works .footer-main {
     // 1616px (320px (product-card width) * 5) + 16px (horizontal margin) * 2
     @media (min-width: 1648px) {
         grid-template-columns: 1fr 1616px 1fr;
+    }
+}
+
+.page_work .footer-main, .page_about .footer-main, .page_services .footer-main {
+    // 1440px + 16px * 2
+    @media (min-width: 1472px) {
+        grid-template-columns: 1fr 1440px 1fr;
     }
 }
