@@ -52,4 +52,4 @@ To convert global time to local, I set the `Date` object's time via `setTime`, p
 2. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
 
 ### Page identification for CSS
-I explicitly specify paths to the different pages to determine whether one of them matches the current location. I then assign a class name to each of the pages and use those class names in CSS to match different pages, for example, to implement the [Header and footer width difference on different pages]() specification.
+I explicitly specify paths to the different pages to determine whether one of them matches the current location. I then assign a class name to each of the pages and use those class names in CSS to match different pages, for example, to implement the [Header and footer width difference on different pages](https://github.com/gottfried-github/e-commerce-product#header-and-footer-width-difference-on-different-pages) specification.
