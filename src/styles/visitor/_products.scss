@@ -1,0 +1,36 @@
+.product-card {
+    width: 320px;
+
+    padding: 0px;
+    margin: 0px;
+
+    list-style-type: none;
+
+    .product-card__photo-container {
+        display: block;
+
+        margin: 0 0 10px 0;
+    }
+
+    .product-card__photo {
+        width: 320px;
+        height: 230px;
+
+        object-fit: cover;
+    }
+
+    .product-card__info {
+        margin: 0 0 10px 0;
+        
+        .product-card__price, .product-card__name {
+            display: block;
+
+            margin: 0;
+            padding: 0px;
+        }
+
+        .product-card__price {
+            font-weight: 600;
+        }
+    }
+}
