@@ -6,9 +6,12 @@ import {kopToHrn} from '../price.js'
 export default (api) => {  
     return () => {
         const [products, setProducts] = useState([])
+        const [fieldName, setFieldName] = useState('time')
+        const [dir, setDir] = useState(-1)
+        const [inStock, setInStock] = useState(false)
 
         useEffect(() => {
-            api.product.getMany('name', 1, false, (body) => {
+            api.product.getMany(fieldName, dir, inStock, (body) => {
                 console.log('api.product.getMany, successCb - body:', body)
                 setProducts(body)
             }, () => {
