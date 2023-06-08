@@ -3,6 +3,8 @@ import {Link} from 'react-router-dom'
 
 import {kopToHrn} from '../price.js'
 
+import Filters from './filters.js'
+
 export default (api) => {  
     return () => {
         const [products, setProducts] = useState([])
@@ -19,21 +21,45 @@ export default (api) => {
             })
         }, [])
 
+        useEffect(() => {
+            api.product.getMany(fieldName, dir, inStock, (body) => {
+                console.log('api.product.getMany, successCb - body:', body)
+                setProducts(body)
+            }, () => {
+                console.log('api.product.getMany, failureCb - body:', body)
+            })
+        }, [fieldName, dir, inStock])
+
         return (
             <section id="products">
-                <ul className="filters"></ul>
-                <ul className="product-cards">
-                    {
-                        products.map((product) => {
-                            return <ProductCard 
-                                id={product.id}
-                                photoUrl={product.cover_photo.path}
-                                name={product.name}
-                                price={product.price}
-                            />
-                        })
-                    }
-                </ul>
+                <div className="products-container">
+                    <Filters 
+                        fieldName={fieldName}
+                        dir={dir}
+                        inStock={inStock}
+                        fieldNameChangeCb={(fieldName) => {
+                            setFieldName(fieldName)
+                        }}
+                        dirChangeCb={(dir) => {
+                            setDir(dir)
+                        }}
+                        inStockChangeCb={(inStock) => {
+                            setInStock(inStock)
+                        }}
+                    />
+                    <ul className="product-cards">
+                        {
+                            products.map((product) => {
+                                return <ProductCard 
+                                    id={product.id}
+                                    photoUrl={product.cover_photo.path}
+                                    name={product.name}
+                                    price={product.price}
+                                />
+                            })
+                        }
+                    </ul>
+                </div>
             </section>
         )
     }

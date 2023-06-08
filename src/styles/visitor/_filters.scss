@@ -1,0 +1,39 @@
+.filters {
+    display: flex;
+    justify-content: flex-end;
+
+    margin: 0;
+    padding: 0px;
+
+    list-style-type: none;
+
+    .filter {
+
+    }
+
+    .dropdown-container {
+        position: relative;
+
+        .dropdown {
+            position: absolute;
+            
+            left: -16px;
+
+            box-sizing: content-box;
+            width: 100%;
+            
+            margin: 0;
+            padding: 0px;
+            padding: 6px 16px;
+            
+            background-color: $background-light-blue;
+            list-style-type: none;
+        }
+        
+        .dropdown.max-width {
+            left: unset;
+            right: -16px;
+            width: max-content;
+        }
+    }
+}

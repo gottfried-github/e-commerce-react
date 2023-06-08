@@ -12,6 +12,11 @@
     }
 }
 
+.products-container {
+    grid-column: 2;
+    margin: auto;
+}
+
 .product-cards {
     grid-column: 2;
     display: grid;
@@ -19,7 +24,7 @@
     column-gap: 4px;
     row-gap: 18px;
 
-    margin: auto;
+    margin: 0;
     padding: 0px;
 
     /* 320px: product-card width; 16px: horizontal margin; 4px: column-gap; */
