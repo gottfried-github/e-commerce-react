@@ -16,7 +16,7 @@ function Filters({
                 }}
             >
                 {
-                    inStock ? 'наявні' : 'усі'
+                    inStock ? 'усі' : 'наявні'
                 }
             </li>
 
@@ -46,28 +46,8 @@ function FilterDropdown({currentValue, values, currentValueChangeCb}) {
     const [maxWidth, setMaxWidth] = useState(false)
     const [dropdownDisplayed, setDropdownDisplayed] = useState(false)
 
-    let currentValueDisplay = null
-
-    switch (currentValue) {
-        case 'time': 
-            currentValueDisplay = 'за часом появи'
-            break;
-        
-        case 'price': 
-            currentValueDisplay = 'за ціною'
-            break;
-            
-        case 'name': 
-            currentValueDisplay = 'за назвою'
-            break;
-
-        default:
-            currentValueDisplay = 'unknown'
-    }
-
     /* see Dropdown width and positioning in readme */
     useEffect(() => {
-        console.log('curentValue effect - currentValue, maxWidth:', currentValue, maxWidth)
         if (!maxWidth) refDropdown.current.classList.add('max-width')
         
         // make dropdown measurable
@@ -93,6 +73,25 @@ function FilterDropdown({currentValue, values, currentValueChangeCb}) {
         refDropdown.current.classList.remove('max-width')
         setMaxWidth(false)
     }, [currentValue])
+
+    let currentValueDisplay = null
+
+    switch (currentValue) {
+        case 'time': 
+            currentValueDisplay = 'за часом появи'
+            break;
+        
+        case 'price': 
+            currentValueDisplay = 'за ціною'
+            break;
+            
+        case 'name': 
+            currentValueDisplay = 'за назвою'
+            break;
+
+        default:
+            currentValueDisplay = 'unknown'
+    }
 
     return (
         <div className="dropdown-container">
