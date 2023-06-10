@@ -21,7 +21,7 @@ function Filters({
             </li>
 
             <li className="filter">
-                <FilterDropdown 
+                <SortOrderDropdown 
                     currentValue={fieldName}
                     values={fieldNames}
                     currentValueChangeCb={(currentValue) => {
@@ -40,7 +40,7 @@ function Filters({
     )
 }
 
-function FilterDropdown({currentValue, values, currentValueChangeCb}) {
+function SortOrderDropdown({currentValue, values, currentValueChangeCb}) {
     const refHead = useRef()
     const refDropdown = useRef()
     const [maxWidth, setMaxWidth] = useState(false)
