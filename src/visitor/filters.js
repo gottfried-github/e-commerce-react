@@ -29,6 +29,13 @@ function Filters({
                     }}
                 />
             </li>
+
+            <li 
+                className={`filter arrow${dir === 1 ? ' bottom-up' : ''}`}
+                onClick={() => {
+                    dirChangeCb(dir === 1 ? -1 : 1)
+                }}
+            ></li>
         </ul>
     )
 }

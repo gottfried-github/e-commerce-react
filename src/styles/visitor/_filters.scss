@@ -1,6 +1,7 @@
 .filters {
     display: flex;
     justify-content: flex-end;
+    align-items: center;
 
     margin: 0;
     padding: 16px 0px;
@@ -37,5 +38,18 @@
             right: -16px;
             width: max-content;
         }
+    }
+
+    .arrow {
+        width: 7px;
+        height: 4px;
+
+        padding: 5px;
+        margin: -5px;
+
+        background-image: url('../assets/images/arrow.svg');
+        background-size: 7px 4px;
+        background-position: center;
+        background-repeat: no-repeat;
     }
 }
