@@ -176,7 +176,7 @@ function main(api) {
 
                 <label className="label" htmlFor="expose">expose</label>
                 <input id="expose" className="input-checkbox" type="checkbox" 
-                    defaultValue={product.state.expose}
+                    checked={product.state.expose}
                     onChange={(ev) => {
                         /* don't check if any of the other fields are not filled */
                         if (ev.target.checked) {
@@ -202,7 +202,7 @@ function main(api) {
 
                 <label className="label" htmlFor="is-in-stock">in stock</label>
                 <input id="is-in-stock" className="input-checkbox" type="checkbox"
-                    defaultValue={product.state.is_in_stock}
+                    checked={product.state.is_in_stock}
                     onChange={(ev) => product.inputChange(Object.assign(product.state, {is_in_stock: ev.target.checked}))}
                     onKeyDown={inputKeydown}
                 />

@@ -53,3 +53,8 @@ To convert global time to local, I set the `Date` object's time via `setTime`, p
 
 ### Page identification for CSS
 I explicitly specify paths to the different pages to determine whether one of them matches the current location. I then assign a class name to each of the pages and use those class names in CSS to match different pages, for example, to implement the [Header and footer width difference on different pages](https://github.com/gottfried-github/e-commerce-product#header-and-footer-width-difference-on-different-pages) specification.
+
+### Dropdown width and positioning
+[The spec](https://github.com/gottfried-github/e-commerce-product#dropdown-width-and-positioning) says that "if items in the dropdown are wider than the head, then the dropdown should be aligned right. If they are narrower, then the dropdown should be aligned left and have the width of the head". 
+
+In `FilterDropdown` I achieve this by using React's refs and comparing the widths of the dropdown and the head with javascript. Before comparing, I set the width of the dropdown to `max-width` since that is the width I want to compare (if e.g., the width is `100%`, then the content would wrap to resemble the head, which is not what I want). I then set appropriate class on the dropdown element.
