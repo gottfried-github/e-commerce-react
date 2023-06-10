@@ -28,6 +28,7 @@ export default (api) => {
                     <img className="photo" src={product.photos[0].path} alt="" />
                     </div>
                     <div className="info">
+                        <h1 className="info__title">{product.name}</h1>
                         <div className="info__row">
                             <span className="info__price">{
                                 `₴${
