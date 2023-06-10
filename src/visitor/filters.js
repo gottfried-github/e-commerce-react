@@ -35,6 +35,7 @@ function FilterDropdown({currentValue, values, currentValueChangeCb}) {
     const refHead = useRef()
     const refDropdown = useRef()
     const [maxWidth, setMaxWidth] = useState(false)
+    const [dropdownDisplayed, setDropdownDisplayed] = useState(false)
 
     let currentValueDisplay = null
 
@@ -57,10 +58,28 @@ function FilterDropdown({currentValue, values, currentValueChangeCb}) {
 
     /* see Dropdown width and positioning in readme */
     useEffect(() => {
+        console.log('curentValue effect - currentValue, maxWidth:', currentValue, maxWidth)
         if (!maxWidth) refDropdown.current.classList.add('max-width')
-        const larger = refDropdown.current.getBoundingClientRect().width > refHead.current.getBoundingClientRect().width
+        
+        // make dropdown measurable
+        if (!dropdownDisplayed) {
+            refDropdown.current.style.visibility = 'hidden'
+            refDropdown.current.classList.remove('noned')
+        }
 
-        if (larger) return
+        // measure the dropdown and the head
+        const dropdownLarger = refDropdown.current.getBoundingClientRect().width > refHead.current.getBoundingClientRect().width
+
+        // restore dropdown state
+        if (!dropdownDisplayed) {
+            refDropdown.current.style.visibility = 'unset'
+            refDropdown.current.classList.add('noned')
+        }
+
+        if (dropdownLarger) {
+            if (!maxWidth) setMaxWidth(true)
+            return
+        }
 
         refDropdown.current.classList.remove('max-width')
         setMaxWidth(false)
@@ -68,19 +87,27 @@ function FilterDropdown({currentValue, values, currentValueChangeCb}) {
 
     return (
         <div className="dropdown-container">
-            <div className="dropdown-container__head" ref={refHead}>
-                {
-                    currentValueDisplay
-                }
+            <div 
+                className="dropdown-container__head" 
+                ref={refHead}
+                onClick={() => setDropdownDisplayed(true)}
+            >
+                {currentValueDisplay}
             </div>
-            <ul className={`dropdown${maxWidth ? ' max-width' : ''}`} ref={refDropdown}>
+            <ul 
+                className={`dropdown${maxWidth ? ' max-width' : ''}${!dropdownDisplayed ? ' noned' : ''}`
+                }
+                ref={refDropdown}>
                 {
                     values.map((v) => {
                         switch(v) {
                             case 'time': 
                                 return <li 
                                     className="dropdown__item"
-                                    onClick={() => currentValueChangeCb(v)}
+                                    onClick={() => {
+                                        currentValueChangeCb(v)
+                                        setDropdownDisplayed(false)
+                                    }}
                                 >
                                     за часом появи
                                 </li>
@@ -88,7 +115,10 @@ function FilterDropdown({currentValue, values, currentValueChangeCb}) {
                             case 'price':
                                 return <li 
                                     className="dropdown__item"
-                                    onClick={() => currentValueChangeCb(v)}
+                                    onClick={() => {
+                                        currentValueChangeCb(v)
+                                        setDropdownDisplayed(false)
+                                    }}
                                 >
                                     за ціною
                                 </li>
@@ -96,7 +126,10 @@ function FilterDropdown({currentValue, values, currentValueChangeCb}) {
                             case 'name':
                                 return <li 
                                     className="dropdown__item"
-                                    onClick={() => currentValueChangeCb(v)}
+                                    onClick={() => {
+                                        currentValueChangeCb(v)
+                                        setDropdownDisplayed(false)
+                                    }}
                                 >
                                     за назвою
                                 </li>
