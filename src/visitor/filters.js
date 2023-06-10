@@ -20,13 +20,15 @@ function Filters({
                 }
             </li>
 
-            <FilterDropdown 
-                currentValue={fieldName}
-                values={fieldNames}
-                currentValueChangeCb={(currentValue) => {
-                    fieldNameChangeCb(currentValue)
-                }}
-            />
+            <li className="filter">
+                <FilterDropdown 
+                    currentValue={fieldName}
+                    values={fieldNames}
+                    currentValueChangeCb={(currentValue) => {
+                        fieldNameChangeCb(currentValue)
+                    }}
+                />
+            </li>
         </ul>
     )
 }
