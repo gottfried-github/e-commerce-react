@@ -47,7 +47,7 @@
 }
 
 .product-card {
-    width: 320px;
+    width: 100%;
 
     padding: 0px;
     margin: 0px;
@@ -61,8 +61,8 @@
     }
 
     .product-card__photo {
-        width: 320px;
-        height: 230px;
+        width: 100%;
+        aspect-ratio: 1.38;
 
         object-fit: cover;
     }
@@ -79,6 +79,16 @@
 
         .product-card__price {
             font-weight: 600;
+        }
+    }
+
+    @media (min-width: calc(320px + 16px * 2)) {
+        width: 320px;
+
+        .product-card__photo {
+            aspect-ratio: unset;
+            width: 320px;
+            height: 230px;
         }
     }
 }
