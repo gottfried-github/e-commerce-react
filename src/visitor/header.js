@@ -9,9 +9,9 @@ function Header() {
             <div id="logo"></div>
             <nav className="nav-main">
                 <ul className="nav-links">
-                    <li className="nav-link-container"><Link className="nav-link" to="/#products">Вироби</Link></li>
-                    <li className="nav-link-container"><Link className="nav-link" to="/#services">Послуги</Link></li>
-                    <li className="nav-link-container"><Link className="nav-link" to="/#about">Про мене</Link></li>
+                    <li className="nav-link-container"><Link className="nav-link" to="/home#products">Вироби</Link></li>
+                    <li className="nav-link-container"><Link className="nav-link" to="/home#services">Послуги</Link></li>
+                    <li className="nav-link-container"><Link className="nav-link" to="/home#about">Про мене</Link></li>
                 </ul>
 
                 <ul className="social-links">
