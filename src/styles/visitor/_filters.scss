@@ -11,7 +11,15 @@
     list-style-type: none;
 
     .filter {
+        cursor: pointer;
 
+        &:hover {
+            color: $primary-hover;
+
+            &.arrow {
+                background-image: url('../assets/images/arrow_hover.svg');
+            }
+        }
     }
 
     .dropdown-container {
@@ -20,21 +28,34 @@
         .dropdown {
             position: absolute;
             
+            // account for padding on .dropdown__item
             left: -16px;
 
             box-sizing: content-box;
-            width: 100%;
+
+            // account for padding on .dropdown__item
+            width: calc(100% + 16px * 2);
             
-            margin: 0;
-            padding: 0px;
-            padding: 6px 16px;
+            margin: 8px 0 0 0;
+            padding: 6px 0px;
             
-            background-color: $background-light-blue;
+            background-color: $background-one-inactive;
             list-style-type: none;
+
+            .dropdown__item {
+                padding: 0px 16px;
+
+                &:hover {
+                    background-color: $background-one-active;
+                    color: $primary-hover;
+                }
+            }
         }
         
         .dropdown.max-width {
             left: unset;
+
+            // account for padding on .dropdown__item
             right: -16px;
             width: max-content;
         }

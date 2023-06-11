@@ -50,7 +50,8 @@ export default (api) => {
                     <ul className="product-cards">
                         {
                             products.map((product) => {
-                                return <ProductCard 
+                                return <ProductCard
+                                    key={product.id} 
                                     id={product.id}
                                     photoUrl={product.cover_photo.path}
                                     name={product.name}

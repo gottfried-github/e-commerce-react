@@ -98,14 +98,16 @@ function SortOrderDropdown({currentValue, values, currentValueChangeCb}) {
             <div 
                 className="dropdown-container__head" 
                 ref={refHead}
-                onClick={() => setDropdownDisplayed(true)}
+                onClick={() => setDropdownDisplayed(!dropdownDisplayed)}
             >
                 {currentValueDisplay}
             </div>
             <ul 
                 className={`dropdown${maxWidth ? ' max-width' : ''}${!dropdownDisplayed ? ' noned' : ''}`
                 }
-                ref={refDropdown}>
+                ref={refDropdown}
+                role="listbox"
+            >
                 {
                     values.map((v) => {
                         switch(v) {
@@ -116,6 +118,10 @@ function SortOrderDropdown({currentValue, values, currentValueChangeCb}) {
                                         currentValueChangeCb(v)
                                         setDropdownDisplayed(false)
                                     }}
+                                    id={v}
+                                    key={v}
+                                    role="option"
+                                    aria-selected={currentValue === v}
                                 >
                                     за часом появи
                                 </li>
@@ -127,6 +133,10 @@ function SortOrderDropdown({currentValue, values, currentValueChangeCb}) {
                                         currentValueChangeCb(v)
                                         setDropdownDisplayed(false)
                                     }}
+                                    id={v}
+                                    key={v}
+                                    role="option"
+                                    aria-selected={currentValue === v}
                                 >
                                     за ціною
                                 </li>
@@ -138,6 +148,10 @@ function SortOrderDropdown({currentValue, values, currentValueChangeCb}) {
                                         currentValueChangeCb(v)
                                         setDropdownDisplayed(false)
                                     }}
+                                    id={v}
+                                    key={v}
+                                    role="option"
+                                    aria-selected={currentValue === v}
                                 >
                                     за назвою
                                 </li>
