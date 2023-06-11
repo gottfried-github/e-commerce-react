@@ -10,7 +10,7 @@ function Header() {
             <nav className="nav-main">
                 <ul className="nav-links">
                     <li className="nav-link-container"><Link className="nav-link" to="/home#products">Вироби</Link></li>
-                    <li className="nav-link-container"><Link className="nav-link" to="/home#services">Послуги</Link></li>
+                    {/* <li className="nav-link-container"><Link className="nav-link" to="/home#services">Послуги</Link></li> */}
                     <li className="nav-link-container"><Link className="nav-link" to="/home#about">Про мене</Link></li>
                 </ul>
 
