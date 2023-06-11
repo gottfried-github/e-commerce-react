@@ -116,6 +116,7 @@ function SortOrderDropdown({currentValue, values, currentValueChangeCb}) {
                                         currentValueChangeCb(v)
                                         setDropdownDisplayed(false)
                                     }}
+                                    key={v}
                                 >
                                     за часом появи
                                 </li>
@@ -127,6 +128,7 @@ function SortOrderDropdown({currentValue, values, currentValueChangeCb}) {
                                         currentValueChangeCb(v)
                                         setDropdownDisplayed(false)
                                     }}
+                                    key={v}
                                 >
                                     за ціною
                                 </li>
@@ -138,6 +140,7 @@ function SortOrderDropdown({currentValue, values, currentValueChangeCb}) {
                                         currentValueChangeCb(v)
                                         setDropdownDisplayed(false)
                                     }}
+                                    key={v}
                                 >
                                     за назвою
                                 </li>
