@@ -98,7 +98,7 @@ function SortOrderDropdown({currentValue, values, currentValueChangeCb}) {
             <div 
                 className="dropdown-container__head" 
                 ref={refHead}
-                onClick={() => setDropdownDisplayed(true)}
+                onClick={() => setDropdownDisplayed(!dropdownDisplayed)}
             >
                 {currentValueDisplay}
             </div>
