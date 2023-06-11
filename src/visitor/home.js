@@ -19,8 +19,8 @@ export default (api) => {
         const [productsRendered, setProductsRendered] = useState(false)
 
         useEffect(() => {
+            // scan the positions each time Products renders data
             const observer = new MutationObserver(() => {
-                // scan the positions each time Products renders data
                 sectionsPosCb({
                     products: refProducts.current.getBoundingClientRect().top + window.pageYOffset || document.documentElement.scrollTop || body.scrollTop,
                     about: refAbout.current.getBoundingClientRect().top + window.pageYOffset || document.documentElement.scrollTop || body.scrollTop,
@@ -30,6 +30,13 @@ export default (api) => {
             observer.observe(refProducts.current, {
                 childList: true, 
                 subtree: true
+            })
+
+            window.addEventListener('resize', () => {
+                sectionsPosCb({
+                    products: refProducts.current.getBoundingClientRect().top + window.pageYOffset || document.documentElement.scrollTop || body.scrollTop,
+                    about: refAbout.current.getBoundingClientRect().top + window.pageYOffset || document.documentElement.scrollTop || body.scrollTop,
+                })
             })
         }, [productsRendered])
 
