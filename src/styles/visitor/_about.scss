@@ -1,0 +1,60 @@
+#about {
+    display: grid;
+    grid-template-columns: 8px 1fr 8px;
+    position: relative;
+    height: 650px;
+
+    background-color: black;
+    overflow: hidden;
+
+    .background-photo {
+        position: absolute;
+        top: 50%;
+        left: 0px;
+
+        transform: translateY(-50%);
+
+        mask: url('../assets/images/about-mask_01-01.svg') 0/101% 101%;
+    }
+
+    @media (min-width: 325px) {
+        grid-template-columns: 16px 1fr 16px;
+    }
+
+    @media (min-width: 650px) {
+
+    }
+
+    @media (min-width: 970px) {
+        grid-template-columns: 16px 1fr 1fr 16px;
+
+        .background-photo {
+            grid-column: 2 / 4;
+        }
+
+        .about__quote {
+            grid-column: 3;
+            align-self: center;
+            justify-self: flex-end;
+
+            margin: 0;
+            padding: 0px;
+
+            max-width: 80%;
+
+            text-align: right;
+            
+            color: $accent;
+            font-weight: 200;
+            font-style: normal;
+            z-index: 1;
+        }
+    }
+
+    // 1616px (320px (product-card width) * 5) + 16px (horizontal margin) * 2
+    @media (min-width: 1648px) {
+        grid-template-columns: 1fr 808px 808px 1fr;
+
+        
+    }
+}

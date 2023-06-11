@@ -13,7 +13,7 @@ export default (api) => {
         return (
             <div id="home">
                 <Products />
-                <Services />
+                {/* <Services /> */}
                 <About />
             </div>
         )
