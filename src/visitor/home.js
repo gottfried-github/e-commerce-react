@@ -1,4 +1,5 @@
-import React from 'react'
+import React, {useState, useEffect, useRef, forwardRef} from 'react'
+import {useOutletContext} from 'react-router-dom'
 
 import products from './products.js'
 import services from './services.js'
@@ -10,11 +11,38 @@ export default (api) => {
     const About = about(api)
 
     return () => {
+        const sectionsPosCb = useOutletContext()
+
+        const refProducts = useRef()
+        const refAbout = useRef()
+
+        const [productsRendered, setProductsRendered] = useState(false)
+
+        useEffect(() => {
+            const observer = new MutationObserver(() => {
+                // scan the positions each time Products renders data
+                sectionsPosCb({
+                    products: refProducts.current.getBoundingClientRect().top + window.pageYOffset || document.documentElement.scrollTop || body.scrollTop,
+                    about: refAbout.current.getBoundingClientRect().top + window.pageYOffset || document.documentElement.scrollTop || body.scrollTop,
+                })
+            })
+
+            observer.observe(refProducts.current, {
+                childList: true, 
+                subtree: true
+            })
+        }, [productsRendered])
+
         return (
             <div id="home">
-                <Products />
+                <Products 
+                    ref={refProducts} 
+                    productsRenderedCb={() => {
+                        setProductsRendered(true)
+                    }}
+                />
                 {/* <Services /> */}
-                <About />
+                <About ref={refAbout} />
             </div>
         )
     }

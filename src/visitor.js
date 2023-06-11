@@ -10,6 +10,9 @@ import product from './visitor/product.js'
 
 function main(container, api) {
     function Index() {
+        // pass positions of sections in Home to Header for it to scroll to when links are clicked
+        const [sectionsPos, setSectionsPos] = useState({})
+
         const matchHome = useMatch('/home')
         const matchProduct = useMatch('/product/:id')
         
@@ -22,9 +25,14 @@ function main(container, api) {
 
         return (
             <div className={`wrapper ${page ? ` ${page}` : ''}`}>
-                <Header />
+                <Header sectionsPos={sectionsPos} />
                 <main id="main">
-                    <Outlet></Outlet>
+                    <Outlet context={
+                        // this is to be called from within Home, which renders the sections
+                        (pos) => {
+                            setSectionsPos(pos)
+                        }
+                    }></Outlet>
                 </main>
                 <Footer />
             </div>
