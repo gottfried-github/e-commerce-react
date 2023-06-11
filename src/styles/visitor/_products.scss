@@ -82,6 +82,10 @@
         }
     }
 
+    &:hover {
+        color: $primary-hover;
+    }
+
     @media (min-width: calc(320px + 16px * 2)) {
         width: 320px;
 

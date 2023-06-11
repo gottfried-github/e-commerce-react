@@ -12,6 +12,14 @@
 
     .filter {
         cursor: pointer;
+
+        &:hover {
+            color: $primary-hover;
+
+            &.arrow {
+                background-image: url('../assets/images/arrow_hover.svg');
+            }
+        }
     }
 
     .dropdown-container {
@@ -39,6 +47,7 @@
 
                 &:hover {
                     background-color: $background-one-active;
+                    color: $primary-hover;
                 }
             }
         }
