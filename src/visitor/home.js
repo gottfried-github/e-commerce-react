@@ -21,21 +21,26 @@ export default (api) => {
         useEffect(() => {
             // scan the positions each time Products renders data
             const observer = new MutationObserver(() => {
-                sectionsPosCb({
-                    products: refProducts.current.getBoundingClientRect().top + window.pageYOffset || document.documentElement.scrollTop || body.scrollTop,
-                    about: refAbout.current.getBoundingClientRect().top + window.pageYOffset || document.documentElement.scrollTop || body.scrollTop,
-                })
+
+                // see Determining the `about` section position in readme
+                setTimeout(() => {
+                    sectionsPosCb({
+                        products: refProducts.current.offsetTop,
+                        about: refAbout.current.offsetTop
+                    })
+                }, 1000)
             })
 
             observer.observe(refProducts.current, {
                 childList: true, 
-                subtree: true
+                subtree: true,
+                characterData: true,
             })
 
             window.addEventListener('resize', () => {
                 sectionsPosCb({
-                    products: refProducts.current.getBoundingClientRect().top + window.pageYOffset || document.documentElement.scrollTop || body.scrollTop,
-                    about: refAbout.current.getBoundingClientRect().top + window.pageYOffset || document.documentElement.scrollTop || body.scrollTop,
+                    products: refProducts.current.offsetTop,
+                    about: refAbout.current.offsetTop
                 })
             })
         }, [productsRendered])
