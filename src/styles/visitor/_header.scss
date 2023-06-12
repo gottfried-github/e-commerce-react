@@ -69,6 +69,7 @@
 
         // see Mobile menu view in product spec
         overflow-y: scroll;
+        z-index: 2;
 
         .nav-main {
             justify-self: flex-start;

@@ -58,3 +58,6 @@ I explicitly specify paths to the different pages to determine whether one of th
 [The spec](https://github.com/gottfried-github/e-commerce-product#dropdown-width-and-positioning) says that "if items in the dropdown are wider than the head, then the dropdown should be aligned right. If they are narrower, then the dropdown should be aligned left and have the width of the head". 
 
 In [`SortOrderDropdown`](https://github.com/gottfried-github/e-commerce-react/blob/master/src/visitor/filters.js#L43) I achieve this by using React's refs and comparing the widths of the dropdown and the head with javascript. Before comparing, I set the width of the dropdown to `max-width` since that is the width I want to compare (if e.g., the width is `100%`, then the content would wrap to resemble the head, which is not what I want). I then set appropriate class on the dropdown element.
+
+### Determining the `about` section position
+In `Home` I use MutationObserver to observe changes to `Products` and get the position of the `About` section based on that. But, for some reason, the position ends up being incorrect in some cases anyway (particularly, when the screen width is about `278px`). To solve that I use `setTimeout` which is not really a satisfiable solution but I haven't found anything better.

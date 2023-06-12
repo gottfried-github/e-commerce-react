@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef, forwardRef} from 'react'
 import {Link} from 'react-router-dom'
 
 import {kopToHrn} from '../price.js'
@@ -6,7 +6,7 @@ import {kopToHrn} from '../price.js'
 import Filters from './filters.js'
 
 export default (api) => {  
-    return () => {
+    return forwardRef(({productsRenderedCb}, ref) => {
         const [products, setProducts] = useState([])
         const [fieldName, setFieldName] = useState('time')
         const [dir, setDir] = useState(-1)
@@ -30,8 +30,12 @@ export default (api) => {
             })
         }, [fieldName, dir, inStock])
 
+        useEffect(() => {
+            productsRenderedCb()
+        }, [products])
+
         return (
-            <section id="products">
+            <section id="products" ref={ref}>
                 <div className="products-container">
                     <Filters 
                         fieldName={fieldName}
@@ -63,7 +67,7 @@ export default (api) => {
                 </div>
             </section>
         )
-    }
+    })
 }
 
 function ProductCard({id, photoUrl, name, price}) {
