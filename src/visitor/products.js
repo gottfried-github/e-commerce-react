@@ -12,8 +12,6 @@ export default (api) => {
         const [dir, setDir] = useState(-1)
         const [inStock, setInStock] = useState(false)
 
-        const productsRef = useRef()
-
         useEffect(() => {
             api.product.getMany(fieldName, dir, inStock, (body) => {
                 console.log('api.product.getMany, successCb - body:', body)
