@@ -61,3 +61,8 @@ In [`SortOrderDropdown`](https://github.com/gottfried-github/e-commerce-react/bl
 
 ### Determining the `about` section position
 In `Home` I use MutationObserver to observe changes to `Products` and get the position of the `About` section based on that. But, for some reason, the position ends up being incorrect in some cases anyway (particularly, when the screen width is about `278px`). To solve that I use `setTimeout` which is not really a satisfiable solution but I haven't found anything better.
+
+### Passing sections positions from `Home` to `Header`
+I need the positions of the sections in `Header` in order to scroll to them when clicked on a link in the `Header`. But `Home` renders the sections so it has access to their positions. 
+
+The way I have my routes set up with `React Router` is that I render the `Header` in a parent route to that in which I render the `Home` component: I use `React Router`'s `Outlet` component to place the routes within the parent route. So I need to lift data up from the child route where `Home` is rendered to the parent route where `Header` is rendered, through an `Outlet`. I do that by passing a callback to the `Outlet`, as `context`, which modifies the state of the parent route and passes it down to the `Header`. To consume the `Outlet`'s context in `Home`, I use the `useOutletContext` hook.

@@ -10,7 +10,7 @@ import product from './visitor/product.js'
 
 function main(container, api) {
     function Index() {
-        // pass positions of sections in Home to Header for it to scroll to when links are clicked
+        // pass positions of sections in Home to Header for it to scroll to when links are clicked (see Passing sections positions from `Home` to `Header` in readme)
         const [sectionsPos, setSectionsPos] = useState({})
 
         const matchHome = useMatch('/home')
