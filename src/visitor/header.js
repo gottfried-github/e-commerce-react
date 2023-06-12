@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom'
 function Header({sectionsPos}) {
     const [isOpen, setIsOpen] = useState(false)
 
-    console.log('Header, sectionsPos:', sectionsPos)
+    console.log('Header - sectionsPos:', sectionsPos)
 
     return (
         <header className={`header-main${isOpen ? ' header-main_opened' : ''}`}>
@@ -16,6 +16,7 @@ function Header({sectionsPos}) {
                             className="nav-link" 
                             to="/home#products"
                             onClick={() => {
+                                if (isOpen) setIsOpen(false)
                                 window.scrollTo(0, sectionsPos.products)
                             }}
                         >Вироби</Link>
@@ -26,6 +27,7 @@ function Header({sectionsPos}) {
                             className="nav-link" 
                             to="/home#about"
                             onClick={() => {
+                                if (isOpen) setIsOpen(false)
                                 window.scrollTo(0, sectionsPos.about)
                             }}
                         >Про мене</Link>
