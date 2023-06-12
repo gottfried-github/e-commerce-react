@@ -26,7 +26,9 @@ The component's state has default values for the fields. The api data simply doe
 #### Sending time
 The [e-commerce project specification](https://github.com/gottfried-github/e-commerce-api#specification) says that time is stored as UTC in the application. 
 `Date`'s `now` and `getTime` methods produce time in UTC, without accounting for timezone difference: in `CreateProduct`, I use one of them to add a `time` representing the moment the product is created.
+
 When passed an ISO string to the `Date` constructor, if the timezone information is not included in the string but time information (the info after the `T`) is included (e.g., `2023-01-01T00:00`), the time in the string will be interpreted as local time. In the `Product` view, I read the information on time from the HTML inputs and create a `Date` object with it, which results in it's time being set to the time in UTC, corresponding to the time, specified to the constructor, which is what the API expects.
+
 If no date is set in the date HTML input, but time is set, in the HTML input, I do not send anything to the server.
 
 #### Reading time
@@ -48,3 +50,14 @@ To convert global time to local, I set the `Date` object's time via `setTime`, p
 ###### Refs
 1. https://developer.mozilla.org/en-US/docs/Web/HTML/Date_and_time_formats
 2. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
+
+### Page identification for CSS
+I explicitly specify paths to the different pages to determine whether one of them matches the current location. I then assign a class name to each of the pages and use those class names in CSS to match different pages, for example, to implement the [Header and footer width difference on different pages](https://github.com/gottfried-github/e-commerce-product#header-and-footer-width-difference-on-different-pages) specification.
+
+### Dropdown width and positioning
+[The spec](https://github.com/gottfried-github/e-commerce-product#dropdown-width-and-positioning) says that "if items in the dropdown are wider than the head, then the dropdown should be aligned right. If they are narrower, then the dropdown should be aligned left and have the width of the head". 
+
+In [`SortOrderDropdown`](https://github.com/gottfried-github/e-commerce-react/blob/master/src/visitor/filters.js#L43) I achieve this by using React's refs and comparing the widths of the dropdown and the head with javascript. Before comparing, I set the width of the dropdown to `max-width` since that is the width I want to compare (if e.g., the width is `100%`, then the content would wrap to resemble the head, which is not what I want). I then set appropriate class on the dropdown element.
+
+### Determining the `about` section position
+In `Home` I use MutationObserver to observe changes to `Products` and get the position of the `About` section based on that. But, for some reason, the position ends up being incorrect in some cases anyway (particularly, when the screen width is about `278px`). To solve that I use `setTimeout` which is not really a satisfiable solution but I haven't found anything better.

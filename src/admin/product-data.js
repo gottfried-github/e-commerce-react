@@ -1,23 +1,4 @@
-/**
-     * @param {Number} kop
-     * @description express kopiykas as hryvnias with kopiykas
-    */
-function kopToHrn(kop) {
-    return {
-        hrn: Number(kop.toString().slice(0, kop.toString().length-2)),
-        kop: Number(kop.toString().slice(kop.toString().length-2))
-    }
-}
-
-/**
- * @param {Number} hrn 
- * @param {Number} kop
- * @description express hryvnias with kopiykas as kopiykas 
-*/ 
-function hrnToKop(hrn, kop) {
-    console.log('hrnToKop - hrn, kop:', hrn, kop)
-    return hrn * 100 + kop
-}
+import {kopToHrn, hrnToKop} from '../price.js'
 
 /**
  * @param {Object} fields
@@ -28,7 +9,7 @@ function dataToState(fields) {
         name: fields.name || '',
         expose: fields.expose || false,
         is_in_stock: fields.is_in_stock || false,
-        photos: fields.photos?.length || null,
+        photos: fields.photos?.length ? fields.photos : null,
         cover_photo: fields.cover_photo || '',
         description: fields.description || '',
         time: fields.time ? new Date(fields.time).getTime() : null
