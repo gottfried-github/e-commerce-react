@@ -10,7 +10,7 @@ function dataToState(fields) {
         expose: fields.expose || false,
         is_in_stock: fields.is_in_stock || false,
         photos: fields.photos?.length ? fields.photos : null,
-        cover_photo: fields.cover_photo || '',
+        cover_photo: fields.cover_photo || null,
         description: fields.description || '',
         time: fields.time ? new Date(fields.time).getTime() : null
     }
