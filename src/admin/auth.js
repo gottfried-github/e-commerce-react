@@ -4,6 +4,7 @@ import React, {Component, useState} from "react"
 import { useNavigate } from "react-router-dom"
 
 function main(api) {
+    /*
     function Signup(props) {
         const navigate = useNavigate()
         
@@ -72,6 +73,7 @@ function main(api) {
             </form>
         )
     }
+    */
     
     function Login(props) {
         const [name, setName] = useState('a')
@@ -127,7 +129,7 @@ function main(api) {
         )
     }
 
-    return {Signup, Login}
+    return {Login}
 }
 
 export default main
