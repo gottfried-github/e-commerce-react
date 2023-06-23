@@ -47,7 +47,7 @@ function main(api) {
             expose: false,
             is_in_stock: false,
             photos: null,
-            cover_photo: '',
+            cover_photo: null,
             description: '',
             time: null
         })
