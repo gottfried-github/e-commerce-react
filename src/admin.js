@@ -28,7 +28,7 @@ function main(container, api) {
         return (
             <div>
                 <Link to="/login">{'login'}</Link>
-                <Link to="/signup">{'signup'}</Link>
+                {/* <Link to="/signup">{'signup'}</Link> */}
             </div>
         )
     }
@@ -109,7 +109,7 @@ function main(container, api) {
                         <Route path="dash/*" element={<DashController />} />
                         <Route path="signin" element={<Signin />}/>
                         <Route path="login" element={<auth.Login />} />
-                        <Route path="signup" element={<auth.Signup />} />
+                        {/* <Route path="signup" element={<auth.Signup />} /> */}
                     </Route>
                     <Route path="/*" element={<Blank />} />
                 </Routes>
