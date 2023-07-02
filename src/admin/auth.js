@@ -1,4 +1,4 @@
-import * as m from '../../../fi-common/messages.js'
+import * as m from '../../../e-commerce-common/messages.js'
 
 import React, {Component, useState} from "react"
 import { useNavigate } from "react-router-dom"
