@@ -1,5 +1,7 @@
 # Description
-The front end for the [e-commerce project](https://github.com/gottfried-github/e-commerce-app). Work in progress, only some admin routes are implemented.
+The front end for the [e-commerce project](https://github.com/gottfried-github/e-commerce-app). Work in progress. 
+
+See the website live [here](http://gottfried.chost.com.ua:3000).
 
 # Overview
 ## App
