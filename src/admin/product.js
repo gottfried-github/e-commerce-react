@@ -93,6 +93,13 @@ function main(api) {
             })
         }
 
+        const removeCb = (photo) => {
+            api.product.removePhotos(params.id, [photo.id], (body) => {
+                setPhotosAll(body.photos_all)
+                setState(data.dataToState(body))
+            })
+        }
+
         const coverPickCb = (photo) => {
             console.log('coverPickCb, photo:', photo)
             api.product.update(params.id, data.stateToData({...state, cover_photo: photo}), null, (body) => {
@@ -117,7 +124,8 @@ function main(api) {
             })
         }
 
-        return {state, photos_all, photosUpload, pickCb, coverPickCb, photosReorderCb, inputChange}
+
+        return {state, photos_all, photosUpload, pickCb, removeCb, coverPickCb, photosReorderCb, inputChange}
     }
 
     function Product() {
@@ -286,6 +294,7 @@ function main(api) {
                         photos={product.state.photos ? product.state.photos : []} 
                         upload={product.photosUpload} 
                         pickCb={product.pickCb}
+                        removeCb={product.removeCb}
                     />
                     
                     : 

@@ -81,7 +81,7 @@ function PhotoRadio({photo, picked, pickCb, name}) {
  * @param {Function} upload fire when files are chosen for upload
  * @description picks one or multiple photos from photosAll
 */
-function PhotosPicker({photosAll, photos, pickCb, upload}) {
+function PhotosPicker({photosAll, photos, pickCb, removeCb, upload}) {
     return (
         <div className="photos-container">
             <PhotosPickable 
@@ -92,6 +92,7 @@ function PhotosPicker({photosAll, photos, pickCb, upload}) {
                     })
                 )} 
                 pickCb={pickCb} 
+                removeCb={removeCb}
             />
             <PhotosUpload upload={upload}/>
         </div>
@@ -103,13 +104,14 @@ function PhotosPicker({photosAll, photos, pickCb, upload}) {
  * @param {Function} pickCb callback to pass to PhotoPicked
  * @description renders `photos` using PhotoPickable
 */
-function PhotosPickable({photos, pickCb}) {
+function PhotosPickable({photos, pickCb, removeCb}) {
     return (
         <div className="photos">{
             photos.map(photo => <PhotoPickable 
                 key={photo.id} 
                 photo={photo} 
                 pickCb={pickCb}
+                removeCb={removeCb}
                 picked={photo.picked}
             />)
         }</div>
@@ -121,9 +123,13 @@ function PhotosPickable({photos, pickCb}) {
  * @param {Boolean} picked whether to render the photo checkmarked
  * @param {Function} pickCb callback for when photo gets checked or unchecked
 */
-function PhotoPickable({photo, picked, pickCb}) {
+function PhotoPickable({photo, picked, pickCb, removeCb}) {
     const _pickCb = (ev) => {
       pickCb(ev.target.checked, photo)
+    }
+
+    const _removeCb = () => {
+        removeCb(photo)
     }
 
     return (
@@ -138,6 +144,8 @@ function PhotoPickable({photo, picked, pickCb}) {
           :
           <input type="checkbox" onChange={_pickCb}></input>
           }
+
+          <button onClick={_removeCb}>Remove</button>
       </div>
     )
 }
