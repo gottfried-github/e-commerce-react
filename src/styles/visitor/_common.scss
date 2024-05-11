@@ -1,34 +1,34 @@
 .social-links {
-    display: flex;
-    column-gap: 8px;
+  display: flex;
+  column-gap: 8px;
 
-    margin: 0;
-    padding: 0px;
+  margin: 0;
+  padding: 0px;
 
-    list-style-type: none;
+  list-style-type: none;
 
-    .social-link {
-        width: 24px;
-        height: 24px;
+  .social-link {
+    width: 24px;
+    height: 24px;
 
-        background-position: center;
-        background-size: contain;
-        background-repeat: no-repeat;
-    }
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
 
-    .social-link.instagram {
-        background-image: url('../assets/images/logo-instagram.svg');
-    }
+  .social-link.instagram {
+    background-image: url('../assets/images/logo-instagram.svg');
+  }
 
-    .social-link.facebook {
-        background-image: url('../assets/images/logo-facebook.svg');
-    }
+  .social-link.facebook {
+    background-image: url('../assets/images/logo-facebook.svg');
+  }
 }
 
 .noned {
-    display: none;
+  display: none;
 }
 
 .bottom-up {
-    transform: rotate(180deg);
+  transform: rotate(180deg);
 }
