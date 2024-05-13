@@ -1,4 +1,4 @@
-import React, { Component, useState, useEffect, useRef } from 'react'
+import React, { Component, useState, useEffect, useMemo, useRef } from 'react'
 import { useNavigate, useParams, redirect } from 'react-router-dom'
 
 import { DndProvider } from 'react-dnd'
@@ -50,95 +50,114 @@ function main(api) {
       priceKop: null,
       expose: false,
       is_in_stock: false,
-      photos: null,
-      cover_photo: null,
       description: '',
       time: null,
     })
     const [photos_all, setPhotosAll] = useState([])
 
+    const photosPublic = useMemo(
+      () =>
+        photos_all
+          .filter(photo => photo.public)
+          // sort in ascending order
+          .sort((photoA, photoB) => (photoA.order > photoB.order ? 1 : -1)),
+      [photos_all]
+    )
+    const photoCover = useMemo(() => photos_all.find(photo => photo.cover) || null, [photos_all])
+
     useEffect(() => {
       api.product.get(params.id, body => {
-        setPhotosAll(body.photos_all)
         setState(data.dataToState(body))
+      })
+
+      api.product.getPhotos(params.id, null, body => {
+        setPhotosAll(body)
       })
     }, [])
 
     // make api request to upload photos
     const photosUpload = files => {
-      api.product.upload(params.id, files, body => {
-        setPhotosAll(body.photos_all)
-        setState(data.dataToState(body))
+      api.product.upload(params.id, files, () => {
+        api.product.getPhotos(params.id, null, body => {
+          setPhotosAll(body)
+        })
       })
     }
 
     // add or remove a photo from `photos` based on whether it's checked or not and make api request to update the `photos` field
     const pickCb = (picked, photo) => {
-      const photosPicked = state.photos ? [...state.photos] : []
-
-      if (!picked) {
-        photosPicked.splice(photosPicked.map(photo => photo.id).indexOf(photo.id), 1)
-      } else {
-        photosPicked.push(photo)
-      }
-
-      if (!photosPicked.length) {
-        return api.product.update(
-          params.id,
-          data.stateToData({ ...state, photos: null }),
-          ['photos'],
-          body => {
-            console.log('Product, product.update successCb - body:', body)
-            setPhotosAll(body.photos_all)
-            setState(data.dataToState(body))
-          }
-        )
-      }
-
-      api.product.update(
-        params.id,
-        data.stateToData({ ...state, photos: photosPicked }),
-        null,
-        body => {
-          console.log('Product, product.update successCb - body:', body)
-          setPhotosAll(body.photos_all)
+      api.product.updatePhotosPublicity(params.id, [{ id: photo.id, public: picked }], () => {
+        // `expose` might have changed, so updating product state
+        api.product.get(params.id, body => {
           setState(data.dataToState(body))
-        }
-      )
+
+          if (!picked) {
+            setPhotosAll(
+              photos_all.map(_photo => {
+                if (_photo.id !== photo.id) return _photo
+
+                return { ..._photo, public: false }
+              })
+            )
+          } else {
+            const orderDesc = photosPublic
+              .map(photo => photo.order)
+              .sort((a, b) => (a < b ? 1 : -1))
+            const orderGreatest = orderDesc[0] + 1
+
+            setPhotosAll(
+              photos_all.map(_photo => {
+                if (_photo.id !== photo.id) return _photo
+
+                return { ..._photo, public: true, order: orderGreatest }
+              })
+            )
+          }
+        })
+      })
     }
 
     const removeCb = photo => {
       api.product.removePhotos(params.id, [photo.id], body => {
-        setPhotosAll(body.photos_all)
-        setState(data.dataToState(body))
+        // `expose` might have changed, so updating product state
+        api.product.get(params.id, body => {
+          setState(data.dataToState(body))
+          setPhotosAll(photos_all.filter(_photo => _photo.id !== photo.id))
+        })
       })
     }
 
     const coverPickCb = photo => {
-      console.log('coverPickCb, photo:', photo)
-      api.product.update(
-        params.id,
-        data.stateToData({ ...state, cover_photo: photo }),
-        null,
-        body => {
-          setPhotosAll(body.photos_all)
-          setState(data.dataToState(body))
-        }
-      )
+      api.product.setCoverPhoto(params.id, { id: photo.id, cover: true }, () => {
+        setPhotosAll(
+          photos_all.map(_photo => {
+            if (_photo.id !== photo.id) return _photo
+
+            return { ..._photo, cover: true }
+          })
+        )
+      })
     }
 
     const photosReorderCb = photos => {
-      console.log('photosReorderCb - photos, state.photos:', photos, state.photos)
-      api.product.update(params.id, data.stateToData({ ...state, photos }), null, body => {
-        setPhotosAll(body.photos_all)
-        setState(data.dataToState(body))
+      const photosData = photos.map((photo, i) => ({ id: photo.id, order: i }))
+
+      api.product.reorderPhotos(params.id, photosData, () => {
+        const photosDataIds = photosData.map(photo => photo.id)
+
+        setPhotosAll(
+          photos_all.map(photo => {
+            if (!photosDataIds.includes(photo.id)) return photo
+
+            return { ...photo, order: photosData[photosDataIds.indexOf(photo.id)].order }
+          })
+        )
       })
     }
 
     const inputChange = _state => {
       console.log('inputChange, _state:', _state)
       api.product.update(params.id, data.stateToData(_state), null, body => {
-        setPhotosAll(body.photos_all)
         setState(data.dataToState(body))
       })
     }
@@ -146,6 +165,8 @@ function main(api) {
     return {
       state,
       photos_all,
+      photosPublic,
+      photoCover,
       photosUpload,
       pickCb,
       removeCb,
@@ -332,9 +353,9 @@ function main(api) {
         />
 
         <span className="label">cover photo</span>
-        {product.state.cover_photo ? (
+        {product.photoCover ? (
           <div className="photo cover-photo">
-            <img src={product.state.cover_photo.path} />
+            <img src={product.photoCover.pathPublic} />
           </div>
         ) : null}
 
@@ -344,7 +365,7 @@ function main(api) {
         {photoActive ? (
           <PhotoPicker
             photosAll={product.photos_all ? product.photos_all : []}
-            photo={product.state.cover_photo ? product.state.cover_photo : null}
+            photo={product.photoCover}
             pickCb={product.coverPickCb}
             upload={product.photosUpload}
           />
@@ -352,15 +373,12 @@ function main(api) {
 
         <span className="label">photos</span>
         <DndProvider backend={HTML5Backend}>
-          <PhotosSortable
-            photos={product.state.photos ? product.state.photos : []}
-            reorderCb={product.photosReorderCb}
-          />
+          <PhotosSortable photos={product.photosPublic} reorderCb={product.photosReorderCb} />
         </DndProvider>
         {photosActive ? (
           <PhotosPicker
             photosAll={product.photos_all ? product.photos_all : []}
-            photos={product.state.photos ? product.state.photos : []}
+            photos={product.photosPublic}
             upload={product.photosUpload}
             pickCb={product.pickCb}
             removeCb={product.removeCb}

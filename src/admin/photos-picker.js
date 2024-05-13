@@ -60,7 +60,7 @@ function PhotoRadio({ photo, picked, pickCb, name }) {
 
   return (
     <div className="photo photo-pickable">
-      <img src={photo.path} />
+      <img src={photo.pathPublic} />
 
       {picked ? (
         <input type="radio" name={name} onChange={_pickCb} defaultChecked></input>
@@ -131,7 +131,7 @@ function PhotoPickable({ photo, picked, pickCb, removeCb }) {
 
   return (
     <div className="photo photo-pickable">
-      <img src={photo.path} />
+      <img src={photo.pathPublic} />
 
       {picked ? (
         <input type="checkbox" onChange={_pickCb} defaultChecked></input>

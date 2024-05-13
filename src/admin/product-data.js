@@ -9,8 +9,6 @@ function dataToState(fields) {
     name: fields.name || '',
     expose: fields.expose || false,
     is_in_stock: fields.is_in_stock || false,
-    photos: fields.photos?.length ? fields.photos : null,
-    cover_photo: fields.cover_photo || null,
     description: fields.description || '',
     time: fields.time ? new Date(fields.time).getTime() : null,
   }
@@ -49,9 +47,6 @@ function stateToData(state) {
   if (undefined !== state.name && state.name) fields.name = state.name
   if (undefined !== state.expose) fields.expose = state.expose
   if (undefined !== state.is_in_stock) fields.is_in_stock = state.is_in_stock
-  if (state.photos) fields.photos = state.photos.map(photo => photo.id)
-  if (undefined !== state.cover_photo && state.cover_photo)
-    fields.cover_photo = state.cover_photo.id
   if (undefined !== state.description && state.description) fields.description = state.description
   if ('number' === typeof state.time) fields.time = state.time
 
