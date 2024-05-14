@@ -42,6 +42,7 @@ function main(api) {
   }
 
   function useProduct() {
+    const navigate = useNavigate()
     const params = useParams()
 
     const [state, setState] = useState({
@@ -117,7 +118,7 @@ function main(api) {
       })
     }
 
-    const removeCb = photo => {
+    const removePhotoCb = photo => {
       api.product.removePhotos(params.id, [photo.id], body => {
         // `expose` might have changed, so updating product state
         api.product.get(params.id, body => {
@@ -162,6 +163,12 @@ function main(api) {
       })
     }
 
+    const deleteProductCb = () => {
+      api.product.delete(params.id, () => {
+        navigate('/dash/products')
+      })
+    }
+
     return {
       state,
       photos_all,
@@ -169,10 +176,11 @@ function main(api) {
       photoCover,
       photosUpload,
       pickCb,
-      removeCb,
+      removePhotoCb,
       coverPickCb,
       photosReorderCb,
       inputChange,
+      deleteProductCb,
     }
   }
 
@@ -381,11 +389,14 @@ function main(api) {
             photos={product.photosPublic}
             upload={product.photosUpload}
             pickCb={product.pickCb}
-            removeCb={product.removeCb}
+            removeCb={product.removePhotoCb}
           />
         ) : null}
         <button className="control" onClick={photosBtn}>
           add photos
+        </button>
+        <button className="control" onClick={product.deleteProductCb}>
+          Delete Product
         </button>
       </form>
     )
