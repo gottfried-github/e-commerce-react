@@ -6,6 +6,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 
 import parseIsoTime from 'parseisotime'
 
+import { exposePromise } from '../utils/utils.js'
 import * as data from './product-data.js'
 import { PhotoPicker, PhotosPicker } from './photos-picker.js'
 import { PhotosSortable } from './photos-sortable.js'
@@ -66,27 +67,45 @@ function main(api) {
     )
     const photoCover = useMemo(() => photos_all.find(photo => photo.cover) || null, [photos_all])
 
+    const [isDataLoading, setIsDataLoading] = useState(false)
+
     useEffect(() => {
+      const promiseProduct = exposePromise()
+      const promisePhotos = exposePromise()
+
+      setIsDataLoading(true)
+
+      Promise.all([promiseProduct.promise, promisePhotos.promise]).then(() => {
+        setIsDataLoading(false)
+      })
+
       api.product.get(params.id, body => {
         setState(data.dataToState(body))
+        promiseProduct.resolve()
       })
 
       api.product.getPhotos(params.id, null, body => {
         setPhotosAll(body)
+        promisePhotos.resolve()
       })
     }, [])
 
     // make api request to upload photos
     const photosUpload = files => {
+      setIsDataLoading(true)
+
       api.product.upload(params.id, files, () => {
         api.product.getPhotos(params.id, null, body => {
           setPhotosAll(body)
+          setIsDataLoading(false)
         })
       })
     }
 
     // add or remove a photo from `photos` based on whether it's checked or not and make api request to update the `photos` field
     const pickCb = (picked, photo) => {
+      setIsDataLoading(true)
+
       api.product.updatePhotosPublicity(params.id, [{ id: photo.id, public: picked }], () => {
         // `expose` might have changed, so updating product state
         api.product.get(params.id, body => {
@@ -114,21 +133,29 @@ function main(api) {
               })
             )
           }
+
+          setIsDataLoading(false)
         })
       })
     }
 
     const removePhotoCb = photo => {
+      setIsDataLoading(true)
+
       api.product.removePhotos(params.id, [photo.id], body => {
         // `expose` might have changed, so updating product state
         api.product.get(params.id, body => {
           setState(data.dataToState(body))
           setPhotosAll(photos_all.filter(_photo => _photo.id !== photo.id))
+
+          setIsDataLoading(false)
         })
       })
     }
 
     const coverPickCb = photo => {
+      setIsDataLoading(true)
+
       api.product.setCoverPhoto(params.id, { id: photo.id, cover: true }, () => {
         setPhotosAll(
           photos_all.map(_photo => {
@@ -137,11 +164,15 @@ function main(api) {
             return { ..._photo, cover: true }
           })
         )
+
+        setIsDataLoading(false)
       })
     }
 
     const photosReorderCb = photos => {
       const photosData = photos.map((photo, i) => ({ id: photo.id, order: i }))
+
+      setIsDataLoading(true)
 
       api.product.reorderPhotos(params.id, photosData, () => {
         const photosDataIds = photosData.map(photo => photo.id)
@@ -153,18 +184,27 @@ function main(api) {
             return { ...photo, order: photosData[photosDataIds.indexOf(photo.id)].order }
           })
         )
+
+        setIsDataLoading(false)
       })
     }
 
     const inputChange = _state => {
       console.log('inputChange, _state:', _state)
+
+      setIsDataLoading(true)
+
       api.product.update(params.id, data.stateToData(_state), null, body => {
         setState(data.dataToState(body))
+        setIsDataLoading(false)
       })
     }
 
     const deleteProductCb = () => {
+      setIsDataLoading(true)
+
       api.product.delete(params.id, () => {
+        setIsDataLoading(false)
         navigate('/dash/products')
       })
     }
@@ -181,6 +221,7 @@ function main(api) {
       photosReorderCb,
       inputChange,
       deleteProductCb,
+      disabled: isDataLoading,
     }
   }
 
@@ -191,19 +232,31 @@ function main(api) {
     const [photosActive, setPhotosActive] = useState(false)
     const [photoActive, setPhotoActive] = useState(false)
 
+    useEffect(() => {
+      if (!product.disabled) return
+
+      setPhotosActive(false)
+      setPhotoActive(false)
+    }, [product.disabled])
+
     const inputKeydown = ev => {
       // if key is Enter
       if (13 === ev.keyCode) return ev.preventDefault()
     }
 
     const photosBtn = () => {
+      if (product.disabled) return
+
       setPhotosActive(!photosActive)
     }
 
     const photoBtn = () => {
+      if (product.disabled) return
+
       setPhotoActive(!photoActive)
     }
 
+    // TODO: put this chunk of code into a hook
     let time = null
     if (product.state.time) {
       const _time = new Date(product.state.time)
@@ -229,6 +282,7 @@ function main(api) {
             product.inputChange(Object.assign(product.state, { name: ev.target.value }))
           }
           onKeyDown={inputKeydown}
+          disabled={product.disabled}
         />
 
         <label className="label" htmlFor="price-hrn">
@@ -245,6 +299,7 @@ function main(api) {
             )
           }
           onKeyDown={inputKeydown}
+          disabled={product.disabled}
         />
 
         <label className="label" htmlFor="price-kop">
@@ -261,6 +316,7 @@ function main(api) {
             )
           }
           onKeyDown={inputKeydown}
+          disabled={product.disabled}
         />
 
         <label className="label" htmlFor="expose">
@@ -295,6 +351,7 @@ function main(api) {
             return product.inputChange(Object.assign(product.state, { expose: ev.target.checked }))
           }}
           onKeyDown={inputKeydown}
+          disabled={product.disabled}
         />
 
         <label className="label" htmlFor="is-in-stock">
@@ -309,6 +366,7 @@ function main(api) {
             product.inputChange(Object.assign(product.state, { is_in_stock: ev.target.checked }))
           }
           onKeyDown={inputKeydown}
+          disabled={product.disabled}
         />
 
         <label className="label" htmlFor="description">
@@ -323,6 +381,7 @@ function main(api) {
             product.inputChange(Object.assign(product.state, { description: ev.target.value }))
           }
           onKeyDown={inputKeydown}
+          disabled={product.disabled}
         />
 
         <label className="label" htmlFor="date">
@@ -340,6 +399,7 @@ function main(api) {
               time: new Date(`${ev.target.value}T${timeRef.current.value || '00:00'}`).getTime(),
             })
           }}
+          disabled={product.disabled}
         />
 
         <label className="label" htmlFor="time">
@@ -358,6 +418,7 @@ function main(api) {
               time: new Date(`${dateRef.current.value}T${ev.target.value}`).getTime(),
             })
           }}
+          disabled={product.disabled}
         />
 
         <span className="label">cover photo</span>
@@ -367,7 +428,7 @@ function main(api) {
           </div>
         ) : null}
 
-        <button className="control" onClick={photoBtn}>
+        <button className="control" onClick={photoBtn} disabled={product.disabled}>
           pick photo
         </button>
         {photoActive ? (
@@ -392,10 +453,10 @@ function main(api) {
             removeCb={product.removePhotoCb}
           />
         ) : null}
-        <button className="control" onClick={photosBtn}>
+        <button className="control" onClick={photosBtn} disabled={product.disabled}>
           add photos
         </button>
-        <button className="control" onClick={product.deleteProductCb}>
+        <button className="control" onClick={product.deleteProductCb} disabled={product.disabled}>
           Delete Product
         </button>
       </form>
