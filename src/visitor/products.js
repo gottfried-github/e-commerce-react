@@ -9,19 +9,6 @@ export default api => {
   return forwardRef(({ productsRenderedCb }, ref) => {
     const [searchParams, setSearchParams] = useSearchParams()
 
-    const [products, setProducts] = useState([])
-    const [fieldName, setFieldName] = useState('time')
-    const [dir, setDir] = useState(-1)
-    const [inStock, setInStock] = useState(false)
-
-    useEffect(() => {
-      setSearchParams({
-        fieldName,
-        dir,
-        inStock,
-      })
-    }, [fieldName, dir, inStock])
-
     const searchParamsParsed = useMemo(
       () => ({
         fieldName: searchParams.get('fieldName') || 'time',
@@ -35,6 +22,19 @@ export default api => {
       }),
       [searchParams]
     )
+
+    const [products, setProducts] = useState([])
+    const [fieldName, setFieldName] = useState(searchParamsParsed.fieldName)
+    const [dir, setDir] = useState(searchParamsParsed.dir)
+    const [inStock, setInStock] = useState(searchParamsParsed.inStock)
+
+    useEffect(() => {
+      setSearchParams({
+        fieldName,
+        dir,
+        inStock,
+      })
+    }, [fieldName, dir, inStock])
 
     useEffect(() => {
       api.product.getMany(
