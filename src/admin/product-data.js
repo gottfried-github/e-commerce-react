@@ -11,6 +11,8 @@ function dataToState(fields) {
     is_in_stock: fields.is_in_stock || false,
     description: fields.description || '',
     time: fields.time ? new Date(fields.time).getTime() : null,
+    photos_all: fields.photos_all,
+    photo_cover: fields.photo_cover,
   }
 
   if (undefined === fields.price) {

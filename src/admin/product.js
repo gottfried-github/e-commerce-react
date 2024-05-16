@@ -54,18 +54,18 @@ function main(api) {
       is_in_stock: false,
       description: '',
       time: null,
+      photos_all: [],
+      photo_cover: null,
     })
-    const [photos_all, setPhotosAll] = useState([])
 
     const photosPublic = useMemo(
       () =>
-        photos_all
+        state.photos_all
           .filter(photo => photo.public)
           // sort in ascending order
           .sort((photoA, photoB) => (photoA.order > photoB.order ? 1 : -1)),
-      [photos_all]
+      [state.photos_all]
     )
-    const photoCover = useMemo(() => photos_all.find(photo => photo.cover) || null, [photos_all])
 
     const [isDataLoading, setIsDataLoading] = useState(false)
 
@@ -75,18 +75,13 @@ function main(api) {
 
       setIsDataLoading(true)
 
-      Promise.all([promiseProduct.promise, promisePhotos.promise]).then(() => {
+      Promise.all([promiseProduct.promise]).then(() => {
         setIsDataLoading(false)
       })
 
       api.product.get(params.id, body => {
         setState(data.dataToState(body))
         promiseProduct.resolve()
-      })
-
-      api.product.getPhotos(params.id, null, body => {
-        setPhotosAll(body)
-        promisePhotos.resolve()
       })
     }, [])
 
@@ -95,8 +90,8 @@ function main(api) {
       setIsDataLoading(true)
 
       api.product.upload(params.id, files, () => {
-        api.product.getPhotos(params.id, null, body => {
-          setPhotosAll(body)
+        api.product.get(params.id, body => {
+          setState(data.dataToState(body))
           setIsDataLoading(false)
         })
       })
@@ -111,29 +106,6 @@ function main(api) {
         api.product.get(params.id, body => {
           setState(data.dataToState(body))
 
-          if (!picked) {
-            setPhotosAll(
-              photos_all.map(_photo => {
-                if (_photo.id !== photo.id) return _photo
-
-                return { ..._photo, public: false }
-              })
-            )
-          } else {
-            const orderDesc = photosPublic
-              .map(photo => photo.order)
-              .sort((a, b) => (a < b ? 1 : -1))
-            const orderGreatest = orderDesc[0] + 1
-
-            setPhotosAll(
-              photos_all.map(_photo => {
-                if (_photo.id !== photo.id) return _photo
-
-                return { ..._photo, public: true, order: orderGreatest }
-              })
-            )
-          }
-
           setIsDataLoading(false)
         })
       })
@@ -146,7 +118,7 @@ function main(api) {
         // `expose` might have changed, so updating product state
         api.product.get(params.id, body => {
           setState(data.dataToState(body))
-          setPhotosAll(photos_all.filter(_photo => _photo.id !== photo.id))
+          // setPhotosAll(photos_all.filter(_photo => _photo.id !== photo.id))
 
           setIsDataLoading(false)
         })
@@ -157,13 +129,15 @@ function main(api) {
       setIsDataLoading(true)
 
       api.product.setCoverPhoto(params.id, { id: photo.id, cover: true }, () => {
-        setPhotosAll(
-          photos_all.map(_photo => {
+        setState({
+          ...state,
+          photos_all: state.photos_all.map(_photo => {
             if (_photo.id !== photo.id) return _photo
 
             return { ..._photo, cover: true }
-          })
-        )
+          }),
+          photo_cover: { ...photo, cover: true },
+        })
 
         setIsDataLoading(false)
       })
@@ -177,13 +151,14 @@ function main(api) {
       api.product.reorderPhotos(params.id, photosData, () => {
         const photosDataIds = photosData.map(photo => photo.id)
 
-        setPhotosAll(
-          photos_all.map(photo => {
+        setState({
+          ...state,
+          photos_all: state.photos_all.map(photo => {
             if (!photosDataIds.includes(photo.id)) return photo
 
             return { ...photo, order: photosData[photosDataIds.indexOf(photo.id)].order }
-          })
-        )
+          }),
+        })
 
         setIsDataLoading(false)
       })
@@ -211,9 +186,7 @@ function main(api) {
 
     return {
       state,
-      photos_all,
       photosPublic,
-      photoCover,
       photosUpload,
       pickCb,
       removePhotoCb,
@@ -335,8 +308,8 @@ function main(api) {
                 product.state.priceHrn !== null &&
                 product.state.priceKop !== null &&
                 typeof product.state.is_in_stock === 'boolean' &&
-                product.state.photos !== null &&
-                product.state.cover_photo &&
+                product.photosPublic.length &&
+                product.state.photo_cover &&
                 product.state.description.length &&
                 product.state.time !== null
               )
@@ -422,9 +395,9 @@ function main(api) {
         />
 
         <span className="label">cover photo</span>
-        {product.photoCover ? (
+        {product.state.photo_cover ? (
           <div className="photo cover-photo">
-            <img src={product.photoCover.pathPublic} />
+            <img src={product.state.photo_cover.pathPublic} />
           </div>
         ) : null}
 
@@ -433,8 +406,8 @@ function main(api) {
         </button>
         {photoActive ? (
           <PhotoPicker
-            photosAll={product.photos_all ? product.photos_all : []}
-            photo={product.photoCover}
+            photosAll={product.state.photos_all}
+            photo={product.state.photo_cover}
             pickCb={product.coverPickCb}
             upload={product.photosUpload}
           />
@@ -446,7 +419,7 @@ function main(api) {
         </DndProvider>
         {photosActive ? (
           <PhotosPicker
-            photosAll={product.photos_all ? product.photos_all : []}
+            photosAll={product.state.photos_all}
             photos={product.photosPublic}
             upload={product.photosUpload}
             pickCb={product.pickCb}
