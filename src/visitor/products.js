@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, forwardRef } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState, useEffect, useRef, forwardRef, useMemo } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 
 import { kopToHrn } from '../price.js'
 
@@ -7,31 +7,40 @@ import Filters from './filters.js'
 
 export default api => {
   return forwardRef(({ productsRenderedCb }, ref) => {
+    const [searchParams, setSearchParams] = useSearchParams()
+
     const [products, setProducts] = useState([])
     const [fieldName, setFieldName] = useState('time')
     const [dir, setDir] = useState(-1)
     const [inStock, setInStock] = useState(false)
 
     useEffect(() => {
-      api.product.getMany(
+      setSearchParams({
         fieldName,
         dir,
         inStock,
-        body => {
-          console.log('api.product.getMany, successCb - body:', body)
-          setProducts(body)
-        },
-        () => {
-          console.log('api.product.getMany, failureCb - body:', body)
-        }
-      )
-    }, [])
+      })
+    }, [fieldName, dir, inStock])
+
+    const searchParamsParsed = useMemo(
+      () => ({
+        fieldName: searchParams.get('fieldName') || 'time',
+        dir: searchParams.get('dir') ? parseInt(searchParams.get('dir'), 10) : -1,
+        inStock:
+          searchParams.get('inStock') === 'true'
+            ? true
+            : searchParams.get('inStock') === 'false'
+              ? false
+              : false,
+      }),
+      [searchParams]
+    )
 
     useEffect(() => {
       api.product.getMany(
-        fieldName,
-        dir,
-        inStock,
+        searchParamsParsed.fieldName,
+        searchParamsParsed.dir,
+        searchParamsParsed.inStock,
         body => {
           console.log('api.product.getMany, successCb - body:', body)
           setProducts(body)
@@ -40,7 +49,7 @@ export default api => {
           console.log('api.product.getMany, failureCb - body:', body)
         }
       )
-    }, [fieldName, dir, inStock])
+    }, [searchParamsParsed])
 
     useEffect(() => {
       productsRenderedCb()
@@ -50,9 +59,9 @@ export default api => {
       <section id="products" ref={ref}>
         <div className="products-container">
           <Filters
-            fieldName={fieldName}
-            dir={dir}
-            inStock={inStock}
+            fieldName={searchParamsParsed.fieldName}
+            dir={searchParamsParsed.dir}
+            inStock={searchParamsParsed.inStock}
             fieldNameChangeCb={fieldName => {
               setFieldName(fieldName)
             }}
@@ -69,7 +78,7 @@ export default api => {
                 <ProductCard
                   key={product.id}
                   id={product.id}
-                  photoUrl={product.cover_photo.path}
+                  photoUrl={product.photo_cover.pathPublic}
                   name={product.name}
                   price={product.price}
                 />
