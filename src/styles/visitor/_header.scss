@@ -5,8 +5,7 @@
 
   height: 75px;
 
-  background-color: $primary;
-  color: $accent;
+  color: $text-main;
 
   #logo {
     grid-column: 2;
@@ -121,7 +120,7 @@
   }
 
   @media (min-width: 325px) {
-    grid-template-columns: 16px 1fr 16px;
+    grid-template-columns: 25px 1fr 25px;
 
     .nav-main {
       display: block;
@@ -131,6 +130,14 @@
 
       .nav-links {
         column-gap: 24px;
+
+        .nav-link {
+          transition: color $animation-text;
+        }
+
+        .nav-link:hover {
+          color: $text-main-hover;
+        }
       }
     }
 
@@ -141,9 +148,10 @@
 }
 
 .page_home .header-main {
-  // 1616px (320px (product-card width) * 5) + 16px (horizontal margin) * 2
-  @media (min-width: 1648px) {
-    grid-template-columns: 1fr 1616px 1fr;
+  // 1438px = 260px (product-card width) * 5 + 22px (grid column-gap) * 4 + 25px (horizontal margin) * 2
+  @media (min-width: 1438px) {
+    // 260px (product-card width) * 5 + 22px (grid column-gap) * 4
+    grid-template-columns: 1fr 1388px 1fr;
   }
 }
 

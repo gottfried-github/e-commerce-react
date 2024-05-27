@@ -4,12 +4,13 @@
   margin: 0 0 100px 0;
 
   @media (min-width: 325px) {
-    grid-template-columns: 16px 1fr 16px;
+    grid-template-columns: 25px 1fr 25px;
   }
 
-  // 1616px (320px (product-card width) * 5) + 16px (horizontal margin) * 2
-  @media (min-width: 1648px) {
-    grid-template-columns: 1fr 1616px 1fr;
+  // 1438px = 260px (product-card width) * 5 + 22px (grid column-gap) * 4 + 25px (horizontal margin) * 2
+  @media (min-width: 1438px) {
+    // 260px (product-card width) * 5 + 22px (grid column-gap) * 4
+    grid-template-columns: 1fr 1388px 1fr;
   }
 }
 
@@ -22,27 +23,27 @@
   grid-column: 2;
   display: grid;
 
-  column-gap: 4px;
+  column-gap: 22px;
   row-gap: 18px;
 
   margin: 0;
   padding: 0px;
 
   /* 320px: product-card width; 16px: horizontal margin; 4px: column-gap; */
-  @media (min-width: calc(320px * 2 + 16px * 2 + 4px)) {
-    grid-template-columns: repeat(2, 320px);
+  @media (min-width: calc(260px * 2 + 25px * 2 + 22px)) {
+    grid-template-columns: repeat(2, 260px);
   }
 
-  @media (min-width: calc(320px * 3 + 16px * 2 + 4px * 2)) {
-    grid-template-columns: repeat(3, 320px);
+  @media (min-width: calc(260px * 3 + 25px * 2 + 22px * 2)) {
+    grid-template-columns: repeat(3, 260px);
   }
 
-  @media (min-width: calc(320px * 4 + 16px * 2 + 4px * 3)) {
-    grid-template-columns: repeat(4, 320px);
+  @media (min-width: calc(260px * 4 + 25px * 2 + 22px * 3)) {
+    grid-template-columns: repeat(4, 260px);
   }
 
-  @media (min-width: calc(320px * 5 + 16px * 2 + 4px * 4)) {
-    grid-template-columns: repeat(5, 320px);
+  @media (min-width: calc(260px * 5 + 25px * 2 + 22px * 4)) {
+    grid-template-columns: repeat(5, 260px);
   }
 }
 
@@ -70,30 +71,39 @@
   .product-card__info {
     margin: 0 0 10px 0;
 
+    transition: color $animation-text;
+
     .product-card__price,
     .product-card__name {
       display: block;
 
       margin: 0;
       padding: 0px;
+
+      transition: inherit;
     }
 
     .product-card__price {
       font-weight: 600;
+      color: $text-main-bold;
     }
   }
 
   &:hover {
-    color: $primary-hover;
+    color: $text-main-hover;
+
+    .product-card__price {
+      color: $text-main-bold-hover;
+    }
   }
 
   @media (min-width: calc(320px + 16px * 2)) {
-    width: 320px;
+    width: 260px;
 
     .product-card__photo {
       aspect-ratio: unset;
-      width: 320px;
-      height: 230px;
+      width: 260px;
+      height: 232px;
     }
   }
 }
