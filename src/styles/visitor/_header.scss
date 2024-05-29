@@ -1,6 +1,6 @@
 .header-main {
   display: grid;
-  grid-template-columns: 8px 1fr 8px;
+  grid-template-columns: 16px 1fr 16px;
   align-items: center;
 
   height: 75px;
@@ -30,6 +30,14 @@
       padding: 0px;
 
       list-style-type: none;
+
+      .nav-link {
+        transition: color $animation-text;
+      }
+
+      .nav-link:hover {
+        color: $text-main-hover;
+      }
     }
 
     .social-links {
@@ -69,6 +77,9 @@
     // see Mobile menu view in product spec
     overflow-y: scroll;
     z-index: 2;
+
+    background-color: $text_main;
+    color: $background-main;
 
     .nav-main {
       justify-self: flex-start;
@@ -130,14 +141,6 @@
 
       .nav-links {
         column-gap: 24px;
-
-        .nav-link {
-          transition: color $animation-text;
-        }
-
-        .nav-link:hover {
-          color: $text-main-hover;
-        }
       }
     }
 

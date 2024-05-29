@@ -39,8 +39,8 @@ function Header({ sectionsPos }) {
         </ul>
 
         <ul className="social-links">
-          <li className="social-link instagram"></li>
-          <li className="social-link facebook"></li>
+          <li className="social-link social-link-light instagram"></li>
+          <li className="social-link social-link-light facebook"></li>
         </ul>
       </nav>
       <div

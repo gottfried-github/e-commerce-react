@@ -1,6 +1,6 @@
 #products {
   display: grid;
-  grid-template-columns: 8px 1fr 8px;
+  grid-template-columns: 16px 1fr 16px;
   margin: 0 0 100px 0;
 
   @media (min-width: 325px) {
