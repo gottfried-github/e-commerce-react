@@ -1,7 +1,7 @@
 #product {
   display: grid;
-  grid-template-columns: 8px 1fr 8px;
-  padding: 8px 0px 80px 0px;
+  grid-template-columns: 16px 1fr 16px;
+  padding: 16px 0px 80px 0px;
 
   .photos {
     grid-column: 2;
@@ -49,7 +49,7 @@
   }
 
   @media (min-width: 325px) {
-    grid-template-columns: 16px 1fr 16px;
+    grid-template-columns: 25px 1fr 25px;
     padding: 16px 0px 80px 0px;
 
     .photos {
@@ -62,7 +62,7 @@
   }
 
   @media (min-width: 820px) {
-    grid-template-columns: 16px 1fr 16px 1fr 16px;
+    grid-template-columns: 25px 1fr 25px 1fr 25px;
     padding: 75px 0px 75px 0px;
 
     .photos {
@@ -76,8 +76,8 @@
   }
 
   @media (min-width: calc(1440px + 16px * 2)) {
-    // 712px = (1440px - 16px (gap between two content columns)) / 2
-    grid-template-columns: 1fr 712px 16px 712px 1fr;
+    // 708px = (1440px - 24px (gap between two content columns)) / 2
+    grid-template-columns: 1fr 708px 24px 708px 1fr;
 
     .photos {
       grid-column: 2;
