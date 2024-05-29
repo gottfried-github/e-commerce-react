@@ -41,8 +41,20 @@ function Header({ sectionsPos }) {
         </ul>
 
         <ul className="social-links">
-          <li className="social-link social-link-light instagram"></li>
-          <li className="social-link social-link-light facebook"></li>
+          <li className="social-link-container">
+            <a
+              className="social-link social-link-light instagram"
+              href="https://www.instagram.com/animato_jewelry/"
+              target="_blank"
+            ></a>
+          </li>
+          <li className="social-link-container">
+            <a
+              className="social-link social-link-light facebook"
+              href="https://www.facebook.com/bySophiaSalo/"
+              target="_blank"
+            ></a>
+          </li>
         </ul>
       </nav>
       <div
