@@ -12,7 +12,7 @@ function Filters({ fieldName, dir, inStock, fieldNameChangeCb, dirChangeCb, inSt
           inStockChangeCb(!inStock)
         }}
       >
-        {inStock ? 'усі' : 'наявні'}
+        <span className="filter__text">{inStock ? 'усі' : 'наявні'}</span>
       </li>
 
       <li className="filter">
