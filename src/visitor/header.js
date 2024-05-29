@@ -8,7 +8,9 @@ function Header({ sectionsPos }) {
 
   return (
     <header className={`header-main${isOpen ? ' header-main_opened' : ''}`}>
-      <div id="logo"></div>
+      <Link className="logo-container" to="/">
+        <div id="logo"></div>
+      </Link>
       <nav className="nav-main">
         <ul className="nav-links">
           <li className="nav-link-container">
