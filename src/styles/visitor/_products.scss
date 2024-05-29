@@ -70,7 +70,8 @@
     transition: color $animation-text;
 
     .product-card__price,
-    .product-card__name {
+    .product-card__name,
+    .product-card__out-of-stock {
       display: block;
 
       margin: 0;
@@ -82,6 +83,11 @@
     .product-card__price {
       font-weight: 600;
       color: $text-main-bold;
+    }
+
+    .product-card__out-of-stock {
+      font-weight: 600;
+      color: $text-inactive-0;
     }
   }
 
