@@ -53,14 +53,14 @@
       margin: 8px 0 0 0;
       padding: 6px 0px;
 
-      background-color: $background-one-inactive;
+      background-color: $background-1;
       list-style-type: none;
 
       .dropdown__item {
         padding: 0px 16px;
 
         &:hover {
-          background-color: $background-main-1;
+          background-color: $background-2;
         }
       }
     }

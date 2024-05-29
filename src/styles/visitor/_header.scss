@@ -148,10 +148,10 @@
 }
 
 .page_home .header-main {
-  // 1438px = 260px (product-card width) * 5 + 22px (grid column-gap) * 4 + 25px (horizontal margin) * 2
-  @media (min-width: 1438px) {
-    // 260px (product-card width) * 5 + 22px (grid column-gap) * 4
-    grid-template-columns: 1fr 1388px 1fr;
+  // 1405px = 320px (product-card width) * 4 + 25px (grid column-gap) * 3 + 25px (horizontal margin) * 2
+  @media (min-width: 1405px) {
+    // 320px (product-card width) * 4 + 25px (grid column-gap) * 3
+    grid-template-columns: 1fr 1355px 1fr;
   }
 }
 
