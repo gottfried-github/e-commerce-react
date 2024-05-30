@@ -98,7 +98,7 @@ function ProductCard({ id, photoUrl, name, price, isInStock }) {
   return (
     <li className="product-card">
       <Link className="product-card__photo-container" to={`/product/${id}`}>
-        <img className="product-card__photo" src={photoUrl} alt="" />
+        <img className="product-card__photo" src={photoUrl} alt={name} />
       </Link>
       <div className="product-card__info">
         <Link className="product-card__price" to={`/product/${id}`}>{`₴${

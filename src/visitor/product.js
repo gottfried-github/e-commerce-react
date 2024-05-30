@@ -26,7 +26,7 @@ export default api => {
     return product ? (
       <section id="product">
         <div className="photos">
-          <img className="photo" src={product.photo_cover.pathPublic} alt="" />
+          <img className="photo" src={product.photo_cover.pathPublic} alt={product.name} />
         </div>
         <div className="info">
           <h1 className="info__title">{product.name}</h1>
