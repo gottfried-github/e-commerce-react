@@ -1,11 +1,14 @@
 .header-main {
   display: grid;
   grid-template-columns: 16px 1fr 16px;
+  grid-template-rows: 75px 0fr;
   align-items: center;
 
   height: 75px;
 
   color: $text-main;
+
+  transition: background-color 0.3s 0.3s, width 0s 0.3s, height 0s 0.3s, grid-template-rows 0s 0.3s;
 
   .logo-container {
     grid-column: 2;
@@ -25,11 +28,11 @@
   }
 
   .nav-main {
-    display: none;
+    grid-column: 2;
 
     .nav-links {
       display: flex;
-
+      
       margin: 0;
       padding: 0px;
 
@@ -45,7 +48,23 @@
     }
 
     .social-links {
-      display: none;
+      display: flex;
+    }
+
+    @media (max-width: 325px) {
+      justify-self: flex-start;
+  
+      @include hidden;
+  
+      display: flex;
+      flex-direction: column;
+  
+      row-gap: 20px;
+
+      .nav-links {
+        flex-direction: column;
+        row-gap: 8px;
+      }
     }
   }
 
@@ -64,11 +83,16 @@
   }
 
   #menu-close {
-    display: none;
+    grid-row: 1;
+
+    @include hidden;
   }
 
   #timestamp {
-    display: none;
+    grid-row: 3;
+    grid-column: 2;
+
+    @include hidden;
   }
 
   &.header-main_opened {
@@ -82,27 +106,19 @@
     overflow-y: scroll;
     z-index: 2;
 
+    transition: background-color 0.3s;
+
     background-color: $text_main;
     color: $background-main;
 
+    #logo {
+      background-image: url('../assets/images/logo-light.svg');
+    }
+
     .nav-main {
-      justify-self: flex-start;
-
-      display: flex;
-      flex-direction: column;
-      row-gap: 20px;
-
-      grid-column: 2;
       grid-row: 2;
 
-      .nav-links {
-        flex-direction: column;
-        row-gap: 8px;
-      }
-
-      .social-links {
-        display: flex;
-      }
+      @include visible;
     }
 
     #menu-open {
@@ -110,7 +126,7 @@
     }
 
     #menu-close {
-      display: block;
+      @include visible;
 
       grid-column: 2;
       grid-row: 1;
@@ -126,7 +142,8 @@
     }
 
     #timestamp {
-      display: block;
+      @include visible;
+      
       grid-row: 3;
       grid-column: 2;
 
