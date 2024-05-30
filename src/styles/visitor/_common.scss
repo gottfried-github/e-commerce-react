@@ -9,7 +9,7 @@
 
   .social-link {
     display: block;
-    
+
     width: 24px;
     height: 24px;
 
@@ -41,4 +41,27 @@
 
 .bottom-up {
   transform: rotate(180deg);
+}
+
+.wrapper:has(.header-main_opened) {
+  height: 100vh;
+  overflow: hidden;
+}
+
+@mixin hidden {
+  visibility: hidden;
+  opacity: 0;
+  margin-top: -9999px;
+  margin-left: -9999px;
+
+  transition: opacity 0.3s ease-out, visibility 0s 0.3s, margin 0s 0.3s;
+}
+
+@mixin visible {
+  visibility: visible;
+  opacity: 1;
+  margin-top: 0px;
+  margin-left: 0px;
+
+  transition: opacity 0.3s 0.3s ease-out;
 }
