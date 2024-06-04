@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { kopToHrn } from '../price.js'
@@ -23,6 +23,18 @@ export default api => {
       )
     }, [])
 
+    const isSinglePhoto = useMemo(() => {
+      if (!product) return false
+
+      if (
+        !product.photos_all.length ||
+        (product.photos_all.length === 1 && product.photos_all[0].cover)
+      )
+        return true
+
+      return false
+    }, [product?.photos_all])
+
     return product ? (
       <section id="product">
         <div className="photos">
@@ -31,7 +43,7 @@ export default api => {
             photo.cover ? null : <img className="photo" src={photo.pathPublic} key={photo.id} />
           )}
         </div>
-        <div className="info">
+        <div className={`info${isSinglePhoto ? ' single-photo' : ''}`}>
           <h1 className="info__title">{product.name}</h1>
           <div className="info__row">
             <span className="info__price">{`₴${
