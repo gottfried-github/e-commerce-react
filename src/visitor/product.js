@@ -27,6 +27,9 @@ export default api => {
       <section id="product">
         <div className="photos">
           <img className="photo" src={product.photo_cover.pathPublic} alt={product.name} />
+          {product.photos_all.map(photo =>
+            photo.cover ? null : <img className="photo" src={photo.pathPublic} key={photo.id} />
+          )}
         </div>
         <div className="info">
           <h1 className="info__title">{product.name}</h1>
