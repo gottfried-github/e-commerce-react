@@ -11,6 +11,8 @@
   .photos-mobile-container {
     width: 100%;
 
+    margin-bottom: 14px;
+
     .photos-mobile-swiper-container {
       position: relative;
 
@@ -49,15 +51,48 @@
 
     .photos-mobile__navigation {
       display: flex;
+      justify-content: center;
 
-      column-gap: 8px;
+      margin-top: 18px;
+      column-gap: 14px;
     }
 
     .photos-mobile__navigation_left, .photos-mobile__navigation_right {
-      width: 50px;
-      height: 50px;
+      display: flex;
 
-      background-color: grey;
+      width: 40px;
+      height: 40px;
+
+      border-radius: 40px;
+      background-color: $background-3;
+      box-shadow: 0px 2px 2px $shadow-0;
+
+      transition: background-color $animation-text, box-shadow $animation-text;
+
+      &:hover {
+        background-color: $background-hover-0;
+        box-shadow: 0px 2px 2px $shadow-hover-0;
+
+        .navigation__arrow-icon {
+          background-image: url('../assets/images/arrow_left_hover.svg');
+        }
+      }
+
+      .navigation__arrow-icon {
+        width: 4px;
+        height: 8px;
+
+        margin: auto;
+
+        background-image: url('../assets/images/arrow_left.svg');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+      }
+    }
+
+    .photos-mobile__navigation_right .navigation__arrow-icon {
+      transform: rotate(180deg);
     }
 
     .photo-mobile {

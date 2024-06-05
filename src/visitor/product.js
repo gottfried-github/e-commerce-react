@@ -99,8 +99,12 @@ export default api => {
             </swiper-container>
           </div>
           <div className="photos-mobile__navigation">
-            <div className="photos-mobile__navigation_left" ref={refSwiperNavigationLeft}></div>
-            <div className="photos-mobile__navigation_right" ref={refSwiperNavigationRight}></div>
+            <div className="photos-mobile__navigation_left" ref={refSwiperNavigationLeft}>
+              <div className="navigation__arrow-icon"></div>
+            </div>
+            <div className="photos-mobile__navigation_right" ref={refSwiperNavigationRight}>
+              <div className="navigation__arrow-icon"></div>
+            </div>
           </div>
         </div>
         <div className={`info${isSinglePhoto ? ' single-photo' : ''}`}>
