@@ -1,13 +1,20 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { useParams } from 'react-router-dom'
+import { register } from 'swiper/element/bundle'
+import { Navigation } from 'swiper/modules'
 
 import { kopToHrn } from '../price.js'
+
+register()
 
 export default api => {
   return () => {
     const params = useParams()
 
     const [product, setProduct] = useState(null)
+    const refSwiper = useRef(null)
+    const refSwiperNavigationLeft = useRef(null)
+    const refSwiperNavigationRight = useRef(null)
 
     useEffect(() => {
       api.product.get(
@@ -22,6 +29,32 @@ export default api => {
         }
       )
     }, [])
+
+    useEffect(() => {
+      if (
+        !refSwiper.current ||
+        !refSwiperNavigationLeft.current ||
+        !refSwiperNavigationRight.current
+      )
+        return
+
+      const swiperConfig = {
+        spaceBetween: 5,
+        slidesPerView: 1,
+      }
+
+      Object.assign(refSwiper.current, swiperConfig)
+      refSwiper.current.initialize()
+
+      /* using `navigation` parameter in swiperConfig doesn't work, so setting navigation up manually */
+      refSwiperNavigationLeft.current.addEventListener('click', () => {
+        refSwiper.current.swiper.slidePrev()
+      })
+
+      refSwiperNavigationRight.current.addEventListener('click', () => {
+        refSwiper.current.swiper.slideNext()
+      })
+    }, [product])
 
     const isSinglePhoto = useMemo(() => {
       if (!product) return false
@@ -42,6 +75,28 @@ export default api => {
           {product.photos_all.map(photo =>
             photo.cover ? null : <img className="photo" src={photo.pathPublic} key={photo.id} />
           )}
+        </div>
+        <div className="photos-mobile-container">
+          <swiper-container class="photos-mobile" ref={refSwiper}>
+            <swiper-slide>
+              <img
+                className="photo-mobile"
+                src={product.photo_cover.pathPublic}
+                alt={product.name}
+              />
+            </swiper-slide>
+            {product.photos_all.map(photo =>
+              photo.cover ? null : (
+                <swiper-slide key={photo.id}>
+                  <img className="photo-mobile" src={photo.pathPublic} />
+                </swiper-slide>
+              )
+            )}
+          </swiper-container>
+          <div className="photos-mobile__navigation">
+            <div className="photos-mobile__navigation_left" ref={refSwiperNavigationLeft}></div>
+            <div className="photos-mobile__navigation_right" ref={refSwiperNavigationRight}></div>
+          </div>
         </div>
         <div className={`info${isSinglePhoto ? ' single-photo' : ''}`}>
           <h1 className="info__title">{product.name}</h1>
