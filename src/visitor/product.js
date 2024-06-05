@@ -77,22 +77,27 @@ export default api => {
           )}
         </div>
         <div className="photos-mobile-container">
-          <swiper-container class="photos-mobile" ref={refSwiper}>
-            <swiper-slide>
-              <img
-                className="photo-mobile"
-                src={product.photo_cover.pathPublic}
-                alt={product.name}
-              />
-            </swiper-slide>
-            {product.photos_all.map(photo =>
-              photo.cover ? null : (
-                <swiper-slide key={photo.id}>
-                  <img className="photo-mobile" src={photo.pathPublic} />
-                </swiper-slide>
-              )
-            )}
-          </swiper-container>
+          <div class="photos-mobile-swiper-container">
+            <div className="swipe-icon-container">
+              <div className="swipe-icon"></div>
+            </div>
+            <swiper-container class="photos-mobile" ref={refSwiper}>
+              <swiper-slide>
+                <img
+                  className="photo-mobile"
+                  src={product.photo_cover.pathPublic}
+                  alt={product.name}
+                />
+              </swiper-slide>
+              {product.photos_all.map(photo =>
+                photo.cover ? null : (
+                  <swiper-slide key={photo.id}>
+                    <img className="photo-mobile" src={photo.pathPublic} />
+                  </swiper-slide>
+                )
+              )}
+            </swiper-container>
+          </div>
           <div className="photos-mobile__navigation">
             <div className="photos-mobile__navigation_left" ref={refSwiperNavigationLeft}></div>
             <div className="photos-mobile__navigation_right" ref={refSwiperNavigationRight}></div>
