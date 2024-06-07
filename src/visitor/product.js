@@ -68,6 +68,38 @@ export default api => {
       return false
     }, [product?.photos_all])
 
+    const handleIdBadgeClick = async () => {
+      if (navigator.clipboard) {
+        try {
+          await navigator.clipboard.writeText(product._id)
+        } catch (e) {
+          console.log('navigator.clipboard.writeText errored, error:', e)
+        }
+      } else {
+        const textarea = document.createElement('textarea')
+
+        textarea.value = product._id
+        textarea.style.position = 'fixed'
+        textarea.style.top = '-9999px'
+        textarea.style.left = '-9999px'
+
+        document.body.appendChild(textarea)
+
+        textarea.focus()
+        textarea.select()
+
+        try {
+          const res = document.execCommand('copy')
+
+          if (!res) console.log("document.execCommand('copy') returned false")
+        } catch (e) {
+          console.log("document.execCommand('copy') errored, error:", e)
+        }
+
+        document.body.removeChild(textarea)
+      }
+    }
+
     return product ? (
       <section id="product">
         <div className="photos">
@@ -77,11 +109,11 @@ export default api => {
           )}
         </div>
         <div className="photos-mobile-container">
-          <div class="photos-mobile-swiper-container">
+          <div className="photos-mobile-swiper-container">
             <div className="swipe-icon-container">
               <div className="swipe-icon"></div>
             </div>
-            <swiper-container class="photos-mobile" ref={refSwiper}>
+            <swiper-container className="photos-mobile" ref={refSwiper}>
               <swiper-slide>
                 <img
                   className="photo-mobile"
@@ -108,7 +140,17 @@ export default api => {
           </div>
         </div>
         <div className={`info${isSinglePhoto ? ' single-photo' : ''}`}>
-          <h1 className="info__title">{product.name}</h1>
+          <div className="info__heading-block">
+            <h1 className="info__title">{product.name}</h1>
+            <div className="info__id-container">
+              <div className="info__id-text-container" onClick={handleIdBadgeClick}>
+                #<span className="info__id-text">{product._id}</span>
+              </div>
+              <button className="info__id-copy-btn" onClick={handleIdBadgeClick}>
+                <span className="info__id-copy-icon"></span>скопіювати
+              </button>
+            </div>
+          </div>
           <div className="info__row">
             <span className="info__price">{`₴${
               product.priceHrn.kop
