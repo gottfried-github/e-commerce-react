@@ -173,6 +173,10 @@
             background-image: url('../assets/images/icon-copy_hover.svg');
           }
         }
+
+        &:active {
+          background-color: $background-hover-0;
+        }
       }
 
       &:hover {
@@ -207,6 +211,32 @@
 
     .info__description {
       margin: 0;
+    }
+
+    .notification {
+      display: flex;
+      align-items: center;
+      
+      padding: 2px 4px;
+      
+      font-size: 14px;
+
+      border: none;
+      border-radius: 2px;
+      
+      color: $text-main;
+      background-color: $background-text-1;
+    }
+
+    .notification__copied-icon {
+      display: block;
+      width: 16px;
+      height: 16px;
+
+      background-image: url('../assets/images/icon-check.svg');
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
     }
   }
 

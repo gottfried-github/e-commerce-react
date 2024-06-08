@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { register } from 'swiper/element/bundle'
-import { Navigation } from 'swiper/modules'
 
 import { kopToHrn } from '../price.js'
+import Notification from './notification.js'
 
 register()
 
@@ -12,6 +12,8 @@ export default api => {
     const params = useParams()
 
     const [product, setProduct] = useState(null)
+    const [isCopiedNotificationVisible, setIsCopiedNotificationVisible] = useState(false)
+
     const refSwiper = useRef(null)
     const refSwiperNavigationLeft = useRef(null)
     const refSwiperNavigationRight = useRef(null)
@@ -72,6 +74,14 @@ export default api => {
       if (navigator.clipboard) {
         try {
           await navigator.clipboard.writeText(product._id)
+
+          if (!isCopiedNotificationVisible) {
+            setIsCopiedNotificationVisible(true)
+
+            setTimeout(() => {
+              setIsCopiedNotificationVisible(false)
+            }, 1500)
+          }
         } catch (e) {
           console.log('navigator.clipboard.writeText errored, error:', e)
         }
@@ -91,7 +101,17 @@ export default api => {
         try {
           const res = document.execCommand('copy')
 
-          if (!res) console.log("document.execCommand('copy') returned false")
+          if (res) {
+            if (!isCopiedNotificationVisible) {
+              setIsCopiedNotificationVisible(true)
+
+              setTimeout(() => {
+                setIsCopiedNotificationVisible(false)
+              }, 1500)
+            }
+          } else {
+            console.log("document.execCommand('copy') returned false")
+          }
         } catch (e) {
           console.log("document.execCommand('copy') errored, error:", e)
         }
@@ -162,6 +182,11 @@ export default api => {
             </span>
           </div>
           <p className="info__description">{product.description}</p>
+          <Notification hidden={!isCopiedNotificationVisible}>
+            <div className="notification">
+              <span className="notification__copied-icon"></span>скопійовано
+            </div>
+          </Notification>
         </div>
       </section>
     ) : null
