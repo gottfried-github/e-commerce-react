@@ -65,3 +65,47 @@
 
   transition: opacity 0.3s ease-in;
 }
+
+.notification-container {
+  display: grid;
+  grid-template-columns: 25px 1fr 15px;
+  justify-items: flex-end;
+
+  position: fixed;
+  left: 0px;
+  bottom: 38px;
+
+  width: 100vw;
+
+  visibility: visible;
+  opacity: 1;
+
+  transition: opacity $animation-text;
+}
+
+.notification-container.hidden {
+  transition: opacity $animation-text, visibility 0s 0.25s, margin 0s 0.25s;
+
+  opacity: 0;
+  visibility: hidden;
+  margin-left: -9999px;
+  margin-right: -9999px;
+}
+
+.page_home .notification-container {
+  // min-width same as header and footer
+  @media (min-width: 1405px) {
+    grid-template-columns: 1fr 1355px 1fr;
+  }
+}
+
+.page_product .notification-container {
+  // min-width same as header and footer
+  @media (min-width: 1472px) {
+    grid-template-columns: 1fr 1440px 1fr;
+  }
+}
+
+.notification {
+  grid-column: 2;
+}
