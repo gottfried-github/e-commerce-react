@@ -182,6 +182,21 @@ export default api => {
             </span>
           </div>
           <p className="info__description">{product.description}</p>
+          <div className="info__social-links-container">
+            <h2 className="info__social-links-heading">Написати:</h2>
+            <div className="info__social-links">
+              <a
+                className="info__social-link info__social-link-instagram"
+                href="https://ig.me/m/animato_jewelry"
+                target="_blank"
+              ></a>
+              <a
+                className="info__social-link info__social-link-facebook"
+                href={`https://m.me/bySophiaSalo?text=${encodeURIComponent(`Вітаю. \n \n Мене цікавить ${product.name} (${product._id}). \n \n`)}`}
+                target="_blank"
+              ></a>
+            </div>
+          </div>
           <Notification hidden={!isCopiedNotificationVisible}>
             <div className="notification">
               <span className="notification__copied-icon"></span>скопійовано
