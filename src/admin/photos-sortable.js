@@ -26,9 +26,15 @@ function PhotosSortable({ photos, reorderCb }) {
     const sI = __photos.map(photo => photo.id).indexOf(source.id)
 
     const targetClientRect = target.ref.current.getBoundingClientRect()
-    const middle = targetClientRect.width / 2 + targetClientRect.x
 
-    if (clientOffset.x <= middle) {
+    const middle =
+      window.innerWidth > 500
+        ? targetClientRect.width / 2 + targetClientRect.x
+        : targetClientRect.height / 2 + targetClientRect.y
+
+    const offset = window.innerWidth > 500 ? clientOffset.x : clientOffset.y
+
+    if (offset <= middle) {
       // insert source before target
       __photos.splice(tI, 0, __photos.splice(sI, 1)[0])
     } else {
