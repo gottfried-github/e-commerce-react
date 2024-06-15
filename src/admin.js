@@ -9,14 +9,19 @@ import {
   useParams,
   useNavigate,
 } from 'react-router-dom' // , useNavigate
+import { uk } from 'date-fns/locale'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3/index.js'
+import { LocalizationProvider } from '@mui/x-date-pickers'
 
 import Auth from './admin/auth.js'
 import Product from './admin/product.js'
+import ProductNew from './admin/productNew.js'
 import Products from './admin/products.js'
 
 function main(container, api) {
   const auth = Auth(api)
   const product = Product(api)
+  const _ProductNew = ProductNew(api)
   const _Products = Products(api)
 
   // check the api for whether the client is authenticated
@@ -74,6 +79,7 @@ function main(container, api) {
           <Link to="orders">orders</Link>
           <Link to="products">products</Link>
           <Link to="product">product</Link>
+          <Link to="product-new">product new</Link>
           <Link to="logout">logout</Link>
         </nav>
         <section>
@@ -97,6 +103,7 @@ function main(container, api) {
                 </div>
               }
             />
+            <Route path="product-new/:id/*" element={<_ProductNew />} />
             <Route path="logout" element={<Logout />} />
           </Routes>
         </section>
@@ -123,16 +130,18 @@ function main(container, api) {
   function App(props) {
     return (
       <div className="app">
-        <Routes>
-          <Route path="/">
-            <Route index element={<Navigate to="dash" />} />
-            <Route path="dash/*" element={<DashController />} />
-            <Route path="signin" element={<Signin />} />
-            <Route path="login" element={<auth.Login />} />
-            {/* <Route path="signup" element={<auth.Signup />} /> */}
-          </Route>
-          <Route path="/*" element={<Blank />} />
-        </Routes>
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={uk}>
+          <Routes>
+            <Route path="/">
+              <Route index element={<Navigate to="dash" />} />
+              <Route path="dash/*" element={<DashController />} />
+              <Route path="signin" element={<Signin />} />
+              <Route path="login" element={<auth.Login />} />
+              {/* <Route path="signup" element={<auth.Signup />} /> */}
+            </Route>
+            <Route path="/*" element={<Blank />} />
+          </Routes>
+        </LocalizationProvider>
       </div>
     )
   }
