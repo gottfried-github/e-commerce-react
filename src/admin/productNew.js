@@ -13,6 +13,7 @@ import FormControlLabel from '@mui/material/FormControlLabel/index.js'
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker/index.js'
 
 import * as data from './product-data.js'
+import productValidate from './product-validate.js'
 import { PhotoPicker, PhotosPicker } from './photos-picker.js'
 import { PhotosSortable } from './photos-sortable.js'
 
@@ -28,7 +29,14 @@ const productExposedSchema = object({
 })
 
 const productNotExposedSchema = object({
-  expose: boolean().required().oneOf([false]),
+  expose: boolean().oneOf([false]),
+  name: string().trim().max(10000),
+  // lessThan 1 trillion
+  priceHrn: number().integer().positive().lessThan(1e12),
+  priceKop: number().integer().positive().lessThan(100),
+  description: string().trim().max(10000),
+  time: number().integer(),
+  is_in_stock: boolean(),
 })
 
 const main = api => {
@@ -70,49 +78,7 @@ const main = api => {
         time: null,
         expose: false,
       },
-      resolver: async values => {
-        console.log('useForm resolver, values:', values)
-
-        const errors = {}
-        let isTimeValidDate = null
-
-        if (values.time instanceof Date && isNaN(values.time.getTime())) {
-          isTimeValidDate = false
-        } else if (values.time instanceof Date) {
-          isTimeValidDate = true
-        }
-
-        const valuesPrepared = { ...values }
-
-        if (valuesPrepared.time && !isTimeValidDate) {
-          errors.time = 'введено несправний час'
-          delete valuesPrepared.time
-        } else if (valuesPrepared.time) {
-          valuesPrepared.time = valuesPrepared.time.getTime()
-        }
-
-        if (valuesPrepared.priceHrn === '') {
-          delete valuesPrepared.priceHrn
-        }
-
-        if (valuesPrepared.priceKop === '') {
-          delete valuesPrepared.priceKop
-        }
-
-        try {
-          await productExposedSchema.validate(valuesPrepared, { abortEarly: false })
-        } catch (schemaErrors) {
-          for (const e of schemaErrors.inner) {
-            if (e.path === undefined || errors[e.path]) continue
-
-            errors[e.path] = e.errors[0]
-          }
-        }
-
-        console.log('useForm, resolver - valuesPrepared, errors:', valuesPrepared, errors)
-
-        return { values: {}, errors }
-      },
+      resolver: productValidate({ productExposedSchema, productNotExposedSchema }),
     })
 
     const photosPublic = useMemo(
@@ -343,6 +309,7 @@ const main = api => {
                     trigger('time')
                   }}
                 />
+                {errors.time ? <div className="product-data__error">{errors.time}</div> : null}
               </div>
             </div>
           </div>
