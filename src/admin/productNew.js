@@ -229,10 +229,20 @@ const main = api => {
 
     const handleSubmitInner = async values => {
       console.log('handleSubmitInner, values:', values)
+      // setIsDataLoading(true)
+
+      // api.product.update(params.id, data.stateToData(_state), null, body => {
+      //   setState(data.dataToState(body))
+      //   setIsDataLoading(false)
+      // })
     }
 
     const handleSubmitErrors = async errors => {
       console.log('handleSubmitErrors, errors:', errors)
+    }
+
+    const handleFormElSubmit = ev => {
+      ev.preventDefault()
     }
 
     const fieldPropsTime = register('time')
@@ -245,7 +255,7 @@ const main = api => {
 
     return (
       <div className="product-container">
-        <form className="product-data-form">
+        <form className="product-data-form" onSubmit={handleFormElSubmit}>
           <div className="product-data__row">
             <div className="product-data__column">
               <div className="product-data__field-container">
@@ -256,6 +266,7 @@ const main = api => {
                   {...register('name')}
                   error={!!errors.name}
                   helperText={errors.name || null}
+                  disabled={isDataLoading}
                 />
               </div>
             </div>
@@ -273,6 +284,7 @@ const main = api => {
                   {...register('description')}
                   error={!!errors.description}
                   helperText={errors.description || null}
+                  disabled={isDataLoading}
                 />
               </div>
             </div>
@@ -288,6 +300,7 @@ const main = api => {
                   {...register('priceHrn')}
                   error={!!errors.priceHrn}
                   helperText={errors.priceHrn || null}
+                  disabled={isDataLoading}
                 />
               </div>
             </div>
@@ -301,6 +314,7 @@ const main = api => {
                   {...register('priceKop')}
                   error={!!errors.priceKop}
                   helperText={errors.priceKop || null}
+                  disabled={isDataLoading}
                 />
               </div>
             </div>
@@ -319,6 +333,7 @@ const main = api => {
                       />
                     }
                     label={'В наявності'}
+                    disabled={isDataLoading}
                   />
                   {errors.is_in_stock ? (
                     <div className="product-data__error">{errors.is_in_stock}</div>
@@ -342,6 +357,7 @@ const main = api => {
                     setValue('time', date)
                     trigger('time')
                   }}
+                  disabled={isDataLoading}
                 />
                 {errors.time ? <div className="product-data__error">{errors.time}</div> : null}
               </div>
@@ -361,6 +377,7 @@ const main = api => {
                       />
                     }
                     label={'Показувати відвідувачам'}
+                    disabled={isDataLoading}
                   />
                   {errors.expose ? (
                     <div className="product-data__error">{errors.expose}</div>
