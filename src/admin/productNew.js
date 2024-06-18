@@ -66,9 +66,10 @@ const main = api => {
       formState: { errors },
       setValue,
       trigger,
+      reset,
       getFieldState,
     } = useForm({
-      mode: 'onTouched',
+      mode: 'onChange',
       defaultValues: {
         name: '',
         description: '',
@@ -209,6 +210,11 @@ const main = api => {
     }
 
     const fieldPropsTime = register('time')
+    const fieldPropsExpose = register('expose', {
+      onChange: () => {
+        trigger()
+      },
+    })
 
     useEffect(() => {
       const date = state.time ? new Date(state.time) : null
@@ -318,7 +324,7 @@ const main = api => {
               <div className="product-data__field-container">
                 <div className="product-data__checkbox-container">
                   <FormControlLabel
-                    control={<Checkbox {...register('expose')} />}
+                    control={<Checkbox {...fieldPropsExpose} />}
                     label={'Показувати відвідувачам'}
                   />
                   {errors.expose ? (
