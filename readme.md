@@ -68,3 +68,8 @@ In `Home` I use MutationObserver to observe changes to `Products` and get the po
 I need the positions of the sections in `Header` in order to scroll to them when clicked on a link in the `Header`. But `Home` renders the sections so it has access to their positions. 
 
 The way I have my routes set up with `React Router` is that I render the `Header` in a parent route to that in which I render the `Home` component: I use `React Router`'s `Outlet` component to place the routes within the parent route. So I need to lift data up from the child route where `Home` is rendered to the parent route where `Header` is rendered, through an `Outlet`. I do that by passing a callback to the `Outlet`, as `context`, which modifies the state of the parent route and passes it down to the `Header`. To consume the `Outlet`'s context in `Home`, I use the `useOutletContext` hook.
+
+### Admin: `react-hook-form` and `mui` - handling checkboxes
+When using `register` for `mui` `Checkbox`, when `formState`'s initial value is `true`, the `Checkbox` doesn't appear to be checked, although the underlying `<input>` HTML element is `checked`. 
+
+To omit this problem, I use `useController` for `Checkboxes`.

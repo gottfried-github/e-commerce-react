@@ -1,7 +1,7 @@
 import React, { Component, useState, useEffect, useMemo, useRef } from 'react'
 import { useNavigate, useParams, redirect } from 'react-router-dom'
 import { boolean, number, string, object } from 'yup'
-import { useForm } from 'react-hook-form'
+import { useForm, useController } from 'react-hook-form'
 import parseIsoTime from 'parseisotime'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
@@ -60,16 +60,28 @@ const main = api => {
     const [isPhotoPickerVisible, setIsPhotoPickerVisible] = useState(false)
     const [timeData, setTimeData] = useState(state.time ? new Date(state.time) : null)
 
+    const formState = useMemo(
+      () => ({
+        name: state.name,
+        description: state.description,
+        priceHrn: state.priceHrn === null ? '' : state.priceHrn.toString(),
+        priceKop: state.priceKop === null ? '' : state.priceKop.toString(),
+        is_in_stock: state.is_in_stock,
+        time: state.time ? timeData : null,
+        expose: state.expose,
+      }),
+      [state, timeData]
+    )
+
     const {
       register,
       handleSubmit,
       formState: { errors },
       setValue,
       trigger,
-      reset,
-      getFieldState,
+      control,
     } = useForm({
-      mode: 'onChange',
+      mode: 'onTouched',
       defaultValues: {
         name: '',
         description: '',
@@ -79,8 +91,13 @@ const main = api => {
         time: null,
         expose: false,
       },
+      values: formState,
       resolver: productValidate({ productExposedSchema, productNotExposedSchema }),
     })
+
+    // I use controllers for checkboxes. See Admin: `react-hook-form` and `mui` - handling checkboxes
+    const fieldPropsIsInStock = useController({ name: 'is_in_stock', control })
+    const fieldPropsExpose = useController({ name: 'expose', control })
 
     const photosPublic = useMemo(
       () =>
@@ -201,6 +218,15 @@ const main = api => {
       })
     }
 
+    const handleIsInStockChange = ev => {
+      fieldPropsIsInStock.field.onChange(ev.target.checked)
+    }
+
+    const handleExposeChange = ev => {
+      fieldPropsExpose.field.onChange(ev.target.checked)
+      trigger()
+    }
+
     const handleSubmitInner = async values => {
       console.log('handleSubmitInner, values:', values)
     }
@@ -210,11 +236,6 @@ const main = api => {
     }
 
     const fieldPropsTime = register('time')
-    const fieldPropsExpose = register('expose', {
-      onChange: () => {
-        trigger()
-      },
-    })
 
     useEffect(() => {
       const date = state.time ? new Date(state.time) : null
@@ -289,7 +310,14 @@ const main = api => {
               <div className="product-data__field-container">
                 <div className="product-data__checkbox-container">
                   <FormControlLabel
-                    control={<Checkbox {...register('is_in_stock')} />}
+                    control={
+                      <Checkbox
+                        checked={fieldPropsIsInStock.field.value}
+                        onChange={handleIsInStockChange}
+                        onBlur={fieldPropsIsInStock.field.onBlur}
+                        inputRef={fieldPropsIsInStock.field.ref}
+                      />
+                    }
                     label={'В наявності'}
                   />
                   {errors.is_in_stock ? (
@@ -324,7 +352,14 @@ const main = api => {
               <div className="product-data__field-container">
                 <div className="product-data__checkbox-container">
                   <FormControlLabel
-                    control={<Checkbox {...fieldPropsExpose} />}
+                    control={
+                      <Checkbox
+                        checked={fieldPropsExpose.field.value}
+                        onChange={handleExposeChange}
+                        onBlur={fieldPropsExpose.field.onBlur}
+                        inputRef={fieldPropsExpose.field.ref}
+                      />
+                    }
                     label={'Показувати відвідувачам'}
                   />
                   {errors.expose ? (
