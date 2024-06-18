@@ -73,6 +73,15 @@ const main = api => {
       [state, timeData]
     )
 
+    const photosPublic = useMemo(
+      () =>
+        state.photos_all
+          .filter(photo => photo.public)
+          // sort in ascending order
+          .sort((photoA, photoB) => (photoA.order > photoB.order ? 1 : -1)),
+      [state.photos_all]
+    )
+
     const {
       register,
       handleSubmit,
@@ -99,15 +108,6 @@ const main = api => {
     const fieldPropsIsInStock = useController({ name: 'is_in_stock', control })
     const fieldPropsExpose = useController({ name: 'expose', control })
 
-    const photosPublic = useMemo(
-      () =>
-        state.photos_all
-          .filter(photo => photo.public)
-          // sort in ascending order
-          .sort((photoA, photoB) => (photoA.order > photoB.order ? 1 : -1)),
-      [state.photos_all]
-    )
-
     useEffect(() => {
       setIsDataLoading(true)
 
@@ -116,6 +116,37 @@ const main = api => {
         setIsDataLoading(false)
       })
     }, [])
+
+    const handleSubmitInner = async values => {
+      setIsDataLoading(true)
+
+      api.product.update(params.id, data.stateToData(values), null, body => {
+        setState(data.dataToState(body))
+        setIsDataLoading(false)
+      })
+    }
+
+    const handleDeleteProduct = () => {
+      setIsDataLoading(true)
+
+      api.product.delete(params.id, () => {
+        setIsDataLoading(false)
+        navigate('/dash/products')
+      })
+    }
+
+    const handleIsInStockChange = ev => {
+      fieldPropsIsInStock.field.onChange(ev.target.checked)
+    }
+
+    const handleExposeChange = ev => {
+      fieldPropsExpose.field.onChange(ev.target.checked)
+      trigger()
+    }
+
+    const handleFormElSubmit = ev => {
+      ev.preventDefault()
+    }
 
     // make api request to upload photos
     const photosUpload = files => {
@@ -194,37 +225,6 @@ const main = api => {
 
         setIsDataLoading(false)
       })
-    }
-
-    const handleDeleteProduct = () => {
-      setIsDataLoading(true)
-
-      api.product.delete(params.id, () => {
-        setIsDataLoading(false)
-        navigate('/dash/products')
-      })
-    }
-
-    const handleIsInStockChange = ev => {
-      fieldPropsIsInStock.field.onChange(ev.target.checked)
-    }
-
-    const handleExposeChange = ev => {
-      fieldPropsExpose.field.onChange(ev.target.checked)
-      trigger()
-    }
-
-    const handleSubmitInner = async values => {
-      setIsDataLoading(true)
-
-      api.product.update(params.id, data.stateToData(values), null, body => {
-        setState(data.dataToState(body))
-        setIsDataLoading(false)
-      })
-    }
-
-    const handleFormElSubmit = ev => {
-      ev.preventDefault()
     }
 
     const fieldPropsTime = register('time')
