@@ -46,8 +46,8 @@ const main = api => {
 
     const [state, setState] = useState({
       name: '',
-      priceHrn: null,
-      priceKop: null,
+      priceHrn: '',
+      priceKop: '',
       expose: false,
       is_in_stock: false,
       description: '',
@@ -64,8 +64,8 @@ const main = api => {
       () => ({
         name: state.name,
         description: state.description,
-        priceHrn: state.priceHrn === null ? '' : state.priceHrn.toString(),
-        priceKop: state.priceKop === null ? '' : state.priceKop.toString(),
+        priceHrn: state.priceHrn,
+        priceKop: state.priceKop,
         is_in_stock: state.is_in_stock,
         time: state.time ? timeData : null,
         expose: state.expose,
@@ -196,19 +196,6 @@ const main = api => {
       })
     }
 
-    /*
-      const inputChange = _state => {
-      console.log('inputChange, _state:', _state)
-
-      setIsDataLoading(true)
-
-      api.product.update(params.id, data.stateToData(_state), null, body => {
-        setState(data.dataToState(body))
-        setIsDataLoading(false)
-      })
-    }
-    */
-
     const handleDeleteProduct = () => {
       setIsDataLoading(true)
 
@@ -228,17 +215,12 @@ const main = api => {
     }
 
     const handleSubmitInner = async values => {
-      console.log('handleSubmitInner, values:', values)
-      // setIsDataLoading(true)
+      setIsDataLoading(true)
 
-      // api.product.update(params.id, data.stateToData(_state), null, body => {
-      //   setState(data.dataToState(body))
-      //   setIsDataLoading(false)
-      // })
-    }
-
-    const handleSubmitErrors = async errors => {
-      console.log('handleSubmitErrors, errors:', errors)
+      api.product.update(params.id, data.stateToData(values), null, body => {
+        setState(data.dataToState(body))
+        setIsDataLoading(false)
+      })
     }
 
     const handleFormElSubmit = ev => {
@@ -387,7 +369,7 @@ const main = api => {
             </div>
           </div>
         </form>
-        <Button onClick={handleSubmit(handleSubmitInner, handleSubmitErrors)}>Submit</Button>
+        <Button onClick={handleSubmit(handleSubmitInner)}>Submit</Button>
       </div>
     )
   }
