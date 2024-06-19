@@ -387,6 +387,7 @@ const main = api => {
           ) : null}
         </div>
         <div className="layout-col-wide photos-sortable-container">
+          <label className="photos__label">Фотографії</label>
           <DndProvider backend={HTML5Backend}>
             <PhotosSortable photos={photosPublic} reorderCb={handlePhotosReorder} />
           </DndProvider>
