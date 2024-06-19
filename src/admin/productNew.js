@@ -15,7 +15,7 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker/index.js'
 import * as data from './product-data.js'
 import productValidate from './product-validate.js'
 import { PhotoPicker, PhotosPicker } from './photos-picker.js'
-import { PhotosSortable } from './photos-sortable.js'
+import { PhotosSortable } from './photos-sortable-new.js'
 
 const productExposedSchema = object({
   name: string().trim().required().min(2).max(10000),
@@ -375,6 +375,21 @@ const main = api => {
               Submit
             </Button>
           </div>
+          {state.photo_cover ? (
+            <div className="product__cover-photo-container">
+              <label>Обкладинка</label>
+              <img
+                className="product__cover-photo"
+                src={state.photo_cover.pathPublic}
+                alt={'обкладинка'}
+              />
+            </div>
+          ) : null}
+        </div>
+        <div className="layout-col-wide photos-sortable-container">
+          <DndProvider backend={HTML5Backend}>
+            <PhotosSortable photos={photosPublic} reorderCb={handlePhotosReorder} />
+          </DndProvider>
         </div>
       </div>
     )
