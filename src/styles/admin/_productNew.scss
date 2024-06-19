@@ -1,8 +1,22 @@
+.product-container {
+  display: grid;
+
+  grid-template-columns: 16px 1fr 16px;
+
+  @media (min-width: calc(16px * 2 + 600px)) {
+    grid-template-columns: 1fr 600px 1fr;
+  }
+
+  .layout-col-center {
+    grid-column: 2;
+  }
+}
+
 .product-data-form {
   display: flex;
   flex-direction: column;
 
-  max-width: 600px;
+  // max-width: 600px;
 
   row-gap: 16px;
   margin: auto;

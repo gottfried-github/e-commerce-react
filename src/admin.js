@@ -10,6 +10,7 @@ import {
   useNavigate,
 } from 'react-router-dom' // , useNavigate
 import { uk } from 'date-fns/locale'
+import { StyledEngineProvider } from '@mui/material/styles/index.js'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3/index.js'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 
@@ -131,16 +132,18 @@ function main(container, api) {
     return (
       <div className="app">
         <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={uk}>
-          <Routes>
-            <Route path="/">
-              <Route index element={<Navigate to="dash" />} />
-              <Route path="dash/*" element={<DashController />} />
-              <Route path="signin" element={<Signin />} />
-              <Route path="login" element={<auth.Login />} />
-              {/* <Route path="signup" element={<auth.Signup />} /> */}
-            </Route>
-            <Route path="/*" element={<Blank />} />
-          </Routes>
+          <StyledEngineProvider injectFirst>
+            <Routes>
+              <Route path="/">
+                <Route index element={<Navigate to="dash" />} />
+                <Route path="dash/*" element={<DashController />} />
+                <Route path="signin" element={<Signin />} />
+                <Route path="login" element={<auth.Login />} />
+                {/* <Route path="signup" element={<auth.Signup />} /> */}
+              </Route>
+              <Route path="/*" element={<Blank />} />
+            </Routes>
+          </StyledEngineProvider>
         </LocalizationProvider>
       </div>
     )

@@ -237,139 +237,145 @@ const main = api => {
 
     return (
       <div className="product-container">
-        <form className="product-data-form" onSubmit={handleFormElSubmit}>
-          <div className="product-data__row">
-            <div className="product-data__column">
-              <div className="product-data__field-container">
-                <label htmlFor="name">Назва</label>
-                <TextField
-                  id="name"
-                  placeholder="Назва"
-                  {...register('name')}
-                  error={!!errors.name}
-                  helperText={errors.name || null}
-                  disabled={isDataLoading}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="product-data__row">
-            <div className="product-data__column">
-              <div className="product-data__field-container">
-                <label htmlFor="description">Опис</label>
-                <TextField
-                  id="description"
-                  placeholder="Опис"
-                  multiline
-                  minRows={6}
-                  maxRows={12}
-                  {...register('description')}
-                  error={!!errors.description}
-                  helperText={errors.description || null}
-                  disabled={isDataLoading}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="product-data__row-2">
-            <div className="product-data__column">
-              <div className="product-data__field-container">
-                <label htmlFor="priceHrn">Ціна: гривні</label>
-                <TextField
-                  id="priceHrn"
-                  placeholder="Гривні"
-                  type="number"
-                  {...register('priceHrn')}
-                  error={!!errors.priceHrn}
-                  helperText={errors.priceHrn || null}
-                  disabled={isDataLoading}
-                />
-              </div>
-            </div>
-            <div className="product-data__column">
-              <div className="product-data__field-container">
-                <label htmlFor="priceKop">Ціна: копійки</label>
-                <TextField
-                  id="priceKop"
-                  placeholder="Копійки"
-                  type="number"
-                  {...register('priceKop')}
-                  error={!!errors.priceKop}
-                  helperText={errors.priceKop || null}
-                  disabled={isDataLoading}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="product-data__row">
-            <div className="product-data__column">
-              <div className="product-data__field-container">
-                <div className="product-data__checkbox-container">
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={fieldPropsIsInStock.field.value}
-                        onChange={handleIsInStockChange}
-                        onBlur={fieldPropsIsInStock.field.onBlur}
-                        inputRef={fieldPropsIsInStock.field.ref}
-                      />
-                    }
-                    label={'В наявності'}
+        <div className="layout-col-center">
+          <form className="product-data-form" onSubmit={handleFormElSubmit}>
+            <div className="product-data__row">
+              <div className="product-data__column">
+                <div className="product-data__field-container">
+                  <label htmlFor="name">Назва</label>
+                  <TextField
+                    id="name"
+                    placeholder="Назва"
+                    {...register('name')}
+                    error={!!errors.name}
+                    helperText={errors.name || null}
                     disabled={isDataLoading}
                   />
-                  {errors.is_in_stock ? (
-                    <div className="product-data__error">{errors.is_in_stock}</div>
-                  ) : null}
                 </div>
               </div>
             </div>
-          </div>
-          <div className="product-data__row">
-            <div className="product-data__column">
-              <div className="product-data__field-container">
-                <label htmlFor="time">Час створення</label>
-                <DateTimePicker
-                  id="time"
-                  value={timeData}
-                  name={fieldPropsTime.name}
-                  onBlur={fieldPropsTime.onBlur}
-                  inputRef={fieldPropsTime.ref}
-                  onChange={date => {
-                    setTimeData(date)
-                    setValue('time', date)
-                    trigger('time')
-                  }}
-                  disabled={isDataLoading}
-                />
-                {errors.time ? <div className="product-data__error">{errors.time}</div> : null}
-              </div>
-            </div>
-          </div>
-          <div className="product-data__row">
-            <div className="product-data__column">
-              <div className="product-data__field-container">
-                <div className="product-data__checkbox-container">
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={fieldPropsExpose.field.value}
-                        onChange={handleExposeChange}
-                        onBlur={fieldPropsExpose.field.onBlur}
-                        inputRef={fieldPropsExpose.field.ref}
-                      />
-                    }
-                    label={'Показувати відвідувачам'}
+            <div className="product-data__row">
+              <div className="product-data__column">
+                <div className="product-data__field-container">
+                  <label htmlFor="description">Опис</label>
+                  <TextField
+                    id="description"
+                    placeholder="Опис"
+                    multiline
+                    minRows={6}
+                    maxRows={12}
+                    {...register('description')}
+                    error={!!errors.description}
+                    helperText={errors.description || null}
                     disabled={isDataLoading}
                   />
-                  {errors.expose ? (
-                    <div className="product-data__error">{errors.expose}</div>
-                  ) : null}
                 </div>
               </div>
             </div>
+            <div className="product-data__row-2">
+              <div className="product-data__column">
+                <div className="product-data__field-container">
+                  <label htmlFor="priceHrn">Ціна: гривні</label>
+                  <TextField
+                    id="priceHrn"
+                    placeholder="Гривні"
+                    type="number"
+                    {...register('priceHrn')}
+                    error={!!errors.priceHrn}
+                    helperText={errors.priceHrn || null}
+                    disabled={isDataLoading}
+                  />
+                </div>
+              </div>
+              <div className="product-data__column">
+                <div className="product-data__field-container">
+                  <label htmlFor="priceKop">Ціна: копійки</label>
+                  <TextField
+                    id="priceKop"
+                    placeholder="Копійки"
+                    type="number"
+                    {...register('priceKop')}
+                    error={!!errors.priceKop}
+                    helperText={errors.priceKop || null}
+                    disabled={isDataLoading}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="product-data__row">
+              <div className="product-data__column">
+                <div className="product-data__field-container">
+                  <div className="product-data__checkbox-container">
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={fieldPropsIsInStock.field.value}
+                          onChange={handleIsInStockChange}
+                          onBlur={fieldPropsIsInStock.field.onBlur}
+                          inputRef={fieldPropsIsInStock.field.ref}
+                        />
+                      }
+                      label={'В наявності'}
+                      disabled={isDataLoading}
+                    />
+                    {errors.is_in_stock ? (
+                      <div className="product-data__error">{errors.is_in_stock}</div>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="product-data__row">
+              <div className="product-data__column">
+                <div className="product-data__field-container">
+                  <label htmlFor="time">Час створення</label>
+                  <DateTimePicker
+                    id="time"
+                    value={timeData}
+                    name={fieldPropsTime.name}
+                    onBlur={fieldPropsTime.onBlur}
+                    inputRef={fieldPropsTime.ref}
+                    onChange={date => {
+                      setTimeData(date)
+                      setValue('time', date)
+                      trigger('time')
+                    }}
+                    disabled={isDataLoading}
+                  />
+                  {errors.time ? <div className="product-data__error">{errors.time}</div> : null}
+                </div>
+              </div>
+            </div>
+            <div className="product-data__row">
+              <div className="product-data__column">
+                <div className="product-data__field-container">
+                  <div className="product-data__checkbox-container">
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={fieldPropsExpose.field.value}
+                          onChange={handleExposeChange}
+                          onBlur={fieldPropsExpose.field.onBlur}
+                          inputRef={fieldPropsExpose.field.ref}
+                        />
+                      }
+                      label={'Показувати відвідувачам'}
+                      disabled={isDataLoading}
+                    />
+                    {errors.expose ? (
+                      <div className="product-data__error">{errors.expose}</div>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+          <div className="flex-justify-end">
+            <Button variant="contained" onClick={handleSubmit(handleSubmitInner)}>
+              Submit
+            </Button>
           </div>
-        </form>
-        <Button onClick={handleSubmit(handleSubmitInner)}>Submit</Button>
+        </div>
       </div>
     )
   }
