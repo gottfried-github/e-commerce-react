@@ -56,6 +56,10 @@
   row-gap: 8px;
 }
 
+.product-data__field-label {
+  padding: 0 14px;
+}
+
 .product-data__checkbox-container {
   display: flex;
   flex-direction: column;
@@ -77,7 +81,7 @@
 .wide-section__label {
   @media (min-width: calc(600px + 16px * 2)) {
     margin: auto;
-    width: 600px;
+    width: calc(600px - 14px * 2);
   }
 }
 
@@ -123,6 +127,6 @@
 .photos-drawer .photos-drawer__content-box {
   display: flex;
   flex-direction: column;
-  
+
   padding: 8px;
 }

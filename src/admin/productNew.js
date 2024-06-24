@@ -268,7 +268,9 @@ const main = api => {
             <div className="product-data__row">
               <div className="product-data__column">
                 <div className="product-data__field-container">
-                  <label htmlFor="name">Назва</label>
+                  <label className="product-data__field-label" htmlFor="name">
+                    Назва
+                  </label>
                   <TextField
                     id="name"
                     placeholder="Назва"
@@ -283,7 +285,9 @@ const main = api => {
             <div className="product-data__row">
               <div className="product-data__column">
                 <div className="product-data__field-container">
-                  <label htmlFor="description">Опис</label>
+                  <label className="product-data__field-label" htmlFor="description">
+                    Опис
+                  </label>
                   <TextField
                     id="description"
                     placeholder="Опис"
@@ -301,7 +305,9 @@ const main = api => {
             <div className="product-data__row-2">
               <div className="product-data__column">
                 <div className="product-data__field-container">
-                  <label htmlFor="priceHrn">Ціна: гривні</label>
+                  <label className="product-data__field-label" htmlFor="priceHrn">
+                    Ціна: гривні
+                  </label>
                   <TextField
                     id="priceHrn"
                     placeholder="Гривні"
@@ -315,7 +321,9 @@ const main = api => {
               </div>
               <div className="product-data__column">
                 <div className="product-data__field-container">
-                  <label htmlFor="priceKop">Ціна: копійки</label>
+                  <label className="product-data__field-label" htmlFor="priceKop">
+                    Ціна: копійки
+                  </label>
                   <TextField
                     id="priceKop"
                     placeholder="Копійки"
@@ -354,7 +362,9 @@ const main = api => {
             <div className="product-data__row">
               <div className="product-data__column">
                 <div className="product-data__field-container">
-                  <label htmlFor="time">Час створення</label>
+                  <label className="product-data__field-label" htmlFor="time">
+                    Час створення
+                  </label>
                   <DateTimePicker
                     id="time"
                     value={timeData}
@@ -403,7 +413,7 @@ const main = api => {
           </div>
           {state.photo_cover ? (
             <div className="product__cover-photo-container">
-              <label>Обкладинка</label>
+              <label className="product-data__field-label">Обкладинка</label>
               <img
                 className="product__cover-photo"
                 src={state.photo_cover.pathPublic}
@@ -436,7 +446,9 @@ const main = api => {
           <div className="product-data__row">
             <div className="product-data__column">
               <div className="product-data__field-container">
-                <label htmlFor="photos-upload">Завантажити фото до фотошухляди</label>
+                <label className="product-data__field-label" htmlFor="photos-upload">
+                  Завантажити фото до фотошухляди
+                </label>
                 <input
                   type="file"
                   ref={photosFilesInputRef}
