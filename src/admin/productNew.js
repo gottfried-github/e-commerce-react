@@ -1,6 +1,5 @@
 import React, { Component, useState, useEffect, useMemo, useRef } from 'react'
 import { useNavigate, useParams, redirect } from 'react-router-dom'
-import { boolean, number, string, object } from 'yup'
 import { useForm, useController } from 'react-hook-form'
 import parseIsoTime from 'parseisotime'
 import { DndProvider } from 'react-dnd'
@@ -22,28 +21,6 @@ import productValidate from './product-validate.js'
 import { PhotoPicker, PhotosPicker } from './photos-picker.js'
 import { PhotosSortable } from './photos-sortable-new.js'
 import PhotosDrawer from './photos-drawer.js'
-
-const productExposedSchema = object({
-  name: string().trim().required().min(2).max(10000),
-  // lessThan 1 trillion
-  priceHrn: number().required().integer().positive().lessThan(1e12),
-  priceKop: number().required().integer().positive().lessThan(100),
-  description: string().trim().required().min(2).max(10000),
-  time: number().required().integer(),
-  is_in_stock: boolean().required(),
-  expose: boolean().required(),
-})
-
-const productNotExposedSchema = object({
-  expose: boolean().oneOf([false]),
-  name: string().trim().max(10000),
-  // lessThan 1 trillion
-  priceHrn: number().integer().positive().lessThan(1e12),
-  priceKop: number().integer().positive().lessThan(100),
-  description: string().trim().max(10000),
-  time: number().integer(),
-  is_in_stock: boolean(),
-})
 
 const main = api => {
   const ProductNew = () => {
@@ -108,8 +85,6 @@ const main = api => {
       },
       values: formState,
       resolver: productValidate({
-        productExposedSchema,
-        productNotExposedSchema,
         photo_cover: state.photo_cover,
         photosPublic,
       }),

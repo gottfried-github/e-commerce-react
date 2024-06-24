@@ -1,4 +1,28 @@
-export default ({ productExposedSchema, productNotExposedSchema, photo_cover, photosPublic }) =>
+import { boolean, number, string, object } from 'yup'
+
+const productExposedSchema = object({
+  name: string().trim().required().min(2).max(10000),
+  // lessThan 1 trillion
+  priceHrn: number().required().integer().positive().lessThan(1e12),
+  priceKop: number().required().integer().positive().lessThan(100),
+  description: string().trim().required().min(2).max(10000),
+  time: number().required().integer(),
+  is_in_stock: boolean().required(),
+  expose: boolean().required(),
+})
+
+const productNotExposedSchema = object({
+  expose: boolean().oneOf([false]),
+  name: string().trim().max(10000),
+  // lessThan 1 trillion
+  priceHrn: number().integer().positive().lessThan(1e12),
+  priceKop: number().integer().positive().lessThan(100),
+  description: string().trim().max(10000),
+  time: number().integer(),
+  is_in_stock: boolean(),
+})
+
+export default ({ photo_cover, photosPublic }) =>
   async values => {
     const errors = {}
     const valuesPrepared = stripEmpty(values)
