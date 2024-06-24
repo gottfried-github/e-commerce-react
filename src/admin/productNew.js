@@ -16,6 +16,7 @@ import * as data from './product-data.js'
 import productValidate from './product-validate.js'
 import { PhotoPicker, PhotosPicker } from './photos-picker.js'
 import { PhotosSortable } from './photos-sortable-new.js'
+import PhotosDrawer from './photos-drawer.js'
 
 const productExposedSchema = object({
   name: string().trim().required().min(2).max(10000),
@@ -161,7 +162,7 @@ const main = api => {
     }
 
     // add or remove a photo from `photos` based on whether it's checked or not and make api request to update the `photos` field
-    const handlePhotoPick = (picked, photo) => {
+    const handlePhotoPublicPick = (picked, photo) => {
       setIsDataLoading(true)
 
       api.product.updatePhotosPublicity(params.id, [{ id: photo.id, public: picked }], () => {
@@ -171,6 +172,30 @@ const main = api => {
 
           setIsDataLoading(false)
         })
+      })
+    }
+
+    const handlePhotoCoverPick = photo => {
+      setIsDataLoading(true)
+
+      api.product.setCoverPhoto(params.id, { id: photo.id, cover: true }, () => {
+        setState({
+          ...state,
+          photos_all: state.photos_all.map(_photo => {
+            if (_photo.id !== photo.id) {
+              if (_photo.cover) {
+                return { ..._photo, cover: false }
+              }
+
+              return _photo
+            }
+
+            return { ..._photo, cover: true }
+          }),
+          photo_cover: { ...photo, cover: true },
+        })
+
+        setIsDataLoading(false)
       })
     }
 
@@ -185,24 +210,6 @@ const main = api => {
 
           setIsDataLoading(false)
         })
-      })
-    }
-
-    const handlePhotoCoverPick = photo => {
-      setIsDataLoading(true)
-
-      api.product.setCoverPhoto(params.id, { id: photo.id, cover: true }, () => {
-        setState({
-          ...state,
-          photos_all: state.photos_all.map(_photo => {
-            if (_photo.id !== photo.id) return _photo
-
-            return { ..._photo, cover: true }
-          }),
-          photo_cover: { ...photo, cover: true },
-        })
-
-        setIsDataLoading(false)
       })
     }
 
@@ -372,7 +379,7 @@ const main = api => {
           </form>
           <div className="flex-justify-end">
             <Button variant="contained" onClick={handleSubmit(handleSubmitInner)}>
-              Submit
+              Зберегти дані
             </Button>
           </div>
           {state.photo_cover ? (
@@ -386,8 +393,8 @@ const main = api => {
             </div>
           ) : null}
         </div>
-        <div className="layout-col-wide photos-sortable-container">
-          <label className="photos__label">Фотографії</label>
+        <div className="layout-col-wide wide-section-container photos-sortable-container">
+          <label className="wide-section__label">Фотографії</label>
           <DndProvider backend={HTML5Backend}>
             <PhotosSortable
               photos={photosPublic}
@@ -395,6 +402,16 @@ const main = api => {
               disabled={isDataLoading}
             />
           </DndProvider>
+        </div>
+        <div className="layout-col-wide wide-section-container">
+          <label className="wide-section__label">Фотошухляда</label>
+          <PhotosDrawer
+            photos={state.photos_all}
+            handlePhotoPublicPick={handlePhotoPublicPick}
+            handlePhotoCoverPick={handlePhotoCoverPick}
+            handleRemovePhoto={handlePhotoRemove}
+            disabled={isDataLoading}
+          />
         </div>
       </div>
     )
