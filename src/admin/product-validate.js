@@ -1,4 +1,4 @@
-export default ({ productExposedSchema, productNotExposedSchema }) =>
+export default ({ productExposedSchema, productNotExposedSchema, photo_cover, photosPublic }) =>
   async values => {
     const errors = {}
     const valuesPrepared = stripEmpty(values)
@@ -29,6 +29,16 @@ export default ({ productExposedSchema, productNotExposedSchema }) =>
         if (e.path === undefined || errors[e.path]) continue
 
         errors[e.path] = e.errors[0]
+      }
+    }
+
+    if (valuesPrepared.expose) {
+      if (!photo_cover) {
+        errors.photo_cover = "це поле обов'язкове"
+      }
+
+      if (!photosPublic.length) {
+        errors.photosPublic = "це поле обов'язкове"
       }
     }
 

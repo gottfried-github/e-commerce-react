@@ -60,6 +60,26 @@
   padding: 0 14px;
 }
 
+.product-data__error {
+  font-size: 0.75rem;
+  color: $errorColor;
+}
+
+.layout-col-center .product-data__error {
+  padding: 0 14px;
+}
+
+.layout-col-wide .product-data__error {
+  padding: 0 14px;
+
+  @media (min-width: calc(600px + 16px * 2)) {
+    margin: auto;
+    padding: 0;
+    
+    width: calc(600px - 14px * 2);
+  }
+}
+
 .product-data__checkbox-container {
   display: flex;
   flex-direction: column;
@@ -79,8 +99,12 @@
 }
 
 .wide-section__label {
+  padding: 0 14px;
+
   @media (min-width: calc(600px + 16px * 2)) {
     margin: auto;
+    padding: 0;
+    
     width: calc(600px - 14px * 2);
   }
 }

@@ -107,7 +107,12 @@ const main = api => {
         expose: false,
       },
       values: formState,
-      resolver: productValidate({ productExposedSchema, productNotExposedSchema }),
+      resolver: productValidate({
+        productExposedSchema,
+        productNotExposedSchema,
+        photo_cover: state.photo_cover,
+        photosPublic,
+      }),
     })
 
     // I use controllers for checkboxes. See Admin: `react-hook-form` and `mui` - handling checkboxes
@@ -411,16 +416,19 @@ const main = api => {
               Зберегти дані
             </Button>
           </div>
-          {state.photo_cover ? (
-            <div className="product__cover-photo-container">
-              <label className="product-data__field-label">Обкладинка</label>
+          <div className="product__cover-photo-container">
+            <label className="product-data__field-label">Обкладинка</label>
+            {state.photo_cover ? (
               <img
                 className="product__cover-photo"
                 src={state.photo_cover.pathPublic}
                 alt={'обкладинка'}
               />
-            </div>
-          ) : null}
+            ) : null}
+            {errors.photo_cover ? (
+              <div className="product-data__error">{errors.photo_cover}</div>
+            ) : null}
+          </div>
         </div>
         <div className="layout-col-wide wide-section-container photos-sortable-container">
           <label className="wide-section__label">Фотографії</label>
@@ -431,6 +439,9 @@ const main = api => {
               disabled={isDataLoading}
             />
           </DndProvider>
+          {errors.photosPublic ? (
+            <div className="product-data__error">{errors.photosPublic}</div>
+          ) : null}
         </div>
         <div className="layout-col-wide wide-section-container">
           <label className="wide-section__label">Фотошухляда</label>
