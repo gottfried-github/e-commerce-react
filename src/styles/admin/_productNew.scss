@@ -65,19 +65,8 @@
   color: $errorColor;
 }
 
-.layout-col-center .product-data__error {
+.product-data__error {
   padding: 0 14px;
-}
-
-.layout-col-wide .product-data__error {
-  padding: 0 14px;
-
-  @media (min-width: calc(600px + 16px * 2)) {
-    margin: auto;
-    padding: 0;
-    
-    width: calc(600px - 14px * 2);
-  }
 }
 
 .link-inner {
@@ -113,13 +102,6 @@
 
 .wide-section__label {
   padding: 0 14px;
-
-  @media (min-width: calc(600px + 16px * 2)) {
-    margin: auto;
-    padding: 0;
-
-    width: calc(600px - 14px * 2);
-  }
 }
 
 .wide-section__label.target, .product-data__field-label.target {

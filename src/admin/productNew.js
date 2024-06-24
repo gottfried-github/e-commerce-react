@@ -411,7 +411,9 @@ const main = api => {
           </div>
         </div>
         <div className="layout-col-wide wide-section-container photos-sortable-container">
-          <label className="wide-section__label">Публічні фотографії</label>
+          <div className="wide-section__column-center">
+            <label className="wide-section__label">Публічні фотографії</label>
+          </div>
           {photosPublic.length ? (
             <DndProvider backend={HTML5Backend}>
               <PhotosSortable
@@ -428,16 +430,20 @@ const main = api => {
             </div>
           )}
           {errors.photosPublic ? (
-            <div className="product-data__error">{errors.photosPublic}</div>
+            <div className="wide-section__column-center">
+              <div className="product-data__error">{errors.photosPublic}</div>
+            </div>
           ) : null}
         </div>
         <div className="layout-col-wide wide-section-container">
-          <label
-            id="photos-drawer"
-            className={`wide-section__label${location.hash.slice(1) === 'photos-drawer' ? ' target' : ''}`}
-          >
-            Фотошухляда
-          </label>
+          <div className="wide-section__column-center">
+            <label
+              id="photos-drawer"
+              className={`wide-section__label${location.hash.slice(1) === 'photos-drawer' ? ' target' : ''}`}
+            >
+              Фотошухляда
+            </label>
+          </div>
           {state.photos_all.length ? (
             <PhotosDrawer
               photos={state.photos_all}
