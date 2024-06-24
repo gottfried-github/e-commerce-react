@@ -11,6 +11,11 @@ import TextField from '@mui/material/TextField/index.js'
 import Checkbox from '@mui/material/Checkbox/index.js'
 import FormControlLabel from '@mui/material/FormControlLabel/index.js'
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker/index.js'
+import Dialog from '@mui/material/Dialog/index.js'
+import DialogContent from '@mui/material/DialogContent/index.js'
+import DialogContentText from '@mui/material/DialogContentText/index.js'
+import DialogActions from '@mui/material/DialogActions/index.js'
+import Divider from '@mui/material/Divider/index.js'
 
 import * as data from './product-data.js'
 import productValidate from './product-validate.js'
@@ -57,8 +62,8 @@ const main = api => {
       photo_cover: null,
     })
     const [isDataLoading, setIsDataLoading] = useState(false)
-    const [isPhotosPickerVisible, setIsPhotosPickerVisible] = useState(false)
-    const [isPhotoPickerVisible, setIsPhotoPickerVisible] = useState(false)
+    const [isRemoveProductConfirmationDialogOpen, setIsRemoveProductConfirmationDialogOpen] =
+      useState(false)
     const [timeData, setTimeData] = useState(state.time ? new Date(state.time) : null)
 
     const formState = useMemo(
@@ -129,11 +134,12 @@ const main = api => {
       })
     }
 
-    const handleDeleteProduct = () => {
+    const handleDeleteProductConfirmClick = () => {
       setIsDataLoading(true)
 
       api.product.delete(params.id, () => {
         setIsDataLoading(false)
+        setIsRemoveProductConfirmationDialogOpen(false)
         navigate('/dash/products')
       })
     }
@@ -237,6 +243,14 @@ const main = api => {
           setIsDataLoading(false)
         })
       })
+    }
+
+    const handleDeleteProductClick = () => {
+      setIsRemoveProductConfirmationDialogOpen(true)
+    }
+
+    const handleDeleteProductDialogClose = () => {
+      setIsRemoveProductConfirmationDialogOpen(false)
     }
 
     const fieldPropsTime = register('time')
@@ -418,7 +432,6 @@ const main = api => {
             disabled={isDataLoading}
           />
         </div>
-
         <div className="layout-col-center">
           <div className="product-data__row">
             <div className="product-data__column">
@@ -440,6 +453,32 @@ const main = api => {
             </div>
           </div>
         </div>
+        <div className="layout-col-wide">
+          <Divider />
+        </div>
+        <div className="layout-col-center">
+          <div className="flex-justify-end">
+            <Button variant="contained" color="error" onClick={handleDeleteProductClick}>
+              Видалити продукт
+            </Button>
+          </div>
+        </div>
+        <Dialog
+          open={isRemoveProductConfirmationDialogOpen}
+          onClose={handleDeleteProductDialogClose}
+        >
+          <DialogContent>
+            <DialogContentText>
+              Ви впевнені, що хочете видалити продукт? Ви безповоротно втратите усі дані продукту та
+              його фотографії.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button variant="contained" color="error" onClick={handleDeleteProductConfirmClick}>
+              Видалити
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     )
   }
