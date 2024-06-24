@@ -1,12 +1,18 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Paper from '@mui/material/Paper/index.js'
 import Divider from '@mui/material/Divider/index.js'
 import Button from '@mui/material/Button/index.js'
 import Checkbox from '@mui/material/Checkbox/index.js'
 import Radio from '@mui/material/Radio/index.js'
 import FormControlLabel from '@mui/material/FormControlLabel/index.js'
+import Dialog from '@mui/material/Dialog/index.js'
+import DialogContent from '@mui/material/DialogContent/index.js'
+import DialogContentText from '@mui/material/DialogContentText/index.js'
+import DialogActions from '@mui/material/DialogActions/index.js'
 
 const PhotosDrawerItem = ({ photo, handlePublicPick, handleCoverPick, handleRemove, disabled }) => {
+  const [isRemoveConfirmationDialogOpen, setIsRemoveConfirmationDialogOpen] = useState(false)
+
   const handlePublicChange = () => {
     handlePublicPick(!photo.public, photo)
   }
@@ -15,6 +21,19 @@ const PhotosDrawerItem = ({ photo, handlePublicPick, handleCoverPick, handleRemo
     if (photo.cover || !ev.target.checked) return
 
     handleCoverPick(photo)
+  }
+
+  const handleRemoveButtonClick = () => {
+    setIsRemoveConfirmationDialogOpen(true)
+  }
+
+  const handleRemoveConfirmationDialogClose = () => {
+    setIsRemoveConfirmationDialogOpen(false)
+  }
+
+  const handleConfirmRemoveButtonClick = () => {
+    handleRemove(photo)
+    setIsRemoveConfirmationDialogOpen(false)
   }
 
   return (
@@ -39,11 +58,28 @@ const PhotosDrawerItem = ({ photo, handlePublicPick, handleCoverPick, handleRemo
       <Divider />
       <div className="photos-drawer__content-box">
         <div className="flex-justify-end">
-          <Button variant="contained" color="error" disabled={disabled}>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleRemoveButtonClick}
+            disabled={disabled}
+          >
             Видалити
           </Button>
         </div>
       </div>
+      <Dialog open={isRemoveConfirmationDialogOpen} onClose={handleRemoveConfirmationDialogClose}>
+        <DialogContent>
+          <DialogContentText>
+            Ви впевнені, що хочете видалити фото? Ви втратите його на завжди.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="contained" color="error" onClick={handleConfirmRemoveButtonClick}>
+            Видалити
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Paper>
   )
 }
