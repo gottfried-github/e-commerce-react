@@ -176,6 +176,22 @@ const main = api => {
       })
     }
 
+    const handlePhotoCoverRemove = () => {
+      api.product.setCoverPhoto(params.id, { id: state.photo_cover.id, cover: false }, () => {
+        setState({
+          ...state,
+          photos_all: state.photos_all.map(_photo => {
+            if (_photo.id !== state.photo_cover.id) return _photo
+
+            return { ..._photo, cover: false }
+          }),
+          photo_cover: null,
+        })
+
+        setIsDataLoading(false)
+      })
+    }
+
     const handlePhotoRemove = photo => {
       setIsDataLoading(true)
 
@@ -395,11 +411,18 @@ const main = api => {
           <div className="product__cover-photo-container">
             <label className="product-data__field-label">Обкладинка</label>
             {state.photo_cover ? (
-              <img
-                className="product__cover-photo"
-                src={state.photo_cover.pathPublic}
-                alt={'обкладинка'}
-              />
+              <>
+                <img
+                  className="product__cover-photo"
+                  src={state.photo_cover.pathPublic}
+                  alt={'обкладинка'}
+                />
+                <div className="flex-justify-end">
+                  <Button variant="contained" onClick={handlePhotoCoverRemove}>
+                    Прибрати з обкладинки
+                  </Button>
+                </div>
+              </>
             ) : (
               <Link className="link-inner" to="#photos-drawer">
                 <Button variant="contained">Додати обкладинку</Button>
