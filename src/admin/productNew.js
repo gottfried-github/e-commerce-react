@@ -1,5 +1,5 @@
 import React, { Component, useState, useEffect, useMemo, useRef } from 'react'
-import { useNavigate, useParams, redirect } from 'react-router-dom'
+import { useNavigate, useParams, useLocation, Link } from 'react-router-dom'
 import { useForm, useController } from 'react-hook-form'
 import parseIsoTime from 'parseisotime'
 import { DndProvider } from 'react-dnd'
@@ -26,6 +26,7 @@ const main = api => {
   const ProductNew = () => {
     const navigate = useNavigate()
     const params = useParams()
+    const location = useLocation()
 
     const [state, setState] = useState({
       name: '',
@@ -399,40 +400,69 @@ const main = api => {
                 src={state.photo_cover.pathPublic}
                 alt={'обкладинка'}
               />
-            ) : null}
+            ) : (
+              <Link className="link-inner" to="#photos-drawer">
+                <Button variant="contained">Додати обкладинку</Button>
+              </Link>
+            )}
             {errors.photo_cover ? (
               <div className="product-data__error">{errors.photo_cover}</div>
             ) : null}
           </div>
         </div>
         <div className="layout-col-wide wide-section-container photos-sortable-container">
-          <label className="wide-section__label">Фотографії</label>
-          <DndProvider backend={HTML5Backend}>
-            <PhotosSortable
-              photos={photosPublic}
-              reorderCb={handlePhotosReorder}
-              disabled={isDataLoading}
-            />
-          </DndProvider>
+          <label className="wide-section__label">Публічні фотографії</label>
+          {photosPublic.length ? (
+            <DndProvider backend={HTML5Backend}>
+              <PhotosSortable
+                photos={photosPublic}
+                reorderCb={handlePhotosReorder}
+                disabled={isDataLoading}
+              />
+            </DndProvider>
+          ) : (
+            <div className="wide-section__column-center">
+              <Link to="#photos-drawer">
+                <Button variant="contained">Додати фотографії</Button>
+              </Link>
+            </div>
+          )}
           {errors.photosPublic ? (
             <div className="product-data__error">{errors.photosPublic}</div>
           ) : null}
         </div>
         <div className="layout-col-wide wide-section-container">
-          <label className="wide-section__label">Фотошухляда</label>
-          <PhotosDrawer
-            photos={state.photos_all}
-            handlePhotoPublicPick={handlePhotoPublicPick}
-            handlePhotoCoverPick={handlePhotoCoverPick}
-            handleRemovePhoto={handlePhotoRemove}
-            disabled={isDataLoading}
-          />
+          <label
+            id="photos-drawer"
+            className={`wide-section__label${location.hash.slice(1) === 'photos-drawer' ? ' target' : ''}`}
+          >
+            Фотошухляда
+          </label>
+          {state.photos_all.length ? (
+            <PhotosDrawer
+              photos={state.photos_all}
+              handlePhotoPublicPick={handlePhotoPublicPick}
+              handlePhotoCoverPick={handlePhotoCoverPick}
+              handleRemovePhoto={handlePhotoRemove}
+              disabled={isDataLoading}
+            />
+          ) : (
+            <div className="wide-section__column-center">
+              <Link to="#photos-upload">
+                <Button variant="contained">Завантажити фотографії</Button>
+              </Link>
+            </div>
+          )}
         </div>
         <div className="layout-col-center">
           <div className="product-data__row">
             <div className="product-data__column">
               <div className="product-data__field-container">
-                <label className="product-data__field-label" htmlFor="photos-upload">
+                <label
+                  id="photos-upload"
+                  className={`product-data__field-label${location.hash.slice(1) === 'photos-upload' ? ' target' : ''}`}
+                  htmlFor="photos-upload"
+                >
                   Завантажити фото до фотошухляди
                 </label>
                 <input
