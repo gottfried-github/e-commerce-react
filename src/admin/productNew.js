@@ -109,6 +109,8 @@ const main = api => {
     const fieldPropsIsInStock = useController({ name: 'is_in_stock', control })
     const fieldPropsExpose = useController({ name: 'expose', control })
 
+    const photosFilesInputRef = useRef()
+
     useEffect(() => {
       setIsDataLoading(true)
 
@@ -147,18 +149,6 @@ const main = api => {
 
     const handleFormElSubmit = ev => {
       ev.preventDefault()
-    }
-
-    // make api request to upload photos
-    const photosUpload = files => {
-      setIsDataLoading(true)
-
-      api.product.upload(params.id, files, () => {
-        api.product.get(params.id, body => {
-          setState(data.dataToState(body))
-          setIsDataLoading(false)
-        })
-      })
     }
 
     // add or remove a photo from `photos` based on whether it's checked or not and make api request to update the `photos` field
@@ -206,7 +196,6 @@ const main = api => {
         // `expose` might have changed, so updating product state
         api.product.get(params.id, body => {
           setState(data.dataToState(body))
-          // setPhotosAll(photos_all.filter(_photo => _photo.id !== photo.id))
 
           setIsDataLoading(false)
         })
@@ -231,6 +220,22 @@ const main = api => {
         })
 
         setIsDataLoading(false)
+      })
+    }
+
+    // make api request to upload photos
+    const handlePhotosUpload = () => {
+      const files = photosFilesInputRef.current.files
+
+      if (!files.length) return
+
+      setIsDataLoading(true)
+
+      api.product.upload(params.id, files, () => {
+        api.product.get(params.id, body => {
+          setState(data.dataToState(body))
+          setIsDataLoading(false)
+        })
       })
     }
 
@@ -412,6 +417,28 @@ const main = api => {
             handleRemovePhoto={handlePhotoRemove}
             disabled={isDataLoading}
           />
+        </div>
+
+        <div className="layout-col-center">
+          <div className="product-data__row">
+            <div className="product-data__column">
+              <div className="product-data__field-container">
+                <label htmlFor="photos-upload">Завантажити фото до фотошухляди</label>
+                <input
+                  type="file"
+                  ref={photosFilesInputRef}
+                  id="photos-upload"
+                  accept="image/*"
+                  multiple
+                />
+                <div className="flex-justify-end">
+                  <Button variant="contained" onClick={handlePhotosUpload}>
+                    Завантажити
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     )
