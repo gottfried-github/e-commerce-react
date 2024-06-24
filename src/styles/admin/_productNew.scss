@@ -104,6 +104,10 @@
   }
 }
 
+.photos-drawer .photos_drawer__item-container {
+  width: max-content;
+}
+
 .photos-sortable .photos-sortable__photo, 
 .photos-drawer .photos-drawer__photo {
   width: 320px;
@@ -117,5 +121,8 @@
 }
 
 .photos-drawer .photos-drawer__content-box {
+  display: flex;
+  flex-direction: column;
+  
   padding: 8px;
 }

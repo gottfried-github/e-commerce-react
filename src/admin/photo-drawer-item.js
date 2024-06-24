@@ -37,7 +37,7 @@ const PhotosDrawerItem = ({ photo, handlePublicPick, handleCoverPick, handleRemo
   }
 
   return (
-    <Paper elevation={3}>
+    <Paper className="photos_drawer__item-container" elevation={3}>
       <div className="photos-drawer__photo">
         <img src={photo.pathPublic} alt="photo drawer photo" />
       </div>
