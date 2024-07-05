@@ -72,6 +72,7 @@ const main = api => {
       formState: { errors },
       setValue,
       trigger,
+      reset,
       control,
     } = useForm({
       mode: 'onTouched',
@@ -85,11 +86,21 @@ const main = api => {
         expose: false,
       },
       values: formState,
-      resolver: productValidate({
+      resetOptions: {
+        keepDirtyValues: true,
+      },
+      resolver: productValidate(),
+      context: {
         photo_cover: state.photo_cover,
         photosPublic,
-      }),
+      },
     })
+
+    useEffect(() => {
+      console.log('useEffect on formState, formState:', formState)
+      // react-hook-form doesn't validate when useForm `values` option changes, so need to validate manually
+      trigger()
+    }, [formState])
 
     // I use controllers for checkboxes. See Admin: `react-hook-form` and `mui` - handling checkboxes
     const fieldPropsIsInStock = useController({ name: 'is_in_stock', control })
@@ -101,7 +112,9 @@ const main = api => {
       setIsDataLoading(true)
 
       api.product.get(params.id, body => {
-        setState(data.dataToState(body))
+        const stateData = data.dataToState(body)
+        setState(stateData)
+        reset({ ...stateData, time: stateData.time ? new Date(state.time) : null })
         setIsDataLoading(false)
       })
     }, [])
@@ -153,6 +166,11 @@ const main = api => {
     }
 
     const handlePhotoCoverPick = photo => {
+      console.log(
+        'handlePhotoCoverRemove - state, fieldPropsExpose.field.value:',
+        state,
+        fieldPropsExpose.field.value
+      )
       setIsDataLoading(true)
 
       api.product.setCoverPhoto(params.id, { id: photo.id, cover: true }, () => {
@@ -177,6 +195,12 @@ const main = api => {
     }
 
     const handlePhotoCoverRemove = () => {
+      console.log(
+        'handlePhotoCoverRemove - state, fieldPropsExpose.field.value:',
+        state,
+        fieldPropsExpose.field.value
+      )
+
       api.product.setCoverPhoto(params.id, { id: state.photo_cover.id, cover: false }, () => {
         setState({
           ...state,
@@ -201,6 +225,7 @@ const main = api => {
           setState(data.dataToState(body))
 
           setIsDataLoading(false)
+          trigger()
         })
       })
     }
