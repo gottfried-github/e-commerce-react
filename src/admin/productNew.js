@@ -186,17 +186,60 @@ const main = api => {
     }
 
     // add or remove a photo from `photos` based on whether it's checked or not and make api request to update the `photos` field
-    const handlePhotoPublicPick = (picked, photo) => {
+    const handlePhotoPublicPick = async (picked, photo) => {
+      const photosPublicNew = state.photos_all.filter(
+        _photo => (_photo.public && _photo.id !== photo.id) || (_photo.id === photo.id && picked)
+      )
+
+      const { errors } = await validate(
+        {
+          ...getValues(),
+          photosPublic: photosPublicNew,
+        },
+        {}
+      )
+
+      setErrors(errors)
+
+      if (errors.photosPublic) return
+
       setIsDataLoading(true)
 
-      api.product.updatePhotosPublicity(params.id, [{ id: photo.id, public: picked }], () => {
-        // `expose` might have changed, so updating product state
-        api.product.get(params.id, body => {
-          setState(data.dataToState(body))
+      api.product.updatePhotosPublicity(
+        params.id,
+        [{ id: photo.id, public: picked }],
+        () => {
+          setState({
+            ...state,
+            photos_all: state.photos_all.map(_photo => {
+              if (_photo.id !== photo.id) return _photo
+
+              return {
+                ..._photo,
+                public: picked,
+              }
+            }),
+          })
+
+          fieldPropsPhotosPublic.field.onChange(photosPublicNew)
+          fieldPropsPhotosPublic.field.onBlur(photosPublicNew)
 
           setIsDataLoading(false)
-        })
-      })
+        },
+        (body, res) => {
+          if (body.code !== ValidationError.code) {
+            console.log(
+              'handlePhotoCoverRemove, api.product.setCoverPhoto responded with failure - body, res:',
+              body,
+              res
+            )
+            return
+          }
+
+          setErrors({ ...formErrors, photosPublic: body.message })
+          setIsDataLoading(false)
+        }
+      )
     }
 
     const handlePhotoCoverPick = photo => {
@@ -223,6 +266,9 @@ const main = api => {
           }),
           photo_cover: { ...photo, cover: true },
         })
+
+        fieldPropsPhotoCover.field.onChange({ ...photo, cover: true })
+        fieldPropsPhotoCover.field.onBlur({ ...photo, cover: true })
 
         setIsDataLoading(false)
       })
