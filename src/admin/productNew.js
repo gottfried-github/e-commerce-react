@@ -19,9 +19,14 @@ import Divider from '@mui/material/Divider/index.js'
 import { ValidationError } from '../../../e-commerce-common/messages.js'
 import * as data from './product-data.js'
 import productValidate from './product-validate.js'
-import { PhotoPicker, PhotosPicker } from './photos-picker.js'
 import { PhotosSortable } from './photos-sortable-new.js'
 import PhotosDrawer from './photos-drawer.js'
+
+const getPhotosPublic = photos_all =>
+  photos_all
+    .filter(photo => photo.public)
+    // sort in ascending order
+    .sort((photoA, photoB) => (photoA.order > photoB.order ? 1 : -1))
 
 const getFormState = state => ({
   name: state.name,
@@ -32,8 +37,22 @@ const getFormState = state => ({
   time: state.time ? new Date(state.time) : null,
   expose: state.expose,
   photo_cover: state.photo_cover,
-  photosPublic: state.photos_all.filter(photo => photo.public),
+  photosPublic: getPhotosPublic(state.photos_all),
 })
+
+const alterPhotoPublicStatus = (photos_all, photosPublic, photo, publicStatus) => {
+  const orderLast = photosPublic.length ? photosPublic[photosPublic.length - 1].order : -1
+
+  return photos_all.map(_photo => {
+    if (_photo.id !== photo.id) return _photo
+
+    if (!_photo.public && publicStatus) {
+      return { ..._photo, public: publicStatus, order: orderLast + 1 }
+    }
+
+    return { ..._photo, public: publicStatus }
+  })
+}
 
 const main = api => {
   const ProductNew = () => {
@@ -60,15 +79,7 @@ const main = api => {
     const [timeData, setTimeData] = useState(state.time ? new Date(state.time) : null)
 
     const formState = useMemo(() => getFormState(state), [state])
-
-    const photosPublic = useMemo(
-      () =>
-        state.photos_all
-          .filter(photo => photo.public)
-          // sort in ascending order
-          .sort((photoA, photoB) => (photoA.order > photoB.order ? 1 : -1)),
-      [state.photos_all]
-    )
+    const photosPublic = useMemo(() => getPhotosPublic(state.photos_all), [state.photos_all])
 
     const {
       register,
@@ -76,8 +87,6 @@ const main = api => {
       formState: { errors: formErrors },
       getValues,
       setValue,
-      setError,
-      clearErrors,
       trigger,
       reset,
       control,
@@ -106,22 +115,14 @@ const main = api => {
       },
     })
 
-    console.log('formErrors:', formErrors)
-
     useEffect(() => {
-      console.log('useEffect on errors, errors:', errors)
-    }, [errors])
-
-    useEffect(() => {
-      console.log('useEffect on formErrors, formErrors:', formErrors)
-    }, [formErrors])
-
-    useEffect(() => {
-      console.log('useEffect on formState, formState:', formState)
-
       // react-hook-form doesn't validate when useForm `values` option changes, so need to validate manually
       trigger()
     }, [formState])
+
+    useEffect(() => {
+      console.log('useEffect on photosPublic, photosPublic:', photosPublic)
+    }, [photosPublic])
 
     // I use controllers for checkboxes. See Admin: `react-hook-form` and `mui` - handling checkboxes
     const fieldPropsIsInStock = useController({ name: 'is_in_stock', control })
@@ -187,9 +188,13 @@ const main = api => {
 
     // add or remove a photo from `photos` based on whether it's checked or not and make api request to update the `photos` field
     const handlePhotoPublicPick = async (picked, photo) => {
-      const photosPublicNew = state.photos_all.filter(
-        _photo => (_photo.public && _photo.id !== photo.id) || (_photo.id === photo.id && picked)
+      const photos_all_new = alterPhotoPublicStatus(
+        state.photos_all,
+        fieldPropsPhotosPublic.field.value,
+        photo,
+        picked
       )
+      const photosPublicNew = getPhotosPublic(photos_all_new)
 
       const { errors } = await validate(
         {
@@ -212,18 +217,8 @@ const main = api => {
         () => {
           setState({
             ...state,
-            photos_all: state.photos_all.map(_photo => {
-              if (_photo.id !== photo.id) return _photo
-
-              return {
-                ..._photo,
-                public: picked,
-              }
-            }),
+            photos_all: photos_all_new,
           })
-
-          fieldPropsPhotosPublic.field.onChange(photosPublicNew)
-          fieldPropsPhotosPublic.field.onBlur(photosPublicNew)
 
           setIsDataLoading(false)
         },
@@ -263,9 +258,6 @@ const main = api => {
           photo_cover: { ...photo, cover: true },
         })
 
-        fieldPropsPhotoCover.field.onChange({ ...photo, cover: true })
-        fieldPropsPhotoCover.field.onBlur({ ...photo, cover: true })
-
         setIsDataLoading(false)
       })
     }
@@ -295,9 +287,6 @@ const main = api => {
             photo_cover: null,
           })
 
-          fieldPropsPhotoCover.field.onChange(null)
-          fieldPropsPhotoCover.field.onBlur(null)
-
           setIsDataLoading(false)
         },
         (body, res) => {
@@ -317,7 +306,7 @@ const main = api => {
 
     const handlePhotoRemove = async photo => {
       const photos_allNew = state.photos_all.filter(_photo => _photo.id !== photo.id)
-      const photosPublicNew = photos_allNew.filter(photo => photo.public)
+      const photosPublicNew = getPhotosPublic(photos_allNew)
       const photoCoverNew = photos_allNew.find(photo => photo.cover)
 
       const values = getValues()
@@ -344,11 +333,6 @@ const main = api => {
           photos_all: photos_allNew,
           photo_cover: photoCoverNew || null,
         })
-
-        fieldPropsPhotosPublic.field.onChange(photosPublicNew)
-        fieldPropsPhotosPublic.field.onBlur(photosPublicNew)
-        fieldPropsPhotoCover.field.onChange(photoCoverNew || null)
-        fieldPropsPhotoCover.field.onBlur(photoCoverNew || null)
 
         setIsDataLoading(false)
       })
