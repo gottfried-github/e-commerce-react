@@ -66,7 +66,7 @@ export default () => async (values, context) => {
       errors.photo_cover = "це поле обов'язкове"
     }
 
-    if (!context.photosPublic.length) {
+    if (!valuesPrepared.photosPublic.length) {
       errors.photosPublic = "це поле обов'язкове"
     }
   }

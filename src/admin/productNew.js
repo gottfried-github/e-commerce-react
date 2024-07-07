@@ -32,6 +32,7 @@ const getFormState = state => ({
   time: state.time ? new Date(state.time) : null,
   expose: state.expose,
   photo_cover: state.photo_cover,
+  photosPublic: state.photos_all.filter(photo => photo.public),
 })
 
 const main = api => {
@@ -91,7 +92,7 @@ const main = api => {
         time: null,
         expose: false,
         photo_cover: null,
-        // photosPublic: null,
+        photosPublic: [],
       },
       values: formState,
       resetOptions: {
@@ -126,6 +127,7 @@ const main = api => {
     const fieldPropsIsInStock = useController({ name: 'is_in_stock', control })
     const fieldPropsExpose = useController({ name: 'expose', control })
     const fieldPropsPhotoCover = useController({ name: 'photo_cover', control })
+    const fieldPropsPhotosPublic = useController({ name: 'photosPublic', control })
 
     const photosFilesInputRef = useRef()
 
@@ -167,6 +169,7 @@ const main = api => {
     // see Admin: `react-hook-form` validation and reactive `errors`
     const handleProductDataInputBlur = () => {
       fieldPropsPhotoCover.field.onBlur()
+      fieldPropsPhotosPublic.field.onBlur()
     }
 
     const handleIsInStockChange = ev => {
@@ -270,17 +273,41 @@ const main = api => {
       )
     }
 
-    const handlePhotoRemove = photo => {
+    const handlePhotoRemove = async photo => {
+      const photos_allNew = state.photos_all.filter(_photo => _photo.id !== photo.id)
+      const photosPublicNew = photos_allNew.filter(photo => photo.public)
+      const photoCoverNew = photos_allNew.find(photo => photo.cover)
+
+      const values = getValues()
+
+      const { errors } = await validate(
+        {
+          ...values,
+          photosPublic: photosPublicNew,
+          photo_cover: photoCoverNew || null,
+        },
+        {}
+      )
+
+      setErrors(errors)
+
+      if (errors.photosPublic || errors.photo_cover) return
+
       setIsDataLoading(true)
 
       api.product.removePhotos(params.id, [photo.id], body => {
-        // `expose` might have changed, so updating product state
-        api.product.get(params.id, body => {
-          setState(data.dataToState(body))
-
-          setIsDataLoading(false)
-          trigger()
+        setState({
+          ...state,
+          photos_all: photos_allNew,
+          photo_cover: photoCoverNew || null,
         })
+
+        fieldPropsPhotosPublic.field.onChange(photosPublicNew)
+        fieldPropsPhotosPublic.field.onBlur(photosPublicNew)
+        fieldPropsPhotoCover.field.onChange(photoCoverNew || null)
+        fieldPropsPhotoCover.field.onBlur(photoCoverNew || null)
+
+        setIsDataLoading(false)
       })
     }
 
