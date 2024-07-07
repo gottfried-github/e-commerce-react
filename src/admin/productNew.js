@@ -120,10 +120,6 @@ const main = api => {
       trigger()
     }, [formState])
 
-    useEffect(() => {
-      console.log('useEffect on photosPublic, photosPublic:', photosPublic)
-    }, [photosPublic])
-
     // I use controllers for checkboxes. See Admin: `react-hook-form` and `mui` - handling checkboxes
     const fieldPropsIsInStock = useController({ name: 'is_in_stock', control })
     const fieldPropsExpose = useController({ name: 'expose', control })
@@ -145,6 +141,9 @@ const main = api => {
     }, [])
 
     const handleSubmitInner = async values => {
+      delete values.photo_cover
+      delete values.photosPublic
+
       setIsDataLoading(true)
 
       api.product.update(params.id, data.stateToData(values), null, body => {
