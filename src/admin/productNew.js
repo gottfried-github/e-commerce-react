@@ -194,6 +194,7 @@ const main = api => {
       const { errors } = await validate(
         {
           ...getValues(),
+          expose: formState.expose,
           photosPublic: photosPublicNew,
         },
         {}
@@ -271,7 +272,7 @@ const main = api => {
 
     const handlePhotoCoverRemove = async () => {
       const { errors } = await validate(
-        { ...getValues(), photo_cover: null },
+        { ...getValues(), expose: formState.expose, photo_cover: null },
         { photo_cover: null, photosPublic }
       )
       setErrors(errors)
@@ -324,6 +325,7 @@ const main = api => {
       const { errors } = await validate(
         {
           ...values,
+          expose: formState.expose,
           photosPublic: photosPublicNew,
           photo_cover: photoCoverNew || null,
         },
