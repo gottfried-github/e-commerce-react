@@ -62,7 +62,7 @@ export default () => async (values, context) => {
   }
 
   if (valuesPrepared.expose) {
-    if (!context.photo_cover) {
+    if (!valuesPrepared.photo_cover) {
       errors.photo_cover = "це поле обов'язкове"
     }
 
@@ -72,13 +72,18 @@ export default () => async (values, context) => {
   }
 
   console.log('product-validate - values, errors:', values, errors)
+  console.log(
+    'product-validate - photo_cover, photosPublic:',
+    context.photo_cover,
+    context.photosPublic
+  )
 
   return { values: valuesPrepared, errors }
 }
 
 const stripEmpty = values => {
   return Object.keys(values).reduce((_values, k) => {
-    if ([null, ''].includes(values[k])) return _values
+    if ([null, ''].includes(values[k]) && k !== 'photo_cover') return _values
 
     _values[k] = values[k]
     return _values

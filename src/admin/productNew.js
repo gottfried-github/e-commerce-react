@@ -16,17 +16,30 @@ import DialogContentText from '@mui/material/DialogContentText/index.js'
 import DialogActions from '@mui/material/DialogActions/index.js'
 import Divider from '@mui/material/Divider/index.js'
 
+import { ValidationError } from '../../../e-commerce-common/messages.js'
 import * as data from './product-data.js'
 import productValidate from './product-validate.js'
 import { PhotoPicker, PhotosPicker } from './photos-picker.js'
 import { PhotosSortable } from './photos-sortable-new.js'
 import PhotosDrawer from './photos-drawer.js'
 
+const getFormState = state => ({
+  name: state.name,
+  description: state.description,
+  priceHrn: state.priceHrn,
+  priceKop: state.priceKop,
+  is_in_stock: state.is_in_stock,
+  time: state.time ? new Date(state.time) : null,
+  expose: state.expose,
+  photo_cover: state.photo_cover,
+})
+
 const main = api => {
   const ProductNew = () => {
     const navigate = useNavigate()
     const params = useParams()
     const location = useLocation()
+    const validate = productValidate()
 
     const [state, setState] = useState({
       name: '',
@@ -39,23 +52,13 @@ const main = api => {
       photos_all: [],
       photo_cover: null,
     })
+    const [errors, setErrors] = useState({})
     const [isDataLoading, setIsDataLoading] = useState(false)
     const [isRemoveProductConfirmationDialogOpen, setIsRemoveProductConfirmationDialogOpen] =
       useState(false)
     const [timeData, setTimeData] = useState(state.time ? new Date(state.time) : null)
 
-    const formState = useMemo(
-      () => ({
-        name: state.name,
-        description: state.description,
-        priceHrn: state.priceHrn,
-        priceKop: state.priceKop,
-        is_in_stock: state.is_in_stock,
-        time: state.time ? timeData : null,
-        expose: state.expose,
-      }),
-      [state, timeData]
-    )
+    const formState = useMemo(() => getFormState(state), [state])
 
     const photosPublic = useMemo(
       () =>
@@ -69,8 +72,11 @@ const main = api => {
     const {
       register,
       handleSubmit,
-      formState: { errors },
+      formState: { errors: formErrors },
+      getValues,
       setValue,
+      setError,
+      clearErrors,
       trigger,
       reset,
       control,
@@ -84,20 +90,34 @@ const main = api => {
         is_in_stock: false,
         time: null,
         expose: false,
+        photo_cover: null,
+        // photosPublic: null,
       },
       values: formState,
       resetOptions: {
         keepDirtyValues: true,
       },
-      resolver: productValidate(),
+      errors,
+      resolver: validate,
       context: {
         photo_cover: state.photo_cover,
         photosPublic,
       },
     })
 
+    console.log('formErrors:', formErrors)
+
+    useEffect(() => {
+      console.log('useEffect on errors, errors:', errors)
+    }, [errors])
+
+    useEffect(() => {
+      console.log('useEffect on formErrors, formErrors:', formErrors)
+    }, [formErrors])
+
     useEffect(() => {
       console.log('useEffect on formState, formState:', formState)
+
       // react-hook-form doesn't validate when useForm `values` option changes, so need to validate manually
       trigger()
     }, [formState])
@@ -105,6 +125,7 @@ const main = api => {
     // I use controllers for checkboxes. See Admin: `react-hook-form` and `mui` - handling checkboxes
     const fieldPropsIsInStock = useController({ name: 'is_in_stock', control })
     const fieldPropsExpose = useController({ name: 'expose', control })
+    const fieldPropsPhotoCover = useController({ name: 'photo_cover', control })
 
     const photosFilesInputRef = useRef()
 
@@ -115,6 +136,7 @@ const main = api => {
         const stateData = data.dataToState(body)
         setState(stateData)
         reset({ ...stateData, time: stateData.time ? new Date(state.time) : null })
+
         setIsDataLoading(false)
       })
     }, [])
@@ -123,7 +145,11 @@ const main = api => {
       setIsDataLoading(true)
 
       api.product.update(params.id, data.stateToData(values), null, body => {
-        setState(data.dataToState(body))
+        const stateData = data.dataToState(body)
+        setState(stateData)
+
+        reset({ ...stateData, time: stateData.time ? new Date(state.time) : null })
+
         setIsDataLoading(false)
       })
     }
@@ -136,6 +162,11 @@ const main = api => {
         setIsRemoveProductConfirmationDialogOpen(false)
         navigate('/dash/products')
       })
+    }
+
+    // see Admin: `react-hook-form` validation and reactive `errors`
+    const handleProductDataInputBlur = () => {
+      fieldPropsPhotoCover.field.onBlur()
     }
 
     const handleIsInStockChange = ev => {
@@ -194,26 +225,49 @@ const main = api => {
       })
     }
 
-    const handlePhotoCoverRemove = () => {
-      console.log(
-        'handlePhotoCoverRemove - state, fieldPropsExpose.field.value:',
-        state,
-        fieldPropsExpose.field.value
+    const handlePhotoCoverRemove = async () => {
+      const { errors } = await validate(
+        { ...getValues(), photo_cover: null },
+        { photo_cover: null, photosPublic }
       )
+      setErrors(errors)
 
-      api.product.setCoverPhoto(params.id, { id: state.photo_cover.id, cover: false }, () => {
-        setState({
-          ...state,
-          photos_all: state.photos_all.map(_photo => {
-            if (_photo.id !== state.photo_cover.id) return _photo
+      if (errors.photo_cover) return
 
-            return { ..._photo, cover: false }
-          }),
-          photo_cover: null,
-        })
+      setIsDataLoading(true)
 
-        setIsDataLoading(false)
-      })
+      api.product.setCoverPhoto(
+        params.id,
+        { id: state.photo_cover.id, cover: false },
+        async () => {
+          setState({
+            ...state,
+            photos_all: state.photos_all.map(_photo => {
+              if (_photo.id !== state.photo_cover.id) return _photo
+
+              return { ..._photo, cover: false }
+            }),
+            photo_cover: null,
+          })
+
+          fieldPropsPhotoCover.field.onChange(null)
+          fieldPropsPhotoCover.field.onBlur(null)
+
+          setIsDataLoading(false)
+        },
+        (body, res) => {
+          if (body.code !== ValidationError.code) {
+            console.log(
+              'handlePhotoCoverRemove, api.product.setCoverPhoto responded with failure - body, res:',
+              body,
+              res
+            )
+            return
+          }
+
+          setErrors({ ...formErrors, photo_cover: body.message })
+        }
+      )
     }
 
     const handlePhotoRemove = photo => {
@@ -296,9 +350,9 @@ const main = api => {
                   <TextField
                     id="name"
                     placeholder="Назва"
-                    {...register('name')}
-                    error={!!errors.name}
-                    helperText={errors.name || null}
+                    {...register('name', { onBlur: handleProductDataInputBlur })}
+                    error={!!formErrors.name}
+                    helperText={formErrors.name || null}
                     disabled={isDataLoading}
                   />
                 </div>
@@ -316,9 +370,9 @@ const main = api => {
                     multiline
                     minRows={6}
                     maxRows={12}
-                    {...register('description')}
-                    error={!!errors.description}
-                    helperText={errors.description || null}
+                    {...register('description', { onBlur: handleProductDataInputBlur })}
+                    error={!!formErrors.description}
+                    helperText={formErrors.description || null}
                     disabled={isDataLoading}
                   />
                 </div>
@@ -334,9 +388,9 @@ const main = api => {
                     id="priceHrn"
                     placeholder="Гривні"
                     type="number"
-                    {...register('priceHrn')}
-                    error={!!errors.priceHrn}
-                    helperText={errors.priceHrn || null}
+                    {...register('priceHrn', { onBlur: handleProductDataInputBlur })}
+                    error={!!formErrors.priceHrn}
+                    helperText={formErrors.priceHrn || null}
                     disabled={isDataLoading}
                   />
                 </div>
@@ -350,9 +404,9 @@ const main = api => {
                     id="priceKop"
                     placeholder="Копійки"
                     type="number"
-                    {...register('priceKop')}
-                    error={!!errors.priceKop}
-                    helperText={errors.priceKop || null}
+                    {...register('priceKop', { onBlur: handleProductDataInputBlur })}
+                    error={!!formErrors.priceKop}
+                    helperText={formErrors.priceKop || null}
                     disabled={isDataLoading}
                   />
                 </div>
@@ -367,15 +421,18 @@ const main = api => {
                         <Checkbox
                           checked={fieldPropsIsInStock.field.value}
                           onChange={handleIsInStockChange}
-                          onBlur={fieldPropsIsInStock.field.onBlur}
+                          onBlur={() => {
+                            fieldPropsIsInStock.field.onBlur()
+                            handleProductDataInputBlur()
+                          }}
                           inputRef={fieldPropsIsInStock.field.ref}
                         />
                       }
                       label={'В наявності'}
                       disabled={isDataLoading}
                     />
-                    {errors.is_in_stock ? (
-                      <div className="product-data__error">{errors.is_in_stock}</div>
+                    {formErrors.is_in_stock ? (
+                      <div className="product-data__error">{formErrors.is_in_stock}</div>
                     ) : null}
                   </div>
                 </div>
@@ -391,7 +448,10 @@ const main = api => {
                     id="time"
                     value={timeData}
                     name={fieldPropsTime.name}
-                    onBlur={fieldPropsTime.onBlur}
+                    onBlur={() => {
+                      fieldPropsTime.onBlur()
+                      handleProductDataInputBlur()
+                    }}
                     inputRef={fieldPropsTime.ref}
                     onChange={date => {
                       setTimeData(date)
@@ -400,7 +460,9 @@ const main = api => {
                     }}
                     disabled={isDataLoading}
                   />
-                  {errors.time ? <div className="product-data__error">{errors.time}</div> : null}
+                  {formErrors.time ? (
+                    <div className="product-data__error">{formErrors.time}</div>
+                  ) : null}
                 </div>
               </div>
             </div>
@@ -413,15 +475,18 @@ const main = api => {
                         <Checkbox
                           checked={fieldPropsExpose.field.value}
                           onChange={handleExposeChange}
-                          onBlur={fieldPropsExpose.field.onBlur}
+                          onBlur={() => {
+                            fieldPropsExpose.field.onBlur()
+                            handleProductDataInputBlur()
+                          }}
                           inputRef={fieldPropsExpose.field.ref}
                         />
                       }
                       label={'Показувати відвідувачам'}
                       disabled={isDataLoading}
                     />
-                    {errors.expose ? (
-                      <div className="product-data__error">{errors.expose}</div>
+                    {formErrors.expose ? (
+                      <div className="product-data__error">{formErrors.expose}</div>
                     ) : null}
                   </div>
                 </div>
@@ -453,8 +518,8 @@ const main = api => {
                 <Button variant="contained">Додати обкладинку</Button>
               </Link>
             )}
-            {errors.photo_cover ? (
-              <div className="product-data__error">{errors.photo_cover}</div>
+            {formErrors.photo_cover ? (
+              <div className="product-data__error">{formErrors.photo_cover}</div>
             ) : null}
           </div>
         </div>
@@ -477,9 +542,9 @@ const main = api => {
               </Link>
             </div>
           )}
-          {errors.photosPublic ? (
+          {formErrors.photosPublic ? (
             <div className="wide-section__column-center">
-              <div className="product-data__error">{errors.photosPublic}</div>
+              <div className="product-data__error">{formErrors.photosPublic}</div>
             </div>
           ) : null}
         </div>
@@ -507,6 +572,15 @@ const main = api => {
               </Link>
             </div>
           )}
+          {formErrors.photosPublic || formErrors.photo_cover ? (
+            <div className="wide-section__column-center">
+              <div className="product-data__error">
+                {formErrors.photosPublic
+                  ? "Публічні фотографії є обов'язковими"
+                  : "Обкладинка є обов'язковою"}
+              </div>
+            </div>
+          ) : null}
         </div>
         <div className="layout-col-center">
           <div className="product-data__row">

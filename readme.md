@@ -73,3 +73,10 @@ The way I have my routes set up with `React Router` is that I render the `Header
 When using `register` for `mui` `Checkbox`, when `formState`'s initial value is `true`, the `Checkbox` doesn't appear to be checked, although the underlying `<input>` HTML element is `checked`. 
 
 To omit this problem, I use `useController` for `Checkboxes`.
+
+### Admin: `react-hook-form` validation and reactive `errors`
+When I use `useForm`'s `errors` option and update the errors, I run into an issue with the `photo_cover` field.
+
+Let's say I update the errors with an error for `photo_cover`. Then, the next validation returns no error for this field. But the error that I set when updating the errors gets persisted in `useForm`'s `formState`.
+
+Thus I'm forced to trigger `photo_cover`'s `onBlur` each time I update another field in the product data form. I'm aware that it results in duplicate runs of validation, but I haven't found another way of dealing with this.
