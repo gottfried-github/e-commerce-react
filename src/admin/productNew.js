@@ -1,11 +1,9 @@
-import React, { Component, useState, useEffect, useMemo, useRef } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { useNavigate, useParams, useLocation, Link } from 'react-router-dom'
 import { useForm, useController } from 'react-hook-form'
-import parseIsoTime from 'parseisotime'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import Button from '@mui/material/Button/index.js'
-import Typography from '@mui/material/Typography/index.js'
 import TextField from '@mui/material/TextField/index.js'
 import Checkbox from '@mui/material/Checkbox/index.js'
 import FormControlLabel from '@mui/material/FormControlLabel/index.js'
@@ -19,6 +17,8 @@ import Divider from '@mui/material/Divider/index.js'
 import { ValidationError } from '../../../e-commerce-common/messages.js'
 import * as data from './product-data.js'
 import productValidate from './product-validate.js'
+import ProductDataField from './components/ProductDataField.js'
+import ProductDataWideSection from './components/ProductDataWideSection.js'
 import { PhotosSortable } from './photos-sortable-new.js'
 import PhotosDrawer from './photos-drawer.js'
 
@@ -396,79 +396,84 @@ const main = api => {
           <form className="product-data-form" onSubmit={handleFormElSubmit}>
             <div className="product-data__row">
               <div className="product-data__column">
-                <div className="product-data__field-container">
-                  <label className="product-data__field-label" htmlFor="name">
-                    Назва
-                  </label>
-                  <TextField
-                    id="name"
-                    placeholder="Назва"
-                    {...register('name', { onBlur: handleProductDataInputBlur })}
-                    error={!!formErrors.name}
-                    helperText={formErrors.name || null}
-                    disabled={isDataLoading}
-                  />
-                </div>
+                <ProductDataField
+                  id="name"
+                  label="Назва"
+                  content={({ id, label }) => (
+                    <TextField
+                      id={id}
+                      placeholder={label}
+                      {...register('name', { onBlur: handleProductDataInputBlur })}
+                      error={!!formErrors.name}
+                      helperText={formErrors.name || null}
+                      disabled={isDataLoading}
+                    />
+                  )}
+                />
               </div>
             </div>
             <div className="product-data__row">
               <div className="product-data__column">
-                <div className="product-data__field-container">
-                  <label className="product-data__field-label" htmlFor="description">
-                    Опис
-                  </label>
-                  <TextField
-                    id="description"
-                    placeholder="Опис"
-                    multiline
-                    minRows={6}
-                    maxRows={12}
-                    {...register('description', { onBlur: handleProductDataInputBlur })}
-                    error={!!formErrors.description}
-                    helperText={formErrors.description || null}
-                    disabled={isDataLoading}
-                  />
-                </div>
+                <ProductDataField
+                  id="description"
+                  label="Опис"
+                  content={({ id, label }) => (
+                    <TextField
+                      id={id}
+                      placeholder={label}
+                      multiline
+                      minRows={6}
+                      maxRows={12}
+                      {...register('description', { onBlur: handleProductDataInputBlur })}
+                      error={!!formErrors.description}
+                      helperText={formErrors.description || null}
+                      disabled={isDataLoading}
+                    />
+                  )}
+                />
               </div>
             </div>
             <div className="product-data__row-2">
               <div className="product-data__column">
-                <div className="product-data__field-container">
-                  <label className="product-data__field-label" htmlFor="priceHrn">
-                    Ціна: гривні
-                  </label>
-                  <TextField
-                    id="priceHrn"
-                    placeholder="Гривні"
-                    type="number"
-                    {...register('priceHrn', { onBlur: handleProductDataInputBlur })}
-                    error={!!formErrors.priceHrn}
-                    helperText={formErrors.priceHrn || null}
-                    disabled={isDataLoading}
-                  />
-                </div>
+                <ProductDataField
+                  id="priceHrn"
+                  label="Ціна: гривні"
+                  content={({ id, label }) => (
+                    <TextField
+                      id={id}
+                      placeholder={label}
+                      type="number"
+                      {...register('priceHrn', { onBlur: handleProductDataInputBlur })}
+                      error={!!formErrors.priceHrn}
+                      helperText={formErrors.priceHrn || null}
+                      disabled={isDataLoading}
+                    />
+                  )}
+                />
               </div>
               <div className="product-data__column">
-                <div className="product-data__field-container">
-                  <label className="product-data__field-label" htmlFor="priceKop">
-                    Ціна: копійки
-                  </label>
-                  <TextField
-                    id="priceKop"
-                    placeholder="Копійки"
-                    type="number"
-                    {...register('priceKop', { onBlur: handleProductDataInputBlur })}
-                    error={!!formErrors.priceKop}
-                    helperText={formErrors.priceKop || null}
-                    disabled={isDataLoading}
-                  />
-                </div>
+                <ProductDataField
+                  id="priceKop"
+                  label="Ціна: копійки"
+                  content={({ id }) => (
+                    <TextField
+                      id={id}
+                      placeholder="Копійки"
+                      type="number"
+                      {...register('priceKop', { onBlur: handleProductDataInputBlur })}
+                      error={!!formErrors.priceKop}
+                      helperText={formErrors.priceKop || null}
+                      disabled={isDataLoading}
+                    />
+                  )}
+                />
               </div>
             </div>
             <div className="product-data__row">
               <div className="product-data__column">
-                <div className="product-data__field-container">
-                  <div className="product-data__checkbox-container">
+                <ProductDataField
+                  error={formErrors.is_in_stock}
+                  content={() => (
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -484,45 +489,42 @@ const main = api => {
                       label={'В наявності'}
                       disabled={isDataLoading}
                     />
-                    {formErrors.is_in_stock ? (
-                      <div className="product-data__error">{formErrors.is_in_stock}</div>
-                    ) : null}
-                  </div>
-                </div>
+                  )}
+                />
               </div>
             </div>
             <div className="product-data__row">
               <div className="product-data__column">
-                <div className="product-data__field-container">
-                  <label className="product-data__field-label" htmlFor="time">
-                    Час створення
-                  </label>
-                  <DateTimePicker
-                    id="time"
-                    value={timeData}
-                    name={fieldPropsTime.name}
-                    onBlur={() => {
-                      fieldPropsTime.onBlur()
-                      handleProductDataInputBlur()
-                    }}
-                    inputRef={fieldPropsTime.ref}
-                    onChange={date => {
-                      setTimeData(date)
-                      setValue('time', date)
-                      trigger('time')
-                    }}
-                    disabled={isDataLoading}
-                  />
-                  {formErrors.time ? (
-                    <div className="product-data__error">{formErrors.time}</div>
-                  ) : null}
-                </div>
+                <ProductDataField
+                  id="time"
+                  label="Час створення"
+                  error={formErrors.time}
+                  content={({ id }) => (
+                    <DateTimePicker
+                      id={id}
+                      value={timeData}
+                      name={fieldPropsTime.name}
+                      onBlur={() => {
+                        fieldPropsTime.onBlur()
+                        handleProductDataInputBlur()
+                      }}
+                      inputRef={fieldPropsTime.ref}
+                      onChange={date => {
+                        setTimeData(date)
+                        setValue('time', date)
+                        trigger('time')
+                      }}
+                      disabled={isDataLoading}
+                    />
+                  )}
+                />
               </div>
             </div>
             <div className="product-data__row">
               <div className="product-data__column">
-                <div className="product-data__field-container">
-                  <div className="product-data__checkbox-container">
+                <ProductDataField
+                  error={formErrors.expose}
+                  content={() => (
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -538,11 +540,8 @@ const main = api => {
                       label={'Показувати відвідувачам'}
                       disabled={isDataLoading}
                     />
-                    {formErrors.expose ? (
-                      <div className="product-data__error">{formErrors.expose}</div>
-                    ) : null}
-                  </div>
-                </div>
+                  )}
+                />
               </div>
             </div>
           </form>
@@ -551,116 +550,116 @@ const main = api => {
               Зберегти дані
             </Button>
           </div>
-          <div className="product__cover-photo-container">
-            <label className="product-data__field-label">Обкладинка</label>
-            {fieldPropsPhotoCover.field.value ? (
+          <ProductDataField
+            label="Обкладинка"
+            error={formErrors.photo_cover}
+            content={() => (
               <>
-                <img
-                  className="product__cover-photo"
-                  src={fieldPropsPhotoCover.field.value.pathPublic}
-                  alt={'обкладинка'}
-                />
-                <div className="flex-justify-end">
-                  <Button variant="contained" onClick={handlePhotoCoverRemove}>
-                    Прибрати з обкладинки
-                  </Button>
-                </div>
+                {fieldPropsPhotoCover.field.value ? (
+                  <>
+                    <img
+                      className="product__cover-photo"
+                      src={fieldPropsPhotoCover.field.value.pathPublic}
+                      alt={'обкладинка'}
+                    />
+                    <div className="flex-justify-end">
+                      <Button variant="contained" onClick={handlePhotoCoverRemove}>
+                        Прибрати з обкладинки
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <Link className="link-inner" to="#photos-drawer">
+                    <Button variant="contained">Додати обкладинку</Button>
+                  </Link>
+                )}
               </>
-            ) : (
-              <Link className="link-inner" to="#photos-drawer">
-                <Button variant="contained">Додати обкладинку</Button>
-              </Link>
             )}
-            {formErrors.photo_cover ? (
-              <div className="product-data__error">{formErrors.photo_cover}</div>
-            ) : null}
-          </div>
+          />
         </div>
-        <div className="layout-col-wide wide-section-container photos-sortable-container">
-          <div className="wide-section__column-center">
-            <label className="wide-section__label">Публічні фотографії</label>
-          </div>
-          {fieldPropsPhotosPublic.field.value.length ? (
-            <DndProvider backend={HTML5Backend}>
-              <PhotosSortable
-                photos={fieldPropsPhotosPublic.field.value}
-                reorderCb={handlePhotosReorder}
-                disabled={isDataLoading}
-              />
-            </DndProvider>
-          ) : (
-            <div className="wide-section__column-center">
-              <Link to="#photos-drawer">
-                <Button variant="contained">Додати фотографії</Button>
-              </Link>
-            </div>
+        <ProductDataWideSection
+          label="Публічні фотографії"
+          error={formErrors.photosPublic}
+          content={() => (
+            <>
+              {fieldPropsPhotosPublic.field.value.length ? (
+                <DndProvider backend={HTML5Backend}>
+                  <PhotosSortable
+                    photos={fieldPropsPhotosPublic.field.value}
+                    reorderCb={handlePhotosReorder}
+                    disabled={isDataLoading}
+                  />
+                </DndProvider>
+              ) : (
+                <div className="wide-section__column-center">
+                  <div className="flex-justify-end">
+                    <Link to="#photos-drawer">
+                      <Button variant="contained">Додати фотографії</Button>
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </>
           )}
-          {formErrors.photosPublic ? (
-            <div className="wide-section__column-center">
-              <div className="product-data__error">{formErrors.photosPublic}</div>
-            </div>
-          ) : null}
-        </div>
-        <div className="layout-col-wide wide-section-container">
-          <div className="wide-section__column-center">
-            <label
-              id="photos-drawer"
-              className={`wide-section__label${location.hash.slice(1) === 'photos-drawer' ? ' target' : ''}`}
-            >
-              Фотошухляда
-            </label>
-          </div>
-          {state.photos_all.length ? (
-            <PhotosDrawer
-              photos={state.photos_all}
-              handlePhotoPublicPick={handlePhotoPublicPick}
-              handlePhotoCoverPick={handlePhotoCoverPick}
-              handleRemovePhoto={handlePhotoRemove}
-              disabled={isDataLoading}
-            />
-          ) : (
-            <div className="wide-section__column-center">
-              <Link to="#photos-upload">
-                <Button variant="contained">Завантажити фотографії</Button>
-              </Link>
-            </div>
+        />
+        <ProductDataWideSection
+          label="Фотошухляда"
+          target={location.hash.slice(1) === 'photos-drawer'}
+          error={
+            formErrors.photosPublic && formErrors.photo_cover
+              ? "Публічний продукт обо'язково повинен мати обкладинку і публічні фотографії"
+              : formErrors.photosPublic
+                ? "Публічний продукт обов'язково повинен мати публічні фотографії"
+                : formErrors.photo_cover
+                  ? "Публічний продукт обов'язково повинен мати обкладинку"
+                  : null
+          }
+          content={() => (
+            <>
+              {state.photos_all.length ? (
+                <PhotosDrawer
+                  photos={state.photos_all}
+                  handlePhotoPublicPick={handlePhotoPublicPick}
+                  handlePhotoCoverPick={handlePhotoCoverPick}
+                  handleRemovePhoto={handlePhotoRemove}
+                  disabled={isDataLoading}
+                />
+              ) : (
+                <div className="wide-section__column-center">
+                  <div className="flex-justify-end">
+                    <Link to="#photos-upload">
+                      <Button variant="contained">Завантажити фотографії</Button>
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </>
           )}
-          {formErrors.photosPublic || formErrors.photo_cover ? (
-            <div className="wide-section__column-center">
-              <div className="product-data__error">
-                {formErrors.photosPublic && formErrors.photo_cover
-                  ? "Публічний продукт обо'язково повинен мати обкладинку і публічні фотографії"
-                  : formErrors.photosPublic
-                    ? "Публічний продукт обов'язково повинен мати публічні фотографії"
-                    : "Публічний продукт обов'язково повинен мати обкладинку"}
-              </div>
-            </div>
-          ) : null}
-        </div>
+        />
         <div className="layout-col-center">
           <div className="product-data__row">
             <div className="product-data__column">
-              <div className="product-data__field-container">
-                <label
-                  id="photos-upload"
-                  className={`product-data__field-label${location.hash.slice(1) === 'photos-upload' ? ' target' : ''}`}
-                  htmlFor="photos-upload"
-                >
-                  Завантажити фото до фотошухляди
-                </label>
-                <input
-                  type="file"
-                  ref={photosFilesInputRef}
-                  id="photos-upload"
-                  accept="image/*"
-                  multiple
-                />
-                <div className="flex-justify-end">
-                  <Button variant="contained" onClick={handlePhotosUpload}>
-                    Завантажити
-                  </Button>
-                </div>
-              </div>
+              <ProductDataField
+                id="photos-upload"
+                label="Завантажити фото до фотошухляди"
+                target={location.hash.slice(1) === 'photos-upload'}
+                content={({ id }) => (
+                  <>
+                    <input
+                      type="file"
+                      ref={photosFilesInputRef}
+                      id={id}
+                      accept="image/*"
+                      multiple
+                    />
+                    <div className="flex-justify-end">
+                      <Button variant="contained" onClick={handlePhotosUpload}>
+                        Завантажити
+                      </Button>
+                    </div>
+                  </>
+                )}
+              />
             </div>
           </div>
         </div>
