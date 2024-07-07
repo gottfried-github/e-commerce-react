@@ -243,11 +243,6 @@ const main = api => {
     }
 
     const handlePhotoCoverPick = photo => {
-      console.log(
-        'handlePhotoCoverRemove - state, fieldPropsExpose.field.value:',
-        state,
-        fieldPropsExpose.field.value
-      )
       setIsDataLoading(true)
 
       api.product.setCoverPhoto(params.id, { id: photo.id, cover: true }, () => {
@@ -573,11 +568,11 @@ const main = api => {
           </div>
           <div className="product__cover-photo-container">
             <label className="product-data__field-label">Обкладинка</label>
-            {state.photo_cover ? (
+            {fieldPropsPhotoCover.field.value ? (
               <>
                 <img
                   className="product__cover-photo"
-                  src={state.photo_cover.pathPublic}
+                  src={fieldPropsPhotoCover.field.value.pathPublic}
                   alt={'обкладинка'}
                 />
                 <div className="flex-justify-end">
@@ -600,10 +595,10 @@ const main = api => {
           <div className="wide-section__column-center">
             <label className="wide-section__label">Публічні фотографії</label>
           </div>
-          {photosPublic.length ? (
+          {fieldPropsPhotosPublic.field.value.length ? (
             <DndProvider backend={HTML5Backend}>
               <PhotosSortable
-                photos={photosPublic}
+                photos={fieldPropsPhotosPublic.field.value}
                 reorderCb={handlePhotosReorder}
                 disabled={isDataLoading}
               />
@@ -648,9 +643,11 @@ const main = api => {
           {formErrors.photosPublic || formErrors.photo_cover ? (
             <div className="wide-section__column-center">
               <div className="product-data__error">
-                {formErrors.photosPublic
-                  ? "Публічні фотографії є обов'язковими"
-                  : "Обкладинка є обов'язковою"}
+                {formErrors.photosPublic && formErrors.photo_cover
+                  ? "Публічний продукт обо'язково повинен мати обкладинку і публічні фотографії"
+                  : formErrors.photosPublic
+                    ? "Публічний продукт обов'язково повинен мати публічні фотографії"
+                    : "Публічний продукт обов'язково повинен мати обкладинку"}
               </div>
             </div>
           ) : null}
