@@ -15,6 +15,7 @@ import DialogActions from '@mui/material/DialogActions/index.js'
 import Divider from '@mui/material/Divider/index.js'
 
 import { ValidationError } from '../../../e-commerce-common/messages.js'
+import { omit } from './utils/utils.js'
 import { reorderPhotos, setCoverPhoto, removeCoverPhoto, setState } from './actions/product.js'
 import stateReducer, {
   setPhotoPublicStatus as setPhotoPublicStatusReducer,
@@ -130,15 +131,30 @@ const main = api => {
       delete values.photo_cover
       delete values.photosPublic
 
+      const fieldsToRemove = Object.keys(omit(state, ['photo_cover', 'photos_all'])).reduce(
+        (fieldsToRemove, k) => {
+          if (k in values) return fieldsToRemove
+
+          fieldsToRemove.push(k)
+          return fieldsToRemove
+        },
+        []
+      )
+
       setIsDataLoading(true)
 
-      api.product.update(params.id, data.stateToData(values), null, body => {
-        const stateData = data.dataToState(body)
-        dispatch(setState({ state: stateData }))
-        reset(getFormState(stateData))
+      api.product.update(
+        params.id,
+        data.stateToData(values),
+        fieldsToRemove.length ? fieldsToRemove : null,
+        body => {
+          const stateData = data.dataToState(body)
+          dispatch(setState({ state: stateData }))
+          reset(getFormState(stateData))
 
-        setIsDataLoading(false)
-      })
+          setIsDataLoading(false)
+        }
+      )
     }
 
     const handleDeleteProductConfirmClick = () => {
