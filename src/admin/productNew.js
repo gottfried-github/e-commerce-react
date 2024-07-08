@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react'
+import React, { useState, useReducer, useEffect, useMemo, useRef } from 'react'
 import { useNavigate, useParams, useLocation, Link } from 'react-router-dom'
 import { useForm, useController } from 'react-hook-form'
 import { DndProvider } from 'react-dnd'
@@ -15,18 +15,18 @@ import DialogActions from '@mui/material/DialogActions/index.js'
 import Divider from '@mui/material/Divider/index.js'
 
 import { ValidationError } from '../../../e-commerce-common/messages.js'
+import { reorderPhotos, setCoverPhoto, removeCoverPhoto, setState } from './actions/product.js'
+import stateReducer, {
+  setPhotoPublicStatus as setPhotoPublicStatusReducer,
+  removePhoto as removePhotoReducer,
+  getPhotosPublic,
+} from './reducers/product.js'
 import * as data from './product-data.js'
 import productValidate from './product-validate.js'
 import ProductDataField from './components/ProductDataField.js'
 import ProductDataWideSection from './components/ProductDataWideSection.js'
 import { PhotosSortable } from './photos-sortable-new.js'
 import PhotosDrawer from './photos-drawer.js'
-
-const getPhotosPublic = photos_all =>
-  photos_all
-    .filter(photo => photo.public)
-    // sort in ascending order
-    .sort((photoA, photoB) => (photoA.order > photoB.order ? 1 : -1))
 
 const getFormState = state => ({
   name: state.name,
@@ -40,20 +40,6 @@ const getFormState = state => ({
   photosPublic: getPhotosPublic(state.photos_all),
 })
 
-const alterPhotoPublicStatus = (photos_all, photosPublic, photo, publicStatus) => {
-  const orderLast = photosPublic.length ? photosPublic[photosPublic.length - 1].order : -1
-
-  return photos_all.map(_photo => {
-    if (_photo.id !== photo.id) return _photo
-
-    if (!_photo.public && publicStatus) {
-      return { ..._photo, public: publicStatus, order: orderLast + 1 }
-    }
-
-    return { ..._photo, public: publicStatus }
-  })
-}
-
 const main = api => {
   const ProductNew = () => {
     const navigate = useNavigate()
@@ -61,7 +47,7 @@ const main = api => {
     const location = useLocation()
     const validate = productValidate()
 
-    const [state, setState] = useState({
+    const [state, dispatch] = useReducer(stateReducer, {
       name: '',
       priceHrn: '',
       priceKop: '',
@@ -133,8 +119,8 @@ const main = api => {
 
       api.product.get(params.id, body => {
         const stateData = data.dataToState(body)
-        setState(stateData)
-        reset({ ...stateData, time: stateData.time ? new Date(state.time) : null })
+        dispatch(setState({ state: stateData }))
+        reset(getFormState(stateData))
 
         setIsDataLoading(false)
       })
@@ -148,9 +134,8 @@ const main = api => {
 
       api.product.update(params.id, data.stateToData(values), null, body => {
         const stateData = data.dataToState(body)
-        setState(stateData)
-
-        reset({ ...stateData, time: stateData.time ? new Date(state.time) : null })
+        dispatch(setState({ state: stateData }))
+        reset(getFormState(stateData))
 
         setIsDataLoading(false)
       })
@@ -185,15 +170,52 @@ const main = api => {
       ev.preventDefault()
     }
 
+    const handlePhotoCoverPick = photo => {
+      setIsDataLoading(true)
+
+      api.product.setCoverPhoto(params.id, { id: photo.id, cover: true }, () => {
+        dispatch(setCoverPhoto({ photo }))
+        setIsDataLoading(false)
+      })
+    }
+
+    const handlePhotoCoverRemove = async () => {
+      const { errors } = await validate(
+        { ...getValues(), expose: formState.expose, photo_cover: null },
+        { photo_cover: null, photosPublic }
+      )
+      setErrors(errors)
+
+      if (errors.photo_cover) return
+
+      setIsDataLoading(true)
+
+      api.product.setCoverPhoto(
+        params.id,
+        { id: state.photo_cover.id, cover: false },
+        async () => {
+          dispatch(removeCoverPhoto())
+          setIsDataLoading(false)
+        },
+        (body, res) => {
+          if (body.code !== ValidationError.code) {
+            console.log(
+              'handlePhotoCoverRemove, api.product.setCoverPhoto responded with failure - body, res:',
+              body,
+              res
+            )
+            return
+          }
+
+          setErrors({ ...formErrors, photo_cover: body.message })
+        }
+      )
+    }
+
     // add or remove a photo from `photos` based on whether it's checked or not and make api request to update the `photos` field
     const handlePhotoPublicPick = async (picked, photo) => {
-      const photos_all_new = alterPhotoPublicStatus(
-        state.photos_all,
-        fieldPropsPhotosPublic.field.value,
-        photo,
-        picked
-      )
-      const photosPublicNew = getPhotosPublic(photos_all_new)
+      const stateNew = setPhotoPublicStatusReducer(state, { photo, publicStatus: picked })
+      const photosPublicNew = getPhotosPublic(stateNew.photos_all)
 
       const { errors } = await validate(
         {
@@ -214,11 +236,7 @@ const main = api => {
         params.id,
         [{ id: photo.id, public: picked }],
         () => {
-          setState({
-            ...state,
-            photos_all: photos_all_new,
-          })
-
+          dispatch(setState({ state: stateNew }))
           setIsDataLoading(false)
         },
         (body, res) => {
@@ -237,76 +255,9 @@ const main = api => {
       )
     }
 
-    const handlePhotoCoverPick = photo => {
-      setIsDataLoading(true)
-
-      api.product.setCoverPhoto(params.id, { id: photo.id, cover: true }, () => {
-        setState({
-          ...state,
-          photos_all: state.photos_all.map(_photo => {
-            if (_photo.id !== photo.id) {
-              if (_photo.cover) {
-                return { ..._photo, cover: false }
-              }
-
-              return _photo
-            }
-
-            return { ..._photo, cover: true }
-          }),
-          photo_cover: { ...photo, cover: true },
-        })
-
-        setIsDataLoading(false)
-      })
-    }
-
-    const handlePhotoCoverRemove = async () => {
-      const { errors } = await validate(
-        { ...getValues(), expose: formState.expose, photo_cover: null },
-        { photo_cover: null, photosPublic }
-      )
-      setErrors(errors)
-
-      if (errors.photo_cover) return
-
-      setIsDataLoading(true)
-
-      api.product.setCoverPhoto(
-        params.id,
-        { id: state.photo_cover.id, cover: false },
-        async () => {
-          setState({
-            ...state,
-            photos_all: state.photos_all.map(_photo => {
-              if (_photo.id !== state.photo_cover.id) return _photo
-
-              return { ..._photo, cover: false }
-            }),
-            photo_cover: null,
-          })
-
-          setIsDataLoading(false)
-        },
-        (body, res) => {
-          if (body.code !== ValidationError.code) {
-            console.log(
-              'handlePhotoCoverRemove, api.product.setCoverPhoto responded with failure - body, res:',
-              body,
-              res
-            )
-            return
-          }
-
-          setErrors({ ...formErrors, photo_cover: body.message })
-        }
-      )
-    }
-
     const handlePhotoRemove = async photo => {
-      const photos_allNew = state.photos_all.filter(_photo => _photo.id !== photo.id)
-      const photosPublicNew = getPhotosPublic(photos_allNew)
-      const photoCoverNew = photos_allNew.find(photo => photo.cover)
+      const stateNew = removePhotoReducer(state, { photo })
+      const photosPublicNew = getPhotosPublic(stateNew.photos_all)
 
       const values = getValues()
 
@@ -315,7 +266,7 @@ const main = api => {
           ...values,
           expose: formState.expose,
           photosPublic: photosPublicNew,
-          photo_cover: photoCoverNew || null,
+          photo_cover: stateNew.photo_cover,
         },
         {}
       )
@@ -327,12 +278,7 @@ const main = api => {
       setIsDataLoading(true)
 
       api.product.removePhotos(params.id, [photo.id], body => {
-        setState({
-          ...state,
-          photos_all: photos_allNew,
-          photo_cover: photoCoverNew || null,
-        })
-
+        dispatch(setState({ state: stateNew }))
         setIsDataLoading(false)
       })
     }
@@ -343,17 +289,7 @@ const main = api => {
       setIsDataLoading(true)
 
       api.product.reorderPhotos(params.id, photosData, () => {
-        const photosDataIds = photosData.map(photo => photo.id)
-
-        setState({
-          ...state,
-          photos_all: state.photos_all.map(photo => {
-            if (!photosDataIds.includes(photo.id)) return photo
-
-            return { ...photo, order: photosData[photosDataIds.indexOf(photo.id)].order }
-          }),
-        })
-
+        dispatch(reorderPhotos({ photos: photosData }))
         setIsDataLoading(false)
       })
     }
@@ -368,7 +304,7 @@ const main = api => {
 
       api.product.upload(params.id, files, () => {
         api.product.get(params.id, body => {
-          setState(data.dataToState(body))
+          dispatch(setState({ state: data.dataToState(body) }))
           setIsDataLoading(false)
         })
       })
@@ -570,7 +506,9 @@ const main = api => {
                   </>
                 ) : (
                   <Link className="link-inner" to="#photos-drawer">
-                    <Button variant="contained">Додати обкладинку</Button>
+                    <Button variant="contained" disabled={isDataLoading}>
+                      Додати обкладинку
+                    </Button>
                   </Link>
                 )}
               </>
