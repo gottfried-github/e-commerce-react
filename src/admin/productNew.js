@@ -151,25 +151,6 @@ const main = api => {
       })
     }
 
-    // see Admin: `react-hook-form` validation and reactive `errors`
-    const handleProductDataInputBlur = () => {
-      fieldPropsPhotoCover.field.onBlur()
-      fieldPropsPhotosPublic.field.onBlur()
-    }
-
-    const handleIsInStockChange = ev => {
-      fieldPropsIsInStock.field.onChange(ev.target.checked)
-    }
-
-    const handleExposeChange = ev => {
-      fieldPropsExpose.field.onChange(ev.target.checked)
-      trigger()
-    }
-
-    const handleFormElSubmit = ev => {
-      ev.preventDefault()
-    }
-
     const handlePhotoCoverPick = photo => {
       setIsDataLoading(true)
 
@@ -308,6 +289,25 @@ const main = api => {
           setIsDataLoading(false)
         })
       })
+    }
+
+    // see Admin: `react-hook-form` validation and reactive `errors`
+    const handleProductDataInputBlur = () => {
+      fieldPropsPhotoCover.field.onBlur()
+      fieldPropsPhotosPublic.field.onBlur()
+    }
+
+    const handleIsInStockChange = ev => {
+      fieldPropsIsInStock.field.onChange(ev.target.checked)
+    }
+
+    const handleExposeChange = ev => {
+      fieldPropsExpose.field.onChange(ev.target.checked)
+      trigger()
+    }
+
+    const handleFormElSubmit = ev => {
+      ev.preventDefault()
     }
 
     const handleDeleteProductClick = () => {
