@@ -3,8 +3,8 @@ import { boolean, number, string, object } from 'yup'
 const productExposedSchema = object({
   name: string().trim().required().min(2).max(10000),
   // lessThan 1 trillion
-  priceHrn: number().required().integer().positive().lessThan(1e12),
-  priceKop: number().required().integer().positive().lessThan(100),
+  priceHrn: number().required().integer().min(0).max(1e12),
+  priceKop: number().required().integer().min(0).max(99),
   description: string().trim().required().min(2).max(10000),
   time: number().required().integer(),
   is_in_stock: boolean().required(),
@@ -15,20 +15,14 @@ const productNotExposedSchema = object({
   expose: boolean().oneOf([false]),
   name: string().trim().max(10000),
   // lessThan 1 trillion
-  priceHrn: number().integer().positive().lessThan(1e12),
-  priceKop: number().integer().positive().lessThan(100),
+  priceHrn: number().integer().min(0).max(1e12),
+  priceKop: number().integer().min(0).max(99),
   description: string().trim().max(10000),
   time: number().integer(),
   is_in_stock: boolean(),
 })
 
 export default () => async (values, context) => {
-  // console.log(
-  //   'product-validate - context.photo_cover, context.photosPublic',
-  //   context.photo_cover,
-  //   context.photosPublic
-  // )
-
   const errors = {}
   const valuesPrepared = stripEmpty(values)
   let isTimeValidDate = null
@@ -70,13 +64,6 @@ export default () => async (values, context) => {
       errors.photosPublic = "це поле обов'язкове"
     }
   }
-
-  console.log('product-validate - values, errors:', values, errors)
-  console.log(
-    'product-validate - photo_cover, photosPublic:',
-    context.photo_cover,
-    context.photosPublic
-  )
 
   return { values: valuesPrepared, errors }
 }
