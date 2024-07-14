@@ -14,20 +14,19 @@ import DialogContentText from '@mui/material/DialogContentText/index.js'
 import DialogActions from '@mui/material/DialogActions/index.js'
 import Divider from '@mui/material/Divider/index.js'
 
-import { ValidationError } from '../../../e-commerce-common/messages.js'
-import { omit } from './utils/utils.js'
-import { reorderPhotos, setCoverPhoto, removeCoverPhoto, setState } from './actions/product.js'
+import { omit } from '../utils/utils.js'
+import { reorderPhotos, setCoverPhoto, removeCoverPhoto, setState } from '../actions/product.js'
 import stateReducer, {
   setPhotoPublicStatus as setPhotoPublicStatusReducer,
   removePhoto as removePhotoReducer,
   getPhotosPublic,
-} from './reducers/product.js'
+} from '../reducers/product.js'
 import * as data from './product-data.js'
 import productValidate from './product-validate.js'
 import ProductDataField from './components/ProductDataField.js'
 import ProductDataWideSection from './components/ProductDataWideSection.js'
-import { PhotosSortable } from './photos-sortable.js'
-import PhotosDrawer from './photos-drawer.js'
+import { PhotosSortable } from './components/photos-sortable.js'
+import PhotosDrawer from './components/photos-drawer.js'
 
 const getFormState = state => ({
   name: state.name,

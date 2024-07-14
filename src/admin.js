@@ -16,7 +16,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers'
 
 import Auth from './admin/auth.js'
 import ProductCreate from './admin/product-create.js'
-import Product from './admin/product.js'
+import Product from './admin/product/product.js'
 import Products from './admin/products.js'
 
 function main(container, api) {
@@ -77,7 +77,6 @@ function main(container, api) {
     return (
       <div className="admin">
         <nav>
-          <Link to="orders">orders</Link>
           <Link to="products">products</Link>
           <Link to="product">product</Link>
           <Link to="logout">logout</Link>
@@ -85,7 +84,6 @@ function main(container, api) {
         <section>
           <Routes>
             <Route index element={<Navigate to="orders" />}></Route>
-            <Route path="orders" element={<div className="orders">orders</div>} />
             <Route path="products" element={<_Products />} />
             <Route
               path="product"
