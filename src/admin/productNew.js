@@ -61,6 +61,8 @@ const main = api => {
     })
     const [errors, setErrors] = useState({})
     const [isDataLoading, setIsDataLoading] = useState(false)
+    const [isError, setIsError] = useState(false)
+    const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(true)
     const [isRemoveProductConfirmationDialogOpen, setIsRemoveProductConfirmationDialogOpen] =
       useState(false)
     const [timeData, setTimeData] = useState(state.time ? new Date(state.time) : null)
@@ -118,13 +120,21 @@ const main = api => {
     useEffect(() => {
       setIsDataLoading(true)
 
-      api.product.get(params.id, body => {
-        const stateData = data.dataToState(body)
-        dispatch(setState({ state: stateData }))
-        reset(getFormState(stateData))
+      api.product.get(
+        params.id,
+        body => {
+          const stateData = data.dataToState(body)
+          dispatch(setState({ state: stateData }))
+          reset(getFormState(stateData))
 
-        setIsDataLoading(false)
-      })
+          setIsDataLoading(false)
+        },
+        (body, res) => {
+          console.log('api.product.get errored - body, res:', body, res)
+          setIsError(true)
+          setIsDataLoading(false)
+        }
+      )
     }, [])
 
     const handleSubmitInner = async values => {
@@ -153,6 +163,12 @@ const main = api => {
           reset(getFormState(stateData))
 
           setIsDataLoading(false)
+        },
+        (body, res) => {
+          console.log('api.product.update responded with failure - body, res:', body, res)
+
+          setIsDataLoading(false)
+          setIsError(true)
         }
       )
     }
@@ -160,20 +176,47 @@ const main = api => {
     const handleDeleteProductConfirmClick = () => {
       setIsDataLoading(true)
 
-      api.product.delete(params.id, () => {
-        setIsDataLoading(false)
-        setIsRemoveProductConfirmationDialogOpen(false)
-        navigate('/dash/products')
-      })
+      api.product.delete(
+        params.id,
+        () => {
+          setIsDataLoading(false)
+          setIsRemoveProductConfirmationDialogOpen(false)
+          navigate('/dash/products')
+        },
+        () => {
+          console.log(
+            'handleDeleteProductConfirmClick, api.product.delete responded with failure - body, res:',
+            body,
+            res
+          )
+
+          setIsDataLoading(false)
+          setIsError(true)
+        }
+      )
     }
 
     const handlePhotoCoverPick = photo => {
       setIsDataLoading(true)
 
-      api.product.setCoverPhoto(params.id, { id: photo.id, cover: true }, () => {
-        dispatch(setCoverPhoto({ photo }))
-        setIsDataLoading(false)
-      })
+      api.product.setCoverPhoto(
+        params.id,
+        { id: photo.id, cover: true },
+        () => {
+          dispatch(setCoverPhoto({ photo }))
+          setIsDataLoading(false)
+        },
+        (body, res) => {
+          console.log(
+            'handlePhotoCoverPick, api.product.setCoverPhoto responded with failure - body, res:',
+            body,
+            res
+          )
+
+          setIsDataLoading(false)
+          setIsError(true)
+        }
+      )
     }
 
     const handlePhotoCoverRemove = async () => {
@@ -190,21 +233,19 @@ const main = api => {
       api.product.setCoverPhoto(
         params.id,
         { id: state.photo_cover.id, cover: false },
-        async () => {
+        () => {
           dispatch(removeCoverPhoto())
           setIsDataLoading(false)
         },
         (body, res) => {
-          if (body.code !== ValidationError.code) {
-            console.log(
-              'handlePhotoCoverRemove, api.product.setCoverPhoto responded with failure - body, res:',
-              body,
-              res
-            )
-            return
-          }
+          console.log(
+            'handlePhotoCoverRemove, api.product.setCoverPhoto responded with failure - body, res:',
+            body,
+            res
+          )
 
-          setErrors({ ...formErrors, photo_cover: body.message })
+          setIsDataLoading(false)
+          setIsError(true)
         }
       )
     }
@@ -237,17 +278,14 @@ const main = api => {
           setIsDataLoading(false)
         },
         (body, res) => {
-          if (body.code !== ValidationError.code) {
-            console.log(
-              'handlePhotoCoverRemove, api.product.setCoverPhoto responded with failure - body, res:',
-              body,
-              res
-            )
-            return
-          }
+          console.log(
+            'handlePhotoPublicPick, api.product.updatePhotosPublicity responded with failure - body, res:',
+            body,
+            res
+          )
 
-          setErrors({ ...formErrors, photosPublic: body.message })
           setIsDataLoading(false)
+          setIsError(true)
         }
       )
     }
@@ -274,10 +312,24 @@ const main = api => {
 
       setIsDataLoading(true)
 
-      api.product.removePhotos(params.id, [photo.id], body => {
-        dispatch(setState({ state: stateNew }))
-        setIsDataLoading(false)
-      })
+      api.product.removePhotos(
+        params.id,
+        [photo.id],
+        body => {
+          dispatch(setState({ state: stateNew }))
+          setIsDataLoading(false)
+        },
+        (body, res) => {
+          console.log(
+            'handlePhotoRemove, api.product.removePhotos responded with failure - body, res:',
+            body,
+            res
+          )
+
+          setIsDataLoading(false)
+          setIsError(true)
+        }
+      )
     }
 
     const handlePhotosReorder = photos => {
@@ -285,10 +337,24 @@ const main = api => {
 
       setIsDataLoading(true)
 
-      api.product.reorderPhotos(params.id, photosData, () => {
-        dispatch(reorderPhotos({ photos: photosData }))
-        setIsDataLoading(false)
-      })
+      api.product.reorderPhotos(
+        params.id,
+        photosData,
+        () => {
+          dispatch(reorderPhotos({ photos: photosData }))
+          setIsDataLoading(false)
+        },
+        (body, res) => {
+          console.log(
+            'handlePhotosReorder, api.product.reorderPhotos responded with failure - body, res:',
+            body,
+            res
+          )
+
+          setIsDataLoading(false)
+          setIsError(true)
+        }
+      )
     }
 
     // make api request to upload photos
@@ -300,10 +366,23 @@ const main = api => {
       setIsDataLoading(true)
 
       api.product.upload(params.id, files, () => {
-        api.product.get(params.id, body => {
-          dispatch(setState({ state: data.dataToState(body) }))
-          setIsDataLoading(false)
-        })
+        api.product.get(
+          params.id,
+          body => {
+            dispatch(setState({ state: data.dataToState(body) }))
+            setIsDataLoading(false)
+          },
+          (body, res) => {
+            console.log(
+              'handlePhotosUpload, api.product.upload responded with failure - body, res:',
+              body,
+              res
+            )
+
+            setIsDataLoading(false)
+            setIsError(true)
+          }
+        )
       })
     }
 
@@ -334,6 +413,10 @@ const main = api => {
       setIsRemoveProductConfirmationDialogOpen(false)
     }
 
+    const handleErrorDialogClose = () => {
+      setIsErrorDialogOpen(false)
+    }
+
     const fieldPropsTime = register('time')
 
     useEffect(() => {
@@ -343,307 +426,325 @@ const main = api => {
     }, [state])
 
     return (
-      <div className="product-container">
-        <div className="layout-col-center">
-          <form className="product-data-form" onSubmit={handleFormElSubmit}>
-            <div className="product-data__row">
-              <div className="product-data__column">
-                <ProductDataField
-                  id="name"
-                  label="Назва"
-                  content={({ id, label }) => (
-                    <TextField
-                      id={id}
-                      placeholder={label}
-                      {...register('name', { onBlur: handleProductDataInputBlur })}
-                      error={!!formErrors.name}
-                      helperText={formErrors.name || null}
-                      disabled={isDataLoading}
-                    />
-                  )}
-                />
-              </div>
-            </div>
-            <div className="product-data__row">
-              <div className="product-data__column">
-                <ProductDataField
-                  id="description"
-                  label="Опис"
-                  content={({ id, label }) => (
-                    <TextField
-                      id={id}
-                      placeholder={label}
-                      multiline
-                      minRows={6}
-                      maxRows={12}
-                      {...register('description', { onBlur: handleProductDataInputBlur })}
-                      error={!!formErrors.description}
-                      helperText={formErrors.description || null}
-                      disabled={isDataLoading}
-                    />
-                  )}
-                />
-              </div>
-            </div>
-            <div className="product-data__row-2">
-              <div className="product-data__column">
-                <ProductDataField
-                  id="priceHrn"
-                  label="Ціна: гривні"
-                  content={({ id, label }) => (
-                    <TextField
-                      id={id}
-                      placeholder={label}
-                      type="number"
-                      {...register('priceHrn', { onBlur: handleProductDataInputBlur })}
-                      error={!!formErrors.priceHrn}
-                      helperText={formErrors.priceHrn || null}
-                      disabled={isDataLoading}
-                    />
-                  )}
-                />
-              </div>
-              <div className="product-data__column">
-                <ProductDataField
-                  id="priceKop"
-                  label="Ціна: копійки"
-                  content={({ id }) => (
-                    <TextField
-                      id={id}
-                      placeholder="Копійки"
-                      type="number"
-                      {...register('priceKop', { onBlur: handleProductDataInputBlur })}
-                      error={!!formErrors.priceKop}
-                      helperText={formErrors.priceKop || null}
-                      disabled={isDataLoading}
-                    />
-                  )}
-                />
-              </div>
-            </div>
-            <div className="product-data__row">
-              <div className="product-data__column">
-                <ProductDataField
-                  error={formErrors.is_in_stock}
-                  content={() => (
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={fieldPropsIsInStock.field.value}
-                          onChange={handleIsInStockChange}
-                          onBlur={() => {
-                            fieldPropsIsInStock.field.onBlur()
-                            handleProductDataInputBlur()
-                          }}
-                          inputRef={fieldPropsIsInStock.field.ref}
-                        />
-                      }
-                      label={'В наявності'}
-                      disabled={isDataLoading}
-                    />
-                  )}
-                />
-              </div>
-            </div>
-            <div className="product-data__row">
-              <div className="product-data__column">
-                <ProductDataField
-                  id="time"
-                  label="Час створення"
-                  error={formErrors.time}
-                  content={({ id }) => (
-                    <DateTimePicker
-                      id={id}
-                      value={timeData}
-                      name={fieldPropsTime.name}
-                      onBlur={() => {
-                        fieldPropsTime.onBlur()
-                        handleProductDataInputBlur()
-                      }}
-                      inputRef={fieldPropsTime.ref}
-                      onChange={date => {
-                        setTimeData(date)
-                        setValue('time', date)
-                        trigger('time')
-                      }}
-                      disabled={isDataLoading}
-                    />
-                  )}
-                />
-              </div>
-            </div>
-            <div className="product-data__row">
-              <div className="product-data__column">
-                <ProductDataField
-                  error={formErrors.expose}
-                  content={() => (
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={fieldPropsExpose.field.value}
-                          onChange={handleExposeChange}
-                          onBlur={() => {
-                            fieldPropsExpose.field.onBlur()
-                            handleProductDataInputBlur()
-                          }}
-                          inputRef={fieldPropsExpose.field.ref}
-                        />
-                      }
-                      label={'Показувати відвідувачам'}
-                      disabled={isDataLoading}
-                    />
-                  )}
-                />
-              </div>
-            </div>
-          </form>
-          <div className="flex-justify-end">
-            <Button variant="contained" onClick={handleSubmit(handleSubmitInner)}>
-              Зберегти дані
-            </Button>
+      <>
+        {isError ? (
+          <div>
+            <Dialog open={isErrorDialogOpen} onClose={handleErrorDialogClose}>
+              <DialogContent>
+                <DialogContentText>
+                  Сталася помилка. Будь-ласка, перезавантажте сторінку.
+                </DialogContentText>
+              </DialogContent>
+            </Dialog>
           </div>
-          <ProductDataField
-            label="Обкладинка"
-            error={formErrors.photo_cover}
-            content={() => (
-              <>
-                {fieldPropsPhotoCover.field.value ? (
-                  <>
-                    <img
-                      className="product__cover-photo"
-                      src={fieldPropsPhotoCover.field.value.pathPublic}
-                      alt={'обкладинка'}
+        ) : (
+          <div className="product-container">
+            <div className="layout-col-center">
+              <form className="product-data-form" onSubmit={handleFormElSubmit}>
+                <div className="product-data__row">
+                  <div className="product-data__column">
+                    <ProductDataField
+                      id="name"
+                      label="Назва"
+                      content={({ id, label }) => (
+                        <TextField
+                          id={id}
+                          placeholder={label}
+                          {...register('name', { onBlur: handleProductDataInputBlur })}
+                          error={!!formErrors.name}
+                          helperText={formErrors.name || null}
+                          disabled={isDataLoading}
+                        />
+                      )}
                     />
-                    <div className="flex-justify-end">
-                      <Button variant="contained" onClick={handlePhotoCoverRemove}>
-                        Прибрати з обкладинки
-                      </Button>
-                    </div>
-                  </>
-                ) : (
-                  <Link className="link-inner" to="#photos-drawer">
-                    <Button variant="contained" disabled={isDataLoading}>
-                      Додати обкладинку
-                    </Button>
-                  </Link>
-                )}
-              </>
-            )}
-          />
-        </div>
-        <ProductDataWideSection
-          label="Публічні фотографії"
-          error={formErrors.photosPublic}
-          content={() => (
-            <>
-              {fieldPropsPhotosPublic.field.value.length ? (
-                <DndProvider backend={HTML5Backend}>
-                  <PhotosSortable
-                    photos={fieldPropsPhotosPublic.field.value}
-                    reorderCb={handlePhotosReorder}
-                    disabled={isDataLoading}
-                  />
-                </DndProvider>
-              ) : (
-                <div className="wide-section__column-center">
-                  <div className="flex-justify-end">
-                    <Link to="#photos-drawer">
-                      <Button variant="contained">Додати фотографії</Button>
-                    </Link>
                   </div>
                 </div>
-              )}
-            </>
-          )}
-        />
-        <ProductDataWideSection
-          label="Фотошухляда"
-          target={location.hash.slice(1) === 'photos-drawer'}
-          error={
-            formErrors.photosPublic && formErrors.photo_cover
-              ? "Публічний продукт обо'язково повинен мати обкладинку і публічні фотографії"
-              : formErrors.photosPublic
-                ? "Публічний продукт обов'язково повинен мати публічні фотографії"
-                : formErrors.photo_cover
-                  ? "Публічний продукт обов'язково повинен мати обкладинку"
-                  : null
-          }
-          content={() => (
-            <>
-              {state.photos_all.length ? (
-                <PhotosDrawer
-                  photos={state.photos_all}
-                  handlePhotoPublicPick={handlePhotoPublicPick}
-                  handlePhotoCoverPick={handlePhotoCoverPick}
-                  handleRemovePhoto={handlePhotoRemove}
+                <div className="product-data__row">
+                  <div className="product-data__column">
+                    <ProductDataField
+                      id="description"
+                      label="Опис"
+                      content={({ id, label }) => (
+                        <TextField
+                          id={id}
+                          placeholder={label}
+                          multiline
+                          minRows={6}
+                          maxRows={12}
+                          {...register('description', { onBlur: handleProductDataInputBlur })}
+                          error={!!formErrors.description}
+                          helperText={formErrors.description || null}
+                          disabled={isDataLoading}
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
+                <div className="product-data__row-2">
+                  <div className="product-data__column">
+                    <ProductDataField
+                      id="priceHrn"
+                      label="Ціна: гривні"
+                      content={({ id, label }) => (
+                        <TextField
+                          id={id}
+                          placeholder={label}
+                          type="number"
+                          {...register('priceHrn', { onBlur: handleProductDataInputBlur })}
+                          error={!!formErrors.priceHrn}
+                          helperText={formErrors.priceHrn || null}
+                          disabled={isDataLoading}
+                        />
+                      )}
+                    />
+                  </div>
+                  <div className="product-data__column">
+                    <ProductDataField
+                      id="priceKop"
+                      label="Ціна: копійки"
+                      content={({ id }) => (
+                        <TextField
+                          id={id}
+                          placeholder="Копійки"
+                          type="number"
+                          {...register('priceKop', { onBlur: handleProductDataInputBlur })}
+                          error={!!formErrors.priceKop}
+                          helperText={formErrors.priceKop || null}
+                          disabled={isDataLoading}
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
+                <div className="product-data__row">
+                  <div className="product-data__column">
+                    <ProductDataField
+                      error={formErrors.is_in_stock}
+                      content={() => (
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={fieldPropsIsInStock.field.value}
+                              onChange={handleIsInStockChange}
+                              onBlur={() => {
+                                fieldPropsIsInStock.field.onBlur()
+                                handleProductDataInputBlur()
+                              }}
+                              inputRef={fieldPropsIsInStock.field.ref}
+                            />
+                          }
+                          label={'В наявності'}
+                          disabled={isDataLoading}
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
+                <div className="product-data__row">
+                  <div className="product-data__column">
+                    <ProductDataField
+                      id="time"
+                      label="Час створення"
+                      error={formErrors.time}
+                      content={({ id }) => (
+                        <DateTimePicker
+                          id={id}
+                          value={timeData}
+                          name={fieldPropsTime.name}
+                          onBlur={() => {
+                            fieldPropsTime.onBlur()
+                            handleProductDataInputBlur()
+                          }}
+                          inputRef={fieldPropsTime.ref}
+                          onChange={date => {
+                            setTimeData(date)
+                            setValue('time', date)
+                            trigger('time')
+                          }}
+                          disabled={isDataLoading}
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
+                <div className="product-data__row">
+                  <div className="product-data__column">
+                    <ProductDataField
+                      error={formErrors.expose}
+                      content={() => (
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={fieldPropsExpose.field.value}
+                              onChange={handleExposeChange}
+                              onBlur={() => {
+                                fieldPropsExpose.field.onBlur()
+                                handleProductDataInputBlur()
+                              }}
+                              inputRef={fieldPropsExpose.field.ref}
+                            />
+                          }
+                          label={'Показувати відвідувачам'}
+                          disabled={isDataLoading}
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
+              </form>
+              <div className="flex-justify-end">
+                <Button
+                  variant="contained"
                   disabled={isDataLoading}
-                />
-              ) : (
-                <div className="wide-section__column-center">
-                  <div className="flex-justify-end">
-                    <Link to="#photos-upload">
-                      <Button variant="contained">Завантажити фотографії</Button>
-                    </Link>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-        />
-        <div className="layout-col-center">
-          <div className="product-data__row">
-            <div className="product-data__column">
+                  onClick={handleSubmit(handleSubmitInner)}
+                >
+                  Зберегти дані
+                </Button>
+              </div>
               <ProductDataField
-                id="photos-upload"
-                label="Завантажити фото до фотошухляди"
-                target={location.hash.slice(1) === 'photos-upload'}
-                content={({ id }) => (
+                label="Обкладинка"
+                error={formErrors.photo_cover}
+                content={() => (
                   <>
-                    <input
-                      type="file"
-                      ref={photosFilesInputRef}
-                      id={id}
-                      accept="image/*"
-                      multiple
-                    />
-                    <div className="flex-justify-end">
-                      <Button variant="contained" onClick={handlePhotosUpload}>
-                        Завантажити
-                      </Button>
-                    </div>
+                    {fieldPropsPhotoCover.field.value ? (
+                      <>
+                        <img
+                          className="product__cover-photo"
+                          src={fieldPropsPhotoCover.field.value.pathPublic}
+                          alt={'обкладинка'}
+                        />
+                        <div className="flex-justify-end">
+                          <Button variant="contained" onClick={handlePhotoCoverRemove}>
+                            Прибрати з обкладинки
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <Link className="link-inner" to="#photos-drawer">
+                        <Button variant="contained" disabled={isDataLoading}>
+                          Додати обкладинку
+                        </Button>
+                      </Link>
+                    )}
                   </>
                 )}
               />
             </div>
+            <ProductDataWideSection
+              label="Публічні фотографії"
+              error={formErrors.photosPublic}
+              content={() => (
+                <>
+                  {fieldPropsPhotosPublic.field.value.length ? (
+                    <DndProvider backend={HTML5Backend}>
+                      <PhotosSortable
+                        photos={fieldPropsPhotosPublic.field.value}
+                        reorderCb={handlePhotosReorder}
+                        disabled={isDataLoading}
+                      />
+                    </DndProvider>
+                  ) : (
+                    <div className="wide-section__column-center">
+                      <div className="flex-justify-end">
+                        <Link to="#photos-drawer">
+                          <Button variant="contained">Додати фотографії</Button>
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            />
+            <ProductDataWideSection
+              label="Фотошухляда"
+              target={location.hash.slice(1) === 'photos-drawer'}
+              error={
+                formErrors.photosPublic && formErrors.photo_cover
+                  ? "Публічний продукт обо'язково повинен мати обкладинку і публічні фотографії"
+                  : formErrors.photosPublic
+                    ? "Публічний продукт обов'язково повинен мати публічні фотографії"
+                    : formErrors.photo_cover
+                      ? "Публічний продукт обов'язково повинен мати обкладинку"
+                      : null
+              }
+              content={() => (
+                <>
+                  {state.photos_all.length ? (
+                    <PhotosDrawer
+                      photos={state.photos_all}
+                      handlePhotoPublicPick={handlePhotoPublicPick}
+                      handlePhotoCoverPick={handlePhotoCoverPick}
+                      handleRemovePhoto={handlePhotoRemove}
+                      disabled={isDataLoading}
+                    />
+                  ) : (
+                    <div className="wide-section__column-center">
+                      <div className="flex-justify-end">
+                        <Link to="#photos-upload">
+                          <Button variant="contained">Завантажити фотографії</Button>
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            />
+            <div className="layout-col-center">
+              <div className="product-data__row">
+                <div className="product-data__column">
+                  <ProductDataField
+                    id="photos-upload"
+                    label="Завантажити фото до фотошухляди"
+                    target={location.hash.slice(1) === 'photos-upload'}
+                    content={({ id }) => (
+                      <>
+                        <input
+                          type="file"
+                          ref={photosFilesInputRef}
+                          id={id}
+                          accept="image/*"
+                          multiple
+                        />
+                        <div className="flex-justify-end">
+                          <Button variant="contained" onClick={handlePhotosUpload}>
+                            Завантажити
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="layout-col-wide">
+              <Divider />
+            </div>
+            <div className="layout-col-center">
+              <div className="flex-justify-end">
+                <Button variant="contained" color="error" onClick={handleDeleteProductClick}>
+                  Видалити продукт
+                </Button>
+              </div>
+            </div>
+            <Dialog
+              open={isRemoveProductConfirmationDialogOpen}
+              onClose={handleDeleteProductDialogClose}
+            >
+              <DialogContent>
+                <DialogContentText>
+                  Ви впевнені, що хочете видалити продукт? Ви безповоротно втратите усі дані
+                  продукту та його фотографії.
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button variant="contained" color="error" onClick={handleDeleteProductConfirmClick}>
+                  Видалити
+                </Button>
+              </DialogActions>
+            </Dialog>
           </div>
-        </div>
-        <div className="layout-col-wide">
-          <Divider />
-        </div>
-        <div className="layout-col-center">
-          <div className="flex-justify-end">
-            <Button variant="contained" color="error" onClick={handleDeleteProductClick}>
-              Видалити продукт
-            </Button>
-          </div>
-        </div>
-        <Dialog
-          open={isRemoveProductConfirmationDialogOpen}
-          onClose={handleDeleteProductDialogClose}
-        >
-          <DialogContent>
-            <DialogContentText>
-              Ви впевнені, що хочете видалити продукт? Ви безповоротно втратите усі дані продукту та
-              його фотографії.
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button variant="contained" color="error" onClick={handleDeleteProductConfirmClick}>
-              Видалити
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
+        )}
+      </>
     )
   }
 
