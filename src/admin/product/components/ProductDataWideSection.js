@@ -5,9 +5,7 @@ const ProductDataWideSection = ({ id = '', label = '', target = false, error = '
     <div className="layout-col-wide wide-section-container">
       {label ? (
         <div className="wide-section__column-center">
-          <label className={`wide-section__label${target ? ' target' : ''}`}>
-            Публічні фотографії
-          </label>
+          <label className={`wide-section__label${target ? ' target' : ''}`}>{label}</label>
         </div>
       ) : null}
 
