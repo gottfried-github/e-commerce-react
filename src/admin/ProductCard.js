@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom'
 import Card from '@mui/material/Card/index.js'
 import CardContent from '@mui/material/CardContent/index.js'
 
-import { kopToHrn } from '../price.js'
+import { kopToHrnStr } from '../utils/price.js'
 
 const ProductCard = ({ product }) => {
-  const price = typeof product.price === 'number' ? kopToHrn(product.price) : null
+  const price = typeof product.price === 'number' ? kopToHrnStr(product.price) : null
 
   return (
     <Card className="product-card__container" elevation={8}>

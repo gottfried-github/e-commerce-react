@@ -41,7 +41,7 @@ const getFormState = state => ({
 })
 
 const main = api => {
-  const ProductNew = () => {
+  const Product = () => {
     const navigate = useNavigate()
     const params = useParams()
     const location = useLocation()
@@ -747,7 +747,7 @@ const main = api => {
     )
   }
 
-  return ProductNew
+  return Product
 }
 
 export default main
