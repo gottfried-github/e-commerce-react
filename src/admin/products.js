@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import ProductCard from './ProductCard.js'
 
 function main(api) {
   function Products() {
@@ -12,18 +13,10 @@ function main(api) {
     }, [])
 
     return (
-      <div>
+      <div className="products-container">
         {products.map(product => (
-          <Product id={product.id} />
+          <ProductCard key={product.id} product={product} />
         ))}
-      </div>
-    )
-  }
-
-  function Product({ id }) {
-    return (
-      <div>
-        <Link to={`/dash/product/${id}`}>{id}</Link>
       </div>
     )
   }

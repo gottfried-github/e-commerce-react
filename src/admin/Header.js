@@ -7,12 +7,12 @@ const Header = () => {
   return (
     <AppBar position="static">
       <nav className="page-width header-content">
-        <div class="buttons-group">
+        <div className="buttons-group">
           <NavLink to="products">
             <Button variant="header">Продукти</Button>
           </NavLink>
         </div>
-        <div class="buttons-group">
+        <div className="buttons-group">
           <NavLink to="product">
             <Button variant="header">Створити продукт</Button>
           </NavLink>
