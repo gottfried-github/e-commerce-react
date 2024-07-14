@@ -1,0 +1,23 @@
+.auth__page {
+  display: flex;
+
+  min-height: 100vh;
+}
+
+.auth__form-container {
+  margin: auto;
+  padding: 16px;
+
+  width: 600px;
+
+  .auth__heading {
+    text-align: center;
+  }
+}
+
+.auth__form {
+  display: flex;
+  flex-direction: column;
+
+  row-gap: 15px;
+}

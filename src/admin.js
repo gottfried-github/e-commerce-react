@@ -43,15 +43,6 @@ function main(container, api) {
     return isLoggedIn
   }
 
-  function Signin(props) {
-    return (
-      <div>
-        <Link to="/login">{'login'}</Link>
-        {/* <Link to="/signup">{'signup'}</Link> */}
-      </div>
-    )
-  }
-
   // log out over the api and navigate to the root
   function Logout() {
     const navigate = useNavigate()
@@ -81,7 +72,7 @@ function main(container, api) {
         <Header />
         <section className="page-width page-container">
           <Routes>
-            <Route index element={<Navigate to="orders" />}></Route>
+            <Route index element={<Navigate to="products" />}></Route>
             <Route path="products" element={<_Products />} />
             <Route
               path="product"
@@ -115,7 +106,7 @@ function main(container, api) {
     useEffect(() => {
       if (null === isLoggedIn) return
 
-      if (!isLoggedIn) navigate('/signin')
+      if (!isLoggedIn) navigate('/login')
     }, [isLoggedIn])
 
     return isLoggedIn ? <Dash /> : null
@@ -132,7 +123,6 @@ function main(container, api) {
                 <Route path="/">
                   <Route index element={<Navigate to="dash" />} />
                   <Route path="dash/*" element={<DashController />} />
-                  <Route path="signin" element={<Signin />} />
                   <Route path="login" element={<auth.Login />} />
                   {/* <Route path="signup" element={<auth.Signup />} /> */}
                 </Route>
