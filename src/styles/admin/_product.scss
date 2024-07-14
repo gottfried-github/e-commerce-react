@@ -1,93 +1,155 @@
-.form {
+.product-container {
   display: grid;
 
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 16px 1fr 16px;
 
-  column-gap: 8px;
-  row-gap: 2px;
+  row-gap: 16px;
 
-  /* grid setup */
-  .label,
-  .control {
-    grid-column: 1;
-  }
-  .input-text,
-  .input-number,
-  .input-checkbox {
+  .layout-col-center, .layout-col-wide {
     grid-column: 2;
   }
-  .photos-container,
-  .photos,
-  .cover-photo {
-    grid-column: 1 / 3;
-  }
 
-  .label,
-  .control {
-    justify-self: right;
-  }
-  .input-text,
-  .input-number,
-  .input-checkbox {
-    justify-self: left;
-  }
+  @media (min-width: calc(16px * 2 + 600px)) {
+    grid-template-columns: 16px 1fr 600px 1fr 16px;
 
-  .photo > img {
-    width: 100%;
-  }
-
-  .photo-sortable {
-    cursor: pointer;
-  }
-
-  @media (min-width: 500px) {
-    grid-template-columns: 1fr 0.5fr max-content 0.5fr 1fr 1fr;
-
-    /* grid setup */
-    .label,
-    .control {
+    .layout-col-center {
       grid-column: 3;
     }
-    .input-text,
-    .input-number,
-    .input-checkbox {
-      grid-column: 4;
-    }
-    .photos-container,
-    .photos,
-    .cover-photo {
-      grid-column: 2 / 6;
-    }
 
-    .photos {
-      justify-self: center;
-      display: flex;
-      flex-wrap: wrap;
-
-      width: 500px;
-
-      column-gap: 8px;
-      row-gap: 8px;
-    }
-
-    .photo.photo-sortable {
-      // (500 (column width) - 8 (photos column-gap)) / 2
-      width: 246px;
-      height: 246px;
-
-      > img {
-        width: 100%;
-        height: 100%;
-
-        object-fit: cover;
-      }
+    .layout-col-wide {
+      grid-column: 2 / 5;
     }
   }
 
-  // 246 (photo width) * 3 + 8 (photos column gap) * 2
-  @media (min-width: 1390px) {
-    .photos {
-      width: 754px;
-    }
+  @media (min-width: calc(320px * 5 + 8px * 4 + 16px * 2)) {
+    // 516 = 1032 (1632 (320 (photo width) * 5 + 8 (gap width) * 4) - 600 (center column width)) / 2
+    grid-template-columns: 1fr 516px 600px 516px 1fr;
   }
+}
+
+.product-data-form {
+  display: flex;
+  flex-direction: column;
+
+  // max-width: 600px;
+
+  row-gap: 16px;
+  margin: auto;
+}
+
+.product-data__row {}
+
+.product-data__row-2 {
+  display: flex;
+  
+  column-gap: 8px;
+
+  .product-data__column {
+    flex-grow: 1;
+  }
+}
+
+.product-data__field-container, .product__cover-photo-container {
+  display: flex;
+  flex-direction: column;
+
+  row-gap: 8px;
+}
+
+.product-data__field-label {
+  padding: 0 14px;
+}
+
+.product-data__error {
+  font-size: 0.75rem;
+  color: $errorColor;
+}
+
+.product-data__error {
+  padding: 0 14px;
+}
+
+.link-inner {
+  width: max-content;
+}
+
+.product-data__checkbox-container {
+  display: flex;
+  flex-direction: column;
+
+  row-gap: 4px;
+}
+
+.product__cover-photo {
+  width: 100%;
+}
+
+.wide-section-container {
+  display: flex;
+  flex-direction: column;
+
+  row-gap: 8px;
+}
+
+.wide-section__column-center {
+  @media (min-width: calc(600px + 16px * 2)) {
+    margin: auto;
+    padding: 0;
+
+    width: 600px;
+  }
+}
+
+.wide-section__label {
+  padding: 0 14px;
+}
+
+.wide-section__label.target, .product-data__field-label.target {
+  text-decoration: underline;
+}
+
+.photos-sortable, .photos-drawer {
+  display: grid;
+
+  gap: 8px;
+  margin: auto;
+
+  @media (min-width: calc(320px * 2 + 8px + 16px * 2)) {
+    grid-template-columns: repeat(2, 320px);
+  }
+
+  @media (min-width: calc(320px * 3 + 8px * 2 + 16px * 2)) {
+    grid-template-columns: repeat(3, 320px);
+  }
+
+  @media (min-width: calc(320px * 4 + 8px * 3 + 16px * 2)) {
+    grid-template-columns: repeat(4, 320px);
+  }
+
+  @media (min-width: calc(320px * 5 + 8px * 4 + 16px * 2)) {
+    grid-template-columns: repeat(5, 320px);
+  }
+}
+
+.photos-drawer .photos_drawer__item-container {
+  width: max-content;
+}
+
+.photos-sortable .photos-sortable__photo, 
+.photos-drawer .photos-drawer__photo {
+  width: 320px;
+  height: 280px;
+
+  > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.photos-drawer .photos-drawer__content-box {
+  display: flex;
+  flex-direction: column;
+
+  padding: 8px;
 }

@@ -1,4 +1,4 @@
-import { kopToHrn, hrnToKop } from '../price.js'
+import { kopToHrn, hrnToKop } from '../../price.js'
 
 /**
  * @param {Object} fields
