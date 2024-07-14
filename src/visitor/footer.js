@@ -11,8 +11,20 @@ function Footer() {
           <span className="timestamp">{`, ${new Date().getFullYear()}. All rights reserved.`}</span>
         </p>
         <ul className="social-links">
-          <li className="social-link instagram"></li>
-          <li className="social-link facebook"></li>
+          <li className="social-link-container">
+            <a
+              className="social-link instagram"
+              href="https://www.instagram.com/animato_jewelry/"
+              target="_blank"
+            ></a>
+          </li>
+          <li className="social-link-container">
+            <a
+              className="social-link facebook"
+              href="https://www.facebook.com/bySophiaSalo/"
+              target="_blank"
+            ></a>
+          </li>
         </ul>
       </div>
     </footer>

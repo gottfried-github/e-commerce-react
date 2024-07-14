@@ -1,25 +1,25 @@
 .footer-main {
   display: grid;
-  grid-template-columns: 8px 1fr 8px;
+  grid-template-columns: 16px 1fr 16px;
 
-  padding: 150px 0px;
+  padding: 38px 0px;
 
-  color: $accent;
-  background-color: $primary;
+  color: $text-main;
 
   .footer-main__content {
     grid-column: 2;
   }
 
   @media (min-width: 325px) {
-    grid-template-columns: 16px 1fr 16px;
+    grid-template-columns: 25px 1fr 25px;
   }
 }
 
 .page_home .footer-main {
-  // 1616px (320px (product-card width) * 5) + 16px (horizontal margin) * 2
-  @media (min-width: 1648px) {
-    grid-template-columns: 1fr 1616px 1fr;
+  // 1405px = 320px (product-card width) * 4 + 25px (grid column-gap) * 3 + 25px (horizontal margin) * 2
+  @media (min-width: 1405px) {
+    // 320px (product-card width) * 4 + 25px (grid column-gap) * 3
+    grid-template-columns: 1fr 1355px 1fr;
   }
 }
 

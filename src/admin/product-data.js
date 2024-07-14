@@ -16,16 +16,16 @@ function dataToState(fields) {
   }
 
   if (undefined === fields.price) {
-    state.priceHrn = null
-    state.priceKop = null
+    state.priceHrn = ''
+    state.priceKop = ''
 
     return state
   }
 
   const price = kopToHrn(fields.price)
 
-  state.priceHrn = price.hrn
-  state.priceKop = price.kop
+  state.priceHrn = price.hrn.toString()
+  state.priceKop = price.kop.toString()
 
   return state
 }
@@ -37,13 +37,13 @@ function dataToState(fields) {
 function stateToData(state) {
   const fields = {}
 
-  if (null !== state.priceHrn || null !== state.priceKop) {
+  if (state.priceHrn || state.priceKop) {
     fields.price =
-      null === state.priceHrn
-        ? hrnToKop(0, state.priceKop)
-        : null === state.priceKop
-          ? hrnToKop(state.priceHrn, 0)
-          : hrnToKop(state.priceHrn, state.priceKop)
+      '' === state.priceHrn
+        ? hrnToKop(0, parseInt(state.priceKop, 10))
+        : '' === state.priceKop
+          ? hrnToKop(parseInt(state.priceHrn, 10), 0)
+          : hrnToKop(parseInt(state.priceHrn, 10), parseInt(state.priceKop, 10))
   }
 
   if (undefined !== state.name && state.name) fields.name = state.name

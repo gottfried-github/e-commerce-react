@@ -81,6 +81,7 @@ export default api => {
                   photoUrl={product.photo_cover.pathPublic}
                   name={product.name}
                   price={product.price}
+                  isInStock={product.is_in_stock}
                 />
               )
             })}
@@ -91,13 +92,13 @@ export default api => {
   })
 }
 
-function ProductCard({ id, photoUrl, name, price }) {
+function ProductCard({ id, photoUrl, name, price, isInStock }) {
   const _price = kopToHrn(price)
 
   return (
     <li className="product-card">
       <Link className="product-card__photo-container" to={`/product/${id}`}>
-        <img className="product-card__photo" src={photoUrl} alt="" />
+        <img className="product-card__photo" src={photoUrl} alt={name} />
       </Link>
       <div className="product-card__info">
         <Link className="product-card__price" to={`/product/${id}`}>{`₴${
@@ -106,6 +107,9 @@ function ProductCard({ id, photoUrl, name, price }) {
         <Link className="product-card__name" to={`/product/${id}`}>
           {name}
         </Link>
+        {typeof isInStock === 'boolean' && !isInStock ? (
+          <span className="product-card__out-of-stock">немає в наявності</span>
+        ) : null}
       </div>
     </li>
   )

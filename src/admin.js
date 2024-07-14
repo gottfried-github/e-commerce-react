@@ -9,14 +9,20 @@ import {
   useParams,
   useNavigate,
 } from 'react-router-dom' // , useNavigate
+import { uk } from 'date-fns/locale'
+import { StyledEngineProvider } from '@mui/material/styles/index.js'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3/index.js'
+import { LocalizationProvider } from '@mui/x-date-pickers'
 
 import Auth from './admin/auth.js'
+import ProductCreate from './admin/product-create.js'
 import Product from './admin/product.js'
 import Products from './admin/products.js'
 
 function main(container, api) {
   const auth = Auth(api)
-  const product = Product(api)
+  const _ProductCreate = ProductCreate(api)
+  const _Product = Product(api)
   const _Products = Products(api)
 
   // check the api for whether the client is authenticated
@@ -85,7 +91,7 @@ function main(container, api) {
               path="product"
               element={
                 <div className="product-create">
-                  <product.ProductCreate />
+                  <_ProductCreate />
                 </div>
               }
             />
@@ -93,7 +99,7 @@ function main(container, api) {
               path="product/:id/*"
               element={
                 <div className="product">
-                  <product.Product />
+                  <_Product />
                 </div>
               }
             />
@@ -123,16 +129,20 @@ function main(container, api) {
   function App(props) {
     return (
       <div className="app">
-        <Routes>
-          <Route path="/">
-            <Route index element={<Navigate to="dash" />} />
-            <Route path="dash/*" element={<DashController />} />
-            <Route path="signin" element={<Signin />} />
-            <Route path="login" element={<auth.Login />} />
-            {/* <Route path="signup" element={<auth.Signup />} /> */}
-          </Route>
-          <Route path="/*" element={<Blank />} />
-        </Routes>
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={uk}>
+          <StyledEngineProvider injectFirst>
+            <Routes>
+              <Route path="/">
+                <Route index element={<Navigate to="dash" />} />
+                <Route path="dash/*" element={<DashController />} />
+                <Route path="signin" element={<Signin />} />
+                <Route path="login" element={<auth.Login />} />
+                {/* <Route path="signup" element={<auth.Signup />} /> */}
+              </Route>
+              <Route path="/*" element={<Blank />} />
+            </Routes>
+          </StyledEngineProvider>
+        </LocalizationProvider>
       </div>
     )
   }

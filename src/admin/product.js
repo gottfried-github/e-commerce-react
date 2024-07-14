@@ -1,55 +1,57 @@
-import React, { Component, useState, useEffect, useMemo, useRef } from 'react'
-import { useNavigate, useParams, redirect } from 'react-router-dom'
-
+import React, { useState, useReducer, useEffect, useMemo, useRef } from 'react'
+import { useNavigate, useParams, useLocation, Link } from 'react-router-dom'
+import { useForm, useController } from 'react-hook-form'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
+import Button from '@mui/material/Button/index.js'
+import TextField from '@mui/material/TextField/index.js'
+import Checkbox from '@mui/material/Checkbox/index.js'
+import FormControlLabel from '@mui/material/FormControlLabel/index.js'
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker/index.js'
+import Dialog from '@mui/material/Dialog/index.js'
+import DialogContent from '@mui/material/DialogContent/index.js'
+import DialogContentText from '@mui/material/DialogContentText/index.js'
+import DialogActions from '@mui/material/DialogActions/index.js'
+import Divider from '@mui/material/Divider/index.js'
 
-import parseIsoTime from 'parseisotime'
-
-import { exposePromise } from '../utils/utils.js'
+import { ValidationError } from '../../../e-commerce-common/messages.js'
+import { omit } from './utils/utils.js'
+import { reorderPhotos, setCoverPhoto, removeCoverPhoto, setState } from './actions/product.js'
+import stateReducer, {
+  setPhotoPublicStatus as setPhotoPublicStatusReducer,
+  removePhoto as removePhotoReducer,
+  getPhotosPublic,
+} from './reducers/product.js'
 import * as data from './product-data.js'
-import { PhotoPicker, PhotosPicker } from './photos-picker.js'
+import productValidate from './product-validate.js'
+import ProductDataField from './components/ProductDataField.js'
+import ProductDataWideSection from './components/ProductDataWideSection.js'
 import { PhotosSortable } from './photos-sortable.js'
+import PhotosDrawer from './photos-drawer.js'
 
-function main(api) {
-  function ProductCreate() {
-    const navigate = useNavigate()
+const getFormState = state => ({
+  name: state.name,
+  description: state.description,
+  priceHrn: state.priceHrn,
+  priceKop: state.priceKop,
+  is_in_stock: state.is_in_stock,
+  time: state.time ? new Date(state.time) : null,
+  expose: state.expose,
+  photo_cover: state.photo_cover,
+  photosPublic: getPhotosPublic(state.photos_all),
+})
 
-    const [msg, setMsg] = useState('')
-
-    useEffect(() => {
-      api.product.create(
-        {
-          expose: false,
-          // see Time in readme
-          time: Date.now(),
-        },
-        (body, res) => {
-          console.log('ProductCreate api success cb, body:', body)
-          return navigate(`${body}`)
-        },
-        (body, res) => {
-          if (res.status >= 500) {
-            return alert("Something's wrong on the server, please consult a technician")
-          }
-
-          setMsg('Something wrong with the request, please consult a technician')
-          console.log('bad request - body, res:', body, res)
-        }
-      )
-    }, [])
-
-    return <div>{msg}</div>
-  }
-
-  function useProduct() {
+const main = api => {
+  const ProductNew = () => {
     const navigate = useNavigate()
     const params = useParams()
+    const location = useLocation()
+    const validate = productValidate()
 
-    const [state, setState] = useState({
+    const [state, dispatch] = useReducer(stateReducer, {
       name: '',
-      priceHrn: null,
-      priceKop: null,
+      priceHrn: '',
+      priceKop: '',
       expose: false,
       is_in_stock: false,
       description: '',
@@ -57,386 +59,696 @@ function main(api) {
       photos_all: [],
       photo_cover: null,
     })
-
-    const photosPublic = useMemo(
-      () =>
-        state.photos_all
-          .filter(photo => photo.public)
-          // sort in ascending order
-          .sort((photoA, photoB) => (photoA.order > photoB.order ? 1 : -1)),
-      [state.photos_all]
-    )
-
+    const [errors, setErrors] = useState({})
     const [isDataLoading, setIsDataLoading] = useState(false)
+    const [isError, setIsError] = useState(false)
+    const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(true)
+    const [isRemoveProductConfirmationDialogOpen, setIsRemoveProductConfirmationDialogOpen] =
+      useState(false)
+    const [timeData, setTimeData] = useState(state.time ? new Date(state.time) : null)
+
+    const formState = useMemo(() => getFormState(state), [state])
+    const photosPublic = useMemo(() => getPhotosPublic(state.photos_all), [state.photos_all])
+
+    const {
+      register,
+      handleSubmit,
+      formState: { errors: formErrors },
+      getValues,
+      setValue,
+      trigger,
+      reset,
+      control,
+    } = useForm({
+      mode: 'onTouched',
+      defaultValues: {
+        name: '',
+        description: '',
+        priceHrn: '',
+        priceKop: '',
+        is_in_stock: false,
+        time: null,
+        expose: false,
+        photo_cover: null,
+        photosPublic: [],
+      },
+      values: formState,
+      resetOptions: {
+        keepDirtyValues: true,
+      },
+      errors,
+      resolver: validate,
+      context: {
+        photo_cover: state.photo_cover,
+        photosPublic,
+      },
+    })
 
     useEffect(() => {
-      const promiseProduct = exposePromise()
-      const promisePhotos = exposePromise()
+      // react-hook-form doesn't validate when useForm `values` option changes, so need to validate manually
+      trigger()
+    }, [formState])
 
+    // I use controllers for checkboxes. See Admin: `react-hook-form` and `mui` - handling checkboxes
+    const fieldPropsIsInStock = useController({ name: 'is_in_stock', control })
+    const fieldPropsExpose = useController({ name: 'expose', control })
+    const fieldPropsPhotoCover = useController({ name: 'photo_cover', control })
+    const fieldPropsPhotosPublic = useController({ name: 'photosPublic', control })
+
+    const photosFilesInputRef = useRef()
+
+    useEffect(() => {
       setIsDataLoading(true)
 
-      Promise.all([promiseProduct.promise]).then(() => {
-        setIsDataLoading(false)
-      })
+      api.product.get(
+        params.id,
+        body => {
+          const stateData = data.dataToState(body)
+          dispatch(setState({ state: stateData }))
+          reset(getFormState(stateData))
 
-      api.product.get(params.id, body => {
-        setState(data.dataToState(body))
-        promiseProduct.resolve()
-      })
+          setIsDataLoading(false)
+        },
+        (body, res) => {
+          console.log('api.product.get errored - body, res:', body, res)
+          setIsError(true)
+          setIsDataLoading(false)
+        }
+      )
     }, [])
 
-    // make api request to upload photos
-    const photosUpload = files => {
+    const handleSubmitInner = async values => {
+      delete values.photo_cover
+      delete values.photosPublic
+
+      const fieldsToRemove = Object.keys(omit(state, ['photo_cover', 'photos_all'])).reduce(
+        (fieldsToRemove, k) => {
+          if (k in values) return fieldsToRemove
+
+          fieldsToRemove.push(k)
+          return fieldsToRemove
+        },
+        []
+      )
+
       setIsDataLoading(true)
 
-      api.product.upload(params.id, files, () => {
-        api.product.get(params.id, body => {
-          setState(data.dataToState(body))
+      api.product.update(
+        params.id,
+        data.stateToData(values),
+        fieldsToRemove.length ? fieldsToRemove : null,
+        body => {
+          const stateData = data.dataToState(body)
+          dispatch(setState({ state: stateData }))
+          reset(getFormState(stateData))
+
           setIsDataLoading(false)
-        })
-      })
+        },
+        (body, res) => {
+          console.log('api.product.update responded with failure - body, res:', body, res)
+
+          setIsDataLoading(false)
+          setIsError(true)
+        }
+      )
+    }
+
+    const handleDeleteProductConfirmClick = () => {
+      setIsDataLoading(true)
+
+      api.product.delete(
+        params.id,
+        () => {
+          setIsDataLoading(false)
+          setIsRemoveProductConfirmationDialogOpen(false)
+          navigate('/dash/products')
+        },
+        () => {
+          console.log(
+            'handleDeleteProductConfirmClick, api.product.delete responded with failure - body, res:',
+            body,
+            res
+          )
+
+          setIsDataLoading(false)
+          setIsError(true)
+        }
+      )
+    }
+
+    const handlePhotoCoverPick = photo => {
+      setIsDataLoading(true)
+
+      api.product.setCoverPhoto(
+        params.id,
+        { id: photo.id, cover: true },
+        () => {
+          dispatch(setCoverPhoto({ photo }))
+          setIsDataLoading(false)
+        },
+        (body, res) => {
+          console.log(
+            'handlePhotoCoverPick, api.product.setCoverPhoto responded with failure - body, res:',
+            body,
+            res
+          )
+
+          setIsDataLoading(false)
+          setIsError(true)
+        }
+      )
+    }
+
+    const handlePhotoCoverRemove = async () => {
+      const { errors } = await validate(
+        { ...getValues(), expose: formState.expose, photo_cover: null },
+        { photo_cover: null, photosPublic }
+      )
+      setErrors(errors)
+
+      if (errors.photo_cover) return
+
+      setIsDataLoading(true)
+
+      api.product.setCoverPhoto(
+        params.id,
+        { id: state.photo_cover.id, cover: false },
+        () => {
+          dispatch(removeCoverPhoto())
+          setIsDataLoading(false)
+        },
+        (body, res) => {
+          console.log(
+            'handlePhotoCoverRemove, api.product.setCoverPhoto responded with failure - body, res:',
+            body,
+            res
+          )
+
+          setIsDataLoading(false)
+          setIsError(true)
+        }
+      )
     }
 
     // add or remove a photo from `photos` based on whether it's checked or not and make api request to update the `photos` field
-    const pickCb = (picked, photo) => {
+    const handlePhotoPublicPick = async (picked, photo) => {
+      const stateNew = setPhotoPublicStatusReducer(state, { photo, publicStatus: picked })
+      const photosPublicNew = getPhotosPublic(stateNew.photos_all)
+
+      const { errors } = await validate(
+        {
+          ...getValues(),
+          expose: formState.expose,
+          photosPublic: photosPublicNew,
+        },
+        {}
+      )
+
+      setErrors(errors)
+
+      if (errors.photosPublic) return
+
       setIsDataLoading(true)
 
-      api.product.updatePhotosPublicity(params.id, [{ id: photo.id, public: picked }], () => {
-        // `expose` might have changed, so updating product state
-        api.product.get(params.id, body => {
-          setState(data.dataToState(body))
+      api.product.updatePhotosPublicity(
+        params.id,
+        [{ id: photo.id, public: picked }],
+        () => {
+          dispatch(setState({ state: stateNew }))
+          setIsDataLoading(false)
+        },
+        (body, res) => {
+          console.log(
+            'handlePhotoPublicPick, api.product.updatePhotosPublicity responded with failure - body, res:',
+            body,
+            res
+          )
 
           setIsDataLoading(false)
-        })
-      })
+          setIsError(true)
+        }
+      )
     }
 
-    const removePhotoCb = photo => {
+    const handlePhotoRemove = async photo => {
+      const stateNew = removePhotoReducer(state, { photo })
+      const photosPublicNew = getPhotosPublic(stateNew.photos_all)
+
+      const values = getValues()
+
+      const { errors } = await validate(
+        {
+          ...values,
+          expose: formState.expose,
+          photosPublic: photosPublicNew,
+          photo_cover: stateNew.photo_cover,
+        },
+        {}
+      )
+
+      setErrors(errors)
+
+      if (errors.photosPublic || errors.photo_cover) return
+
       setIsDataLoading(true)
 
-      api.product.removePhotos(params.id, [photo.id], body => {
-        // `expose` might have changed, so updating product state
-        api.product.get(params.id, body => {
-          setState(data.dataToState(body))
-          // setPhotosAll(photos_all.filter(_photo => _photo.id !== photo.id))
+      api.product.removePhotos(
+        params.id,
+        [photo.id],
+        body => {
+          dispatch(setState({ state: stateNew }))
+          setIsDataLoading(false)
+        },
+        (body, res) => {
+          console.log(
+            'handlePhotoRemove, api.product.removePhotos responded with failure - body, res:',
+            body,
+            res
+          )
 
           setIsDataLoading(false)
-        })
-      })
+          setIsError(true)
+        }
+      )
     }
 
-    const coverPickCb = photo => {
-      setIsDataLoading(true)
-
-      api.product.setCoverPhoto(params.id, { id: photo.id, cover: true }, () => {
-        setState({
-          ...state,
-          photos_all: state.photos_all.map(_photo => {
-            if (_photo.id !== photo.id) return _photo
-
-            return { ..._photo, cover: true }
-          }),
-          photo_cover: { ...photo, cover: true },
-        })
-
-        setIsDataLoading(false)
-      })
-    }
-
-    const photosReorderCb = photos => {
+    const handlePhotosReorder = photos => {
       const photosData = photos.map((photo, i) => ({ id: photo.id, order: i }))
 
       setIsDataLoading(true)
 
-      api.product.reorderPhotos(params.id, photosData, () => {
-        const photosDataIds = photosData.map(photo => photo.id)
+      api.product.reorderPhotos(
+        params.id,
+        photosData,
+        () => {
+          dispatch(reorderPhotos({ photos: photosData }))
+          setIsDataLoading(false)
+        },
+        (body, res) => {
+          console.log(
+            'handlePhotosReorder, api.product.reorderPhotos responded with failure - body, res:',
+            body,
+            res
+          )
 
-        setState({
-          ...state,
-          photos_all: state.photos_all.map(photo => {
-            if (!photosDataIds.includes(photo.id)) return photo
-
-            return { ...photo, order: photosData[photosDataIds.indexOf(photo.id)].order }
-          }),
-        })
-
-        setIsDataLoading(false)
-      })
+          setIsDataLoading(false)
+          setIsError(true)
+        }
+      )
     }
 
-    const inputChange = _state => {
-      console.log('inputChange, _state:', _state)
+    // make api request to upload photos
+    const handlePhotosUpload = () => {
+      const files = photosFilesInputRef.current.files
+
+      if (!files.length) return
 
       setIsDataLoading(true)
 
-      api.product.update(params.id, data.stateToData(_state), null, body => {
-        setState(data.dataToState(body))
-        setIsDataLoading(false)
+      api.product.upload(params.id, files, () => {
+        api.product.get(
+          params.id,
+          body => {
+            dispatch(setState({ state: data.dataToState(body) }))
+            setIsDataLoading(false)
+          },
+          (body, res) => {
+            console.log(
+              'handlePhotosUpload, api.product.upload responded with failure - body, res:',
+              body,
+              res
+            )
+
+            setIsDataLoading(false)
+            setIsError(true)
+          }
+        )
       })
     }
 
-    const deleteProductCb = () => {
-      setIsDataLoading(true)
-
-      api.product.delete(params.id, () => {
-        setIsDataLoading(false)
-        navigate('/dash/products')
-      })
+    // see Admin: `react-hook-form` validation and reactive `errors`
+    const handleProductDataInputBlur = () => {
+      fieldPropsPhotoCover.field.onBlur()
+      fieldPropsPhotosPublic.field.onBlur()
     }
 
-    return {
-      state,
-      photosPublic,
-      photosUpload,
-      pickCb,
-      removePhotoCb,
-      coverPickCb,
-      photosReorderCb,
-      inputChange,
-      deleteProductCb,
-      disabled: isDataLoading,
+    const handleIsInStockChange = ev => {
+      fieldPropsIsInStock.field.onChange(ev.target.checked)
     }
-  }
 
-  function Product() {
-    const product = useProduct()
+    const handleExposeChange = ev => {
+      fieldPropsExpose.field.onChange(ev.target.checked)
+      trigger()
+    }
 
-    // conditionally render `PhotosAll`
-    const [photosActive, setPhotosActive] = useState(false)
-    const [photoActive, setPhotoActive] = useState(false)
+    const handleFormElSubmit = ev => {
+      ev.preventDefault()
+    }
+
+    const handleDeleteProductClick = () => {
+      setIsRemoveProductConfirmationDialogOpen(true)
+    }
+
+    const handleDeleteProductDialogClose = () => {
+      setIsRemoveProductConfirmationDialogOpen(false)
+    }
+
+    const handleErrorDialogClose = () => {
+      setIsErrorDialogOpen(false)
+    }
+
+    const fieldPropsTime = register('time')
 
     useEffect(() => {
-      if (!product.disabled) return
-
-      setPhotosActive(false)
-      setPhotoActive(false)
-    }, [product.disabled])
-
-    const inputKeydown = ev => {
-      // if key is Enter
-      if (13 === ev.keyCode) return ev.preventDefault()
-    }
-
-    const photosBtn = () => {
-      if (product.disabled) return
-
-      setPhotosActive(!photosActive)
-    }
-
-    const photoBtn = () => {
-      if (product.disabled) return
-
-      setPhotoActive(!photoActive)
-    }
-
-    // TODO: put this chunk of code into a hook
-    let time = null
-    if (product.state.time) {
-      const _time = new Date(product.state.time)
-      // see Converting javascript Date object to HTML date/time inputs, in readme
-      _time.setTime(_time.getTime() - _time.getTimezoneOffset() * 60000)
-      time = parseIsoTime(_time.toISOString())
-    }
-
-    const dateRef = useRef()
-    const timeRef = useRef()
+      const date = state.time ? new Date(state.time) : null
+      setTimeData(date)
+      setValue('time', date)
+    }, [state])
 
     return (
-      <form onSubmit={ev => ev.preventDefault()} className="form">
-        <label className="label" htmlFor="name">
-          name
-        </label>
-        <input
-          id="name"
-          className="input-text"
-          type="text"
-          defaultValue={product.state.name}
-          onBlur={ev =>
-            product.inputChange(Object.assign(product.state, { name: ev.target.value }))
-          }
-          onKeyDown={inputKeydown}
-          disabled={product.disabled}
-        />
-
-        <label className="label" htmlFor="price-hrn">
-          hrn
-        </label>
-        <input
-          id="price-hrn"
-          className="input-number"
-          type="number"
-          defaultValue={product.state.priceHrn}
-          onBlur={ev =>
-            product.inputChange(
-              Object.assign(product.state, { priceHrn: parseInt(ev.target.value, 10) })
-            )
-          }
-          onKeyDown={inputKeydown}
-          disabled={product.disabled}
-        />
-
-        <label className="label" htmlFor="price-kop">
-          kop
-        </label>
-        <input
-          id="price-kop"
-          className="input-number"
-          type="number"
-          defaultValue={product.state.priceKop}
-          onBlur={ev =>
-            product.inputChange(
-              Object.assign(product.state, { priceKop: parseInt(ev.target.value, 10) })
-            )
-          }
-          onKeyDown={inputKeydown}
-          disabled={product.disabled}
-        />
-
-        <label className="label" htmlFor="expose">
-          expose
-        </label>
-        <input
-          id="expose"
-          className="input-checkbox"
-          type="checkbox"
-          checked={product.state.expose}
-          onChange={ev => {
-            /* don't check if any of the other fields are not filled */
-            if (ev.target.checked) {
-              if (
-                product.state.name.length &&
-                product.state.priceHrn !== null &&
-                product.state.priceKop !== null &&
-                typeof product.state.is_in_stock === 'boolean' &&
-                product.photosPublic.length &&
-                product.state.photo_cover &&
-                product.state.description.length &&
-                product.state.time !== null
-              )
-                return product.inputChange(
-                  Object.assign(product.state, { expose: ev.target.checked })
-                )
-
-              ev.target.checked = false
-              return
-            }
-
-            return product.inputChange(Object.assign(product.state, { expose: ev.target.checked }))
-          }}
-          onKeyDown={inputKeydown}
-          disabled={product.disabled}
-        />
-
-        <label className="label" htmlFor="is-in-stock">
-          in stock
-        </label>
-        <input
-          id="is-in-stock"
-          className="input-checkbox"
-          type="checkbox"
-          checked={product.state.is_in_stock}
-          onChange={ev =>
-            product.inputChange(Object.assign(product.state, { is_in_stock: ev.target.checked }))
-          }
-          onKeyDown={inputKeydown}
-          disabled={product.disabled}
-        />
-
-        <label className="label" htmlFor="description">
-          description
-        </label>
-        <input
-          id="description"
-          className="input-text"
-          type="text"
-          defaultValue={product.state.description}
-          onBlur={ev =>
-            product.inputChange(Object.assign(product.state, { description: ev.target.value }))
-          }
-          onKeyDown={inputKeydown}
-          disabled={product.disabled}
-        />
-
-        <label className="label" htmlFor="date">
-          date
-        </label>
-        <input
-          id="date"
-          type="date"
-          ref={dateRef}
-          defaultValue={time ? time.date : ''}
-          onBlur={ev => {
-            product.inputChange({
-              ...product.state,
-              // see Sending time in readme
-              time: new Date(`${ev.target.value}T${timeRef.current.value || '00:00'}`).getTime(),
-            })
-          }}
-          disabled={product.disabled}
-        />
-
-        <label className="label" htmlFor="time">
-          time
-        </label>
-        <input
-          id="time"
-          type="time"
-          ref={timeRef}
-          defaultValue={time ? time.time : ''}
-          onBlur={ev => {
-            if (!dateRef.current.value) return
-
-            product.inputChange({
-              ...product.state,
-              time: new Date(`${dateRef.current.value}T${ev.target.value}`).getTime(),
-            })
-          }}
-          disabled={product.disabled}
-        />
-
-        <span className="label">cover photo</span>
-        {product.state.photo_cover ? (
-          <div className="photo cover-photo">
-            <img src={product.state.photo_cover.pathPublic} />
+      <>
+        {isError ? (
+          <div>
+            <Dialog open={isErrorDialogOpen} onClose={handleErrorDialogClose}>
+              <DialogContent>
+                <DialogContentText>
+                  Сталася помилка. Будь-ласка, перезавантажте сторінку.
+                </DialogContentText>
+              </DialogContent>
+            </Dialog>
           </div>
-        ) : null}
-
-        <button className="control" onClick={photoBtn} disabled={product.disabled}>
-          pick photo
-        </button>
-        {photoActive ? (
-          <PhotoPicker
-            photosAll={product.state.photos_all}
-            photo={product.state.photo_cover}
-            pickCb={product.coverPickCb}
-            upload={product.photosUpload}
-          />
-        ) : null}
-
-        <span className="label">photos</span>
-        <DndProvider backend={HTML5Backend}>
-          <PhotosSortable photos={product.photosPublic} reorderCb={product.photosReorderCb} />
-        </DndProvider>
-        {photosActive ? (
-          <PhotosPicker
-            photosAll={product.state.photos_all}
-            photos={product.photosPublic}
-            upload={product.photosUpload}
-            pickCb={product.pickCb}
-            removeCb={product.removePhotoCb}
-          />
-        ) : null}
-        <button className="control" onClick={photosBtn} disabled={product.disabled}>
-          add photos
-        </button>
-        <button className="control" onClick={product.deleteProductCb} disabled={product.disabled}>
-          Delete Product
-        </button>
-      </form>
+        ) : (
+          <div className="product-container">
+            <div className="layout-col-center">
+              <form className="product-data-form" onSubmit={handleFormElSubmit}>
+                <div className="product-data__row">
+                  <div className="product-data__column">
+                    <ProductDataField
+                      id="name"
+                      label="Назва"
+                      content={({ id, label }) => (
+                        <TextField
+                          id={id}
+                          placeholder={label}
+                          {...register('name', { onBlur: handleProductDataInputBlur })}
+                          error={!!formErrors.name}
+                          helperText={formErrors.name || null}
+                          disabled={isDataLoading}
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
+                <div className="product-data__row">
+                  <div className="product-data__column">
+                    <ProductDataField
+                      id="description"
+                      label="Опис"
+                      content={({ id, label }) => (
+                        <TextField
+                          id={id}
+                          placeholder={label}
+                          multiline
+                          minRows={6}
+                          maxRows={12}
+                          {...register('description', { onBlur: handleProductDataInputBlur })}
+                          error={!!formErrors.description}
+                          helperText={formErrors.description || null}
+                          disabled={isDataLoading}
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
+                <div className="product-data__row-2">
+                  <div className="product-data__column">
+                    <ProductDataField
+                      id="priceHrn"
+                      label="Ціна: гривні"
+                      content={({ id, label }) => (
+                        <TextField
+                          id={id}
+                          placeholder={label}
+                          type="number"
+                          {...register('priceHrn', { onBlur: handleProductDataInputBlur })}
+                          error={!!formErrors.priceHrn}
+                          helperText={formErrors.priceHrn || null}
+                          disabled={isDataLoading}
+                        />
+                      )}
+                    />
+                  </div>
+                  <div className="product-data__column">
+                    <ProductDataField
+                      id="priceKop"
+                      label="Ціна: копійки"
+                      content={({ id }) => (
+                        <TextField
+                          id={id}
+                          placeholder="Копійки"
+                          type="number"
+                          {...register('priceKop', { onBlur: handleProductDataInputBlur })}
+                          error={!!formErrors.priceKop}
+                          helperText={formErrors.priceKop || null}
+                          disabled={isDataLoading}
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
+                <div className="product-data__row">
+                  <div className="product-data__column">
+                    <ProductDataField
+                      error={formErrors.is_in_stock}
+                      content={() => (
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={fieldPropsIsInStock.field.value}
+                              onChange={handleIsInStockChange}
+                              onBlur={() => {
+                                fieldPropsIsInStock.field.onBlur()
+                                handleProductDataInputBlur()
+                              }}
+                              inputRef={fieldPropsIsInStock.field.ref}
+                            />
+                          }
+                          label={'В наявності'}
+                          disabled={isDataLoading}
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
+                <div className="product-data__row">
+                  <div className="product-data__column">
+                    <ProductDataField
+                      id="time"
+                      label="Час створення"
+                      error={formErrors.time}
+                      content={({ id }) => (
+                        <DateTimePicker
+                          id={id}
+                          value={timeData}
+                          name={fieldPropsTime.name}
+                          onBlur={() => {
+                            fieldPropsTime.onBlur()
+                            handleProductDataInputBlur()
+                          }}
+                          inputRef={fieldPropsTime.ref}
+                          onChange={date => {
+                            setTimeData(date)
+                            setValue('time', date)
+                            trigger('time')
+                          }}
+                          disabled={isDataLoading}
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
+                <div className="product-data__row">
+                  <div className="product-data__column">
+                    <ProductDataField
+                      error={formErrors.expose}
+                      content={() => (
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={fieldPropsExpose.field.value}
+                              onChange={handleExposeChange}
+                              onBlur={() => {
+                                fieldPropsExpose.field.onBlur()
+                                handleProductDataInputBlur()
+                              }}
+                              inputRef={fieldPropsExpose.field.ref}
+                            />
+                          }
+                          label={'Показувати відвідувачам'}
+                          disabled={isDataLoading}
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
+              </form>
+              <div className="flex-justify-end">
+                <Button
+                  variant="contained"
+                  disabled={isDataLoading}
+                  onClick={handleSubmit(handleSubmitInner)}
+                >
+                  Зберегти дані
+                </Button>
+              </div>
+              <ProductDataField
+                label="Обкладинка"
+                error={formErrors.photo_cover}
+                content={() => (
+                  <>
+                    {fieldPropsPhotoCover.field.value ? (
+                      <>
+                        <img
+                          className="product__cover-photo"
+                          src={fieldPropsPhotoCover.field.value.pathPublic}
+                          alt={'обкладинка'}
+                        />
+                        <div className="flex-justify-end">
+                          <Button variant="contained" onClick={handlePhotoCoverRemove}>
+                            Прибрати з обкладинки
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <Link className="link-inner" to="#photos-drawer">
+                        <Button variant="contained" disabled={isDataLoading}>
+                          Додати обкладинку
+                        </Button>
+                      </Link>
+                    )}
+                  </>
+                )}
+              />
+            </div>
+            <ProductDataWideSection
+              label="Публічні фотографії"
+              error={formErrors.photosPublic}
+              content={() => (
+                <>
+                  {fieldPropsPhotosPublic.field.value.length ? (
+                    <DndProvider backend={HTML5Backend}>
+                      <PhotosSortable
+                        photos={fieldPropsPhotosPublic.field.value}
+                        reorderCb={handlePhotosReorder}
+                        disabled={isDataLoading}
+                      />
+                    </DndProvider>
+                  ) : (
+                    <div className="wide-section__column-center">
+                      <div className="flex-justify-end">
+                        <Link to="#photos-drawer">
+                          <Button variant="contained">Додати фотографії</Button>
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            />
+            <ProductDataWideSection
+              label="Фотошухляда"
+              target={location.hash.slice(1) === 'photos-drawer'}
+              error={
+                formErrors.photosPublic && formErrors.photo_cover
+                  ? "Публічний продукт обо'язково повинен мати обкладинку і публічні фотографії"
+                  : formErrors.photosPublic
+                    ? "Публічний продукт обов'язково повинен мати публічні фотографії"
+                    : formErrors.photo_cover
+                      ? "Публічний продукт обов'язково повинен мати обкладинку"
+                      : null
+              }
+              content={() => (
+                <>
+                  {state.photos_all.length ? (
+                    <PhotosDrawer
+                      photos={state.photos_all}
+                      handlePhotoPublicPick={handlePhotoPublicPick}
+                      handlePhotoCoverPick={handlePhotoCoverPick}
+                      handleRemovePhoto={handlePhotoRemove}
+                      disabled={isDataLoading}
+                    />
+                  ) : (
+                    <div className="wide-section__column-center">
+                      <div className="flex-justify-end">
+                        <Link to="#photos-upload">
+                          <Button variant="contained">Завантажити фотографії</Button>
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            />
+            <div className="layout-col-center">
+              <div className="product-data__row">
+                <div className="product-data__column">
+                  <ProductDataField
+                    id="photos-upload"
+                    label="Завантажити фото до фотошухляди"
+                    target={location.hash.slice(1) === 'photos-upload'}
+                    content={({ id }) => (
+                      <>
+                        <input
+                          type="file"
+                          ref={photosFilesInputRef}
+                          id={id}
+                          accept="image/*"
+                          multiple
+                        />
+                        <div className="flex-justify-end">
+                          <Button variant="contained" onClick={handlePhotosUpload}>
+                            Завантажити
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="layout-col-wide">
+              <Divider />
+            </div>
+            <div className="layout-col-center">
+              <div className="flex-justify-end">
+                <Button variant="contained" color="error" onClick={handleDeleteProductClick}>
+                  Видалити продукт
+                </Button>
+              </div>
+            </div>
+            <Dialog
+              open={isRemoveProductConfirmationDialogOpen}
+              onClose={handleDeleteProductDialogClose}
+            >
+              <DialogContent>
+                <DialogContentText>
+                  Ви впевнені, що хочете видалити продукт? Ви безповоротно втратите усі дані
+                  продукту та його фотографії.
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button variant="contained" color="error" onClick={handleDeleteProductConfirmClick}>
+                  Видалити
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </div>
+        )}
+      </>
     )
   }
 
-  return { ProductCreate, Product }
+  return ProductNew
 }
 
 export default main
