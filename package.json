@@ -1,6 +1,6 @@
 {
   "name": "e-commerce-react",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "description": "front-end for fi-site",
   "main": "index.js",
   "type": "module",
