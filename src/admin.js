@@ -79,7 +79,7 @@ function main(container, api) {
     return (
       <div className="admin">
         <Header />
-        <section class="page-width page-container">
+        <section className="page-width page-container">
           <Routes>
             <Route index element={<Navigate to="orders" />}></Route>
             <Route path="products" element={<_Products />} />

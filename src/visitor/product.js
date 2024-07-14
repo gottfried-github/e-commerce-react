@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { register } from 'swiper/element/bundle'
 
-import { kopToHrn } from '../price.js'
+import { kopToHrnStr } from '../utils/price.js'
 import Notification from './notification.js'
 
 register()
@@ -23,7 +23,7 @@ export default api => {
         params.id,
         body => {
           console.log('Product, got product from api - body:', body)
-          setProduct({ ...body, priceHrn: kopToHrn(body.price) })
+          setProduct({ ...body, priceHrn: kopToHrnStr(body.price) })
         },
         (body, res) => {
           alert('something went wrong, please consult a technician')
