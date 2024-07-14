@@ -15,14 +15,14 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3/index.js'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 
 import Auth from './admin/auth.js'
+import ProductCreate from './admin/product-create.js'
 import Product from './admin/product.js'
-import ProductNew from './admin/productNew.js'
 import Products from './admin/products.js'
 
 function main(container, api) {
   const auth = Auth(api)
-  const product = Product(api)
-  const _ProductNew = ProductNew(api)
+  const _ProductCreate = ProductCreate(api)
+  const _Product = Product(api)
   const _Products = Products(api)
 
   // check the api for whether the client is authenticated
@@ -80,7 +80,6 @@ function main(container, api) {
           <Link to="orders">orders</Link>
           <Link to="products">products</Link>
           <Link to="product">product</Link>
-          <Link to="product-new">product new</Link>
           <Link to="logout">logout</Link>
         </nav>
         <section>
@@ -92,7 +91,7 @@ function main(container, api) {
               path="product"
               element={
                 <div className="product-create">
-                  <product.ProductCreate />
+                  <_ProductCreate />
                 </div>
               }
             />
@@ -100,11 +99,10 @@ function main(container, api) {
               path="product/:id/*"
               element={
                 <div className="product">
-                  <product.Product />
+                  <_Product />
                 </div>
               }
             />
-            <Route path="product-new/:id/*" element={<_ProductNew />} />
             <Route path="logout" element={<Logout />} />
           </Routes>
         </section>

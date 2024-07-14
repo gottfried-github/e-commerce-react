@@ -10,7 +10,7 @@ const DndTypes = {
  * @param {Function} reorderCb callback to fire on reorder
  * @description uses react-dnd to reorder rendered photos
  */
-function PhotosSortable({ photos, reorderCb }) {
+function PhotosSortable({ photos, reorderCb, disabled }) {
   const [_photos, setPhotos] = useState(photos)
 
   useEffect(() => {
@@ -50,11 +50,16 @@ function PhotosSortable({ photos, reorderCb }) {
   }
 
   const dropCb = (target, source, clientOffset) => {
+    if (disabled) {
+      setPhotos(photos)
+      return
+    }
+
     reorderCb(_photos)
   }
 
   return (
-    <div className="photos">
+    <div className="photos-sortable">
       {_photos.map(photo => (
         <PhotoSortable
           key={photo.id}
@@ -101,7 +106,7 @@ function PhotoSortable({ id, photo, dropCb, hoverCb, dragCancelCb }) {
   drag(drop(ref))
 
   return (
-    <div className="photo photo-sortable" ref={ref}>
+    <div className="photos-sortable__photo" ref={ref}>
       <img src={photo.pathPublic} />
     </div>
   )
