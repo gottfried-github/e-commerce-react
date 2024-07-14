@@ -68,3 +68,15 @@ In `Home` I use MutationObserver to observe changes to `Products` and get the po
 I need the positions of the sections in `Header` in order to scroll to them when clicked on a link in the `Header`. But `Home` renders the sections so it has access to their positions. 
 
 The way I have my routes set up with `React Router` is that I render the `Header` in a parent route to that in which I render the `Home` component: I use `React Router`'s `Outlet` component to place the routes within the parent route. So I need to lift data up from the child route where `Home` is rendered to the parent route where `Header` is rendered, through an `Outlet`. I do that by passing a callback to the `Outlet`, as `context`, which modifies the state of the parent route and passes it down to the `Header`. To consume the `Outlet`'s context in `Home`, I use the `useOutletContext` hook.
+
+### Admin: `react-hook-form` and `mui` - handling checkboxes
+When using `register` for `mui` `Checkbox`, when `formState`'s initial value is `true`, the `Checkbox` doesn't appear to be checked, although the underlying `<input>` HTML element is `checked`. 
+
+To omit this problem, I use `useController` for `Checkboxes`.
+
+### Admin: `react-hook-form` validation and reactive `errors`
+When I use `useForm`'s `errors` option and update the errors, I run into an issue with the `photo_cover` field.
+
+Let's say I update the errors with an error for `photo_cover`. Then, the next validation returns no error for this field. But the error that I set when updating the errors gets persisted in `useForm`'s `formState`.
+
+Thus I'm forced to trigger `photo_cover`'s `onBlur` each time I update another field in the product data form. I'm aware that it results in duplicate runs of validation, but I haven't found another way of dealing with this.
