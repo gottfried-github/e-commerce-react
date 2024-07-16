@@ -370,6 +370,11 @@ const main = api => {
           body => {
             dispatch(setState({ state: data.dataToState(body) }))
             setIsDataLoading(false)
+            photosFilesInputRef.current.value = ''
+            console.log(
+              'handlePhotosUpload, photosFilesInputRef.current.files:',
+              photosFilesInputRef.current.files
+            )
           },
           (body, res) => {
             console.log(
@@ -379,6 +384,7 @@ const main = api => {
             )
 
             setIsDataLoading(false)
+            photosFilesInputRef.current.files = []
             setIsError(true)
           }
         )
@@ -609,7 +615,7 @@ const main = api => {
                       <>
                         <img
                           className="product__cover-photo"
-                          src={fieldPropsPhotoCover.field.value.pathPublic}
+                          src={fieldPropsPhotoCover.field.value.pathsPublic.l}
                           alt={'обкладинка'}
                         />
                         <div className="flex-justify-end">

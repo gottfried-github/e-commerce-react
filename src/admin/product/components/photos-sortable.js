@@ -107,7 +107,7 @@ function PhotoSortable({ id, photo, dropCb, hoverCb, dragCancelCb }) {
 
   return (
     <div className="photos-sortable__photo" ref={ref}>
-      <img src={photo.pathPublic} />
+      <img src={photo.pathsPublic.s} />
     </div>
   )
 }

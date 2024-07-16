@@ -14,7 +14,7 @@ const ProductCard = ({ product }) => {
         <CardContent className="product-card__content">
           <div className={`product-card__cover${product.photo_cover ? '' : ' placeholder'}`}>
             {product.photo_cover ? (
-              <img src={product.photo_cover.pathPublic} alt={product.name || 'cover'} />
+              <img src={product.photo_cover.pathsPublic.s} alt={product.name || 'cover'} />
             ) : null}
           </div>
           <div className="product-card__info">

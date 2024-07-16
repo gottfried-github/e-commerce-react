@@ -123,9 +123,9 @@ export default api => {
     return product ? (
       <section id="product">
         <div className="photos">
-          <img className="photo" src={product.photo_cover.pathPublic} alt={product.name} />
+          <img className="photo" src={product.photo_cover.pathsPublic.l} alt={product.name} />
           {product.photos_all.map(photo =>
-            photo.cover ? null : <img className="photo" src={photo.pathPublic} key={photo.id} />
+            photo.cover ? null : <img className="photo" src={photo.pathsPublic.l} key={photo.id} />
           )}
         </div>
         <div className="photos-mobile-container">
@@ -144,7 +144,7 @@ export default api => {
               {product.photos_all.map(photo =>
                 photo.cover ? null : (
                   <swiper-slide key={photo.id}>
-                    <img className="photo-mobile" src={photo.pathPublic} />
+                    <img className="photo-mobile" src={photo.pathsPublic.l} />
                   </swiper-slide>
                 )
               )}

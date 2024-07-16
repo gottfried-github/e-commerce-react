@@ -78,7 +78,7 @@ export default api => {
                 <ProductCard
                   key={product.id}
                   id={product.id}
-                  photoUrl={product.photo_cover.pathPublic}
+                  photoUrl={product.photo_cover.pathsPublic.s}
                   name={product.name}
                   price={product.price}
                   isInStock={product.is_in_stock}
