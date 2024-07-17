@@ -137,7 +137,7 @@ export default api => {
               <swiper-slide>
                 <img
                   className="photo-mobile"
-                  src={product.photo_cover.pathPublic}
+                  src={product.photo_cover.pathsPublic.l}
                   alt={product.name}
                 />
               </swiper-slide>
@@ -181,7 +181,10 @@ export default api => {
               {product.is_in_stock ? 'в наявності' : 'немає в наявності'}
             </span>
           </div>
-          <p className="info__description">{product.description}</p>
+          <p
+            className="info__description"
+            dangerouslySetInnerHTML={{ __html: product.description }}
+          ></p>
           <div className="info__social-links-container">
             <h2 className="info__social-links-heading">Написати:</h2>
             <div className="info__social-links">
