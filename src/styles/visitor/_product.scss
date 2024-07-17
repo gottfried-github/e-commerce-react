@@ -252,26 +252,14 @@
         color: $text-main-bold;
       }
 
-      .info__social-links {
+      .social-links {
         display: flex;
 
         column-gap: 12px;
 
-        .info__social-link {
+        .social-icon {
           width: 32px;
-          height: 32px;
-
-          background-position: center;
-          background-repeat: no-repeat;
-          background-size: contain;
-        }
-
-        .info__social-link-instagram {
-          background-image: url('../assets/images/logo-instagram.svg');
-        }
-
-        .info__social-link-facebook {
-          background-image: url('../assets/images/logo-facebook.svg');
+          height: 32px; 
         }
       }
     }

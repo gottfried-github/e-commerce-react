@@ -1,5 +1,8 @@
 import React from 'react'
 
+import IconInstagram from './icons/IconInstagram.js'
+import IconFacebook from './icons/IconFacebook.js'
+
 function Footer() {
   return (
     <footer className="footer-main">
@@ -13,17 +16,21 @@ function Footer() {
         <ul className="social-links">
           <li className="social-link-container">
             <a
-              className="social-link instagram"
+              className="social-link"
               href="https://www.instagram.com/animato_jewelry/"
               target="_blank"
-            ></a>
+            >
+              <IconInstagram className="social-icon" />
+            </a>
           </li>
           <li className="social-link-container">
             <a
-              className="social-link facebook"
+              className="social-link"
               href="https://www.facebook.com/bySophiaSalo/"
               target="_blank"
-            ></a>
+            >
+              <IconFacebook className="social-icon" />
+            </a>
           </li>
         </ul>
       </div>

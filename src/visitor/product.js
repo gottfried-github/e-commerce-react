@@ -4,6 +4,8 @@ import { register } from 'swiper/element/bundle'
 
 import { kopToHrnStr } from '../utils/price.js'
 import Notification from './notification.js'
+import IconInstagram from './icons/IconInstagram.js'
+import IconFacebook from './icons/IconFacebook.js'
 
 register()
 
@@ -187,17 +189,17 @@ export default api => {
           ></p>
           <div className="info__social-links-container">
             <h2 className="info__social-links-heading">Написати:</h2>
-            <div className="info__social-links">
+            <div className="social-links">
+              <a className="social-link" href="https://ig.me/m/animato_jewelry" target="_blank">
+                <IconInstagram className="social-icon" />
+              </a>
               <a
-                className="info__social-link info__social-link-instagram"
-                href="https://ig.me/m/animato_jewelry"
-                target="_blank"
-              ></a>
-              <a
-                className="info__social-link info__social-link-facebook"
+                className="social-link"
                 href={`https://m.me/bySophiaSalo?text=${encodeURIComponent(`Вітаю. \n \n Мене цікавить ${product.name} (${product._id}). \n \n`)}`}
                 target="_blank"
-              ></a>
+              >
+                <IconFacebook className="social-icon" />
+              </a>
             </div>
           </div>
           <Notification hidden={!isCopiedNotificationVisible}>

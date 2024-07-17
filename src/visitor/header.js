@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
+import IconInstagram from './icons/IconInstagram.js'
+import IconFacebook from './icons/IconFacebook.js'
+
 function Header({ sectionsPos }) {
   const [isOpen, setIsOpen] = useState(false)
 
@@ -85,17 +88,21 @@ function Header({ sectionsPos }) {
             <ul className="social-links">
               <li className="social-link-container">
                 <a
-                  className="social-link social-link-light instagram"
+                  className="social-link"
                   href="https://www.instagram.com/animato_jewelry/"
                   target="_blank"
-                ></a>
+                >
+                  <IconInstagram className="social-icon_light" />
+                </a>
               </li>
               <li className="social-link-container">
                 <a
-                  className="social-link social-link-light facebook"
+                  className="social-link"
                   href="https://www.facebook.com/bySophiaSalo/"
                   target="_blank"
-                ></a>
+                >
+                  <IconFacebook className="social-icon_light" />
+                </a>
               </li>
             </ul>
           </nav>
