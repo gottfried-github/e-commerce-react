@@ -232,6 +232,10 @@
       p:last-child, ul:last-child, ol:last-child {
         margin-bottom: 0;
       }
+
+      strong {
+        font-weight: 300;
+      }
     }
 
     .info__social-links-container {

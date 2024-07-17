@@ -1,29 +1,18 @@
 .product-container {
   display: grid;
 
-  grid-template-columns: 16px 1fr 16px;
-
   row-gap: 16px;
 
-  .layout-col-center, .layout-col-wide {
-    grid-column: 2;
-  }
-
-  @media (min-width: calc(16px * 2 + 600px)) {
-    grid-template-columns: 16px 1fr 600px 1fr 16px;
+  @media (min-width: calc($sideMargin * 2 + 600px)) {
+    grid-template-columns: 1fr 600px 1fr;
 
     .layout-col-center {
-      grid-column: 3;
+      grid-column: 2;
     }
 
     .layout-col-wide {
-      grid-column: 2 / 5;
+      grid-column: 1 / 4;
     }
-  }
-
-  @media (min-width: calc(320px * 5 + 8px * 4 + 16px * 2)) {
-    // 516 = 1032 (1632 (320 (photo width) * 5 + 8 (gap width) * 4) - 600 (center column width)) / 2
-    grid-template-columns: 1fr 516px 600px 516px 1fr;
   }
 }
 
@@ -92,7 +81,7 @@
 }
 
 .wide-section__column-center {
-  @media (min-width: calc(600px + 16px * 2)) {
+  @media (min-width: calc(600px + 30px * 2)) {
     margin: auto;
     padding: 0;
 
@@ -114,20 +103,16 @@
   gap: 8px;
   margin: auto;
 
-  @media (min-width: calc(320px * 2 + 8px + 16px * 2)) {
+  @media (min-width: calc(320px * 2 + 8px + $sideMargin * 2)) {
     grid-template-columns: repeat(2, 320px);
   }
 
-  @media (min-width: calc(320px * 3 + 8px * 2 + 16px * 2)) {
+  @media (min-width: calc(320px * 3 + 8px * 2 + $sideMargin * 2)) {
     grid-template-columns: repeat(3, 320px);
   }
 
-  @media (min-width: calc(320px * 4 + 8px * 3 + 16px * 2)) {
+  @media (min-width: calc(320px * 4 + 8px * 3 + $sideMargin * 2)) {
     grid-template-columns: repeat(4, 320px);
-  }
-
-  @media (min-width: calc(320px * 5 + 8px * 4 + 16px * 2)) {
-    grid-template-columns: repeat(5, 320px);
   }
 }
 

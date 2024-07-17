@@ -28,11 +28,11 @@ function PhotosSortable({ photos, reorderCb, disabled }) {
     const targetClientRect = target.ref.current.getBoundingClientRect()
 
     const middle =
-      window.innerWidth > 500
+      window.innerWidth > 708
         ? targetClientRect.width / 2 + targetClientRect.x
         : targetClientRect.height / 2 + targetClientRect.y
 
-    const offset = window.innerWidth > 500 ? clientOffset.x : clientOffset.y
+    const offset = window.innerWidth > 708 ? clientOffset.x : clientOffset.y
 
     if (offset <= middle) {
       // insert source before target
