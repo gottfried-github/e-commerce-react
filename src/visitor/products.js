@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, forwardRef, useMemo } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 
-import { kopToHrn } from '../price.js'
+import { kopToHrnStr } from '../utils/price.js'
 
 import Filters from './filters.js'
 
@@ -78,7 +78,7 @@ export default api => {
                 <ProductCard
                   key={product.id}
                   id={product.id}
-                  photoUrl={product.photo_cover.pathPublic}
+                  photoUrl={product.photo_cover.pathsPublic.s}
                   name={product.name}
                   price={product.price}
                   isInStock={product.is_in_stock}
@@ -93,7 +93,7 @@ export default api => {
 }
 
 function ProductCard({ id, photoUrl, name, price, isInStock }) {
-  const _price = kopToHrn(price)
+  const _price = kopToHrnStr(price)
 
   return (
     <li className="product-card">

@@ -9,21 +9,6 @@
 
   .social-link {
     display: block;
-
-    width: 24px;
-    height: 24px;
-
-    background-position: center;
-    background-size: contain;
-    background-repeat: no-repeat;
-  }
-
-  .social-link.instagram {
-    background-image: url('../assets/images/logo-instagram.svg');
-  }
-
-  .social-link.facebook {
-    background-image: url('../assets/images/logo-facebook.svg');
   }
 
   .social-link-light.instagram {
@@ -32,6 +17,28 @@
 
   .social-link-light.facebook {
     background-image: url('../assets/images/logo-facebook_light.svg');
+  }
+
+  .social-icon, .social-icon_light {
+    display: block;
+
+    transition: fill $animation-text;
+  }
+
+  .social-icon {
+    fill: $text-main-bold;
+
+    &:hover {
+      fill: $text-main-hover;
+    }
+  }
+
+  .social-icon_light {
+    fill: $background-main;
+
+    &:hover {
+      fill: $text-main-hover;
+    }
   }
 }
 

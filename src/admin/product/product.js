@@ -13,21 +13,21 @@ import DialogContent from '@mui/material/DialogContent/index.js'
 import DialogContentText from '@mui/material/DialogContentText/index.js'
 import DialogActions from '@mui/material/DialogActions/index.js'
 import Divider from '@mui/material/Divider/index.js'
+import { Editor } from '@tinymce/tinymce-react'
 
-import { ValidationError } from '../../../e-commerce-common/messages.js'
-import { omit } from './utils/utils.js'
-import { reorderPhotos, setCoverPhoto, removeCoverPhoto, setState } from './actions/product.js'
+import { omit } from '../utils/utils.js'
+import { reorderPhotos, setCoverPhoto, removeCoverPhoto, setState } from '../actions/product.js'
 import stateReducer, {
   setPhotoPublicStatus as setPhotoPublicStatusReducer,
   removePhoto as removePhotoReducer,
   getPhotosPublic,
-} from './reducers/product.js'
+} from '../reducers/product.js'
 import * as data from './product-data.js'
 import productValidate from './product-validate.js'
 import ProductDataField from './components/ProductDataField.js'
 import ProductDataWideSection from './components/ProductDataWideSection.js'
-import { PhotosSortable } from './photos-sortable.js'
-import PhotosDrawer from './photos-drawer.js'
+import { PhotosSortable } from './components/photos-sortable.js'
+import PhotosDrawer from './components/photos-drawer.js'
 
 const getFormState = state => ({
   name: state.name,
@@ -42,7 +42,7 @@ const getFormState = state => ({
 })
 
 const main = api => {
-  const ProductNew = () => {
+  const Product = () => {
     const navigate = useNavigate()
     const params = useParams()
     const location = useLocation()
@@ -109,6 +109,8 @@ const main = api => {
       trigger()
     }, [formState])
 
+    // controller for TinyMCE
+    const fieldPropsDescription = useController({ name: 'description', control })
     // I use controllers for checkboxes. See Admin: `react-hook-form` and `mui` - handling checkboxes
     const fieldPropsIsInStock = useController({ name: 'is_in_stock', control })
     const fieldPropsExpose = useController({ name: 'expose', control })
@@ -371,6 +373,11 @@ const main = api => {
           body => {
             dispatch(setState({ state: data.dataToState(body) }))
             setIsDataLoading(false)
+            photosFilesInputRef.current.value = ''
+            console.log(
+              'handlePhotosUpload, photosFilesInputRef.current.files:',
+              photosFilesInputRef.current.files
+            )
           },
           (body, res) => {
             console.log(
@@ -380,6 +387,7 @@ const main = api => {
             )
 
             setIsDataLoading(false)
+            photosFilesInputRef.current.files = []
             setIsError(true)
           }
         )
@@ -464,17 +472,45 @@ const main = api => {
                     <ProductDataField
                       id="description"
                       label="Опис"
+                      error={formErrors.description || null}
                       content={({ id, label }) => (
-                        <TextField
-                          id={id}
-                          placeholder={label}
-                          multiline
-                          minRows={6}
-                          maxRows={12}
-                          {...register('description', { onBlur: handleProductDataInputBlur })}
-                          error={!!formErrors.description}
-                          helperText={formErrors.description || null}
+                        <Editor
+                          value={fieldPropsDescription.field.value}
+                          onEditorChange={v => {
+                            fieldPropsDescription.field.onChange(v)
+                          }}
+                          onBlur={v => {
+                            fieldPropsDescription.field.onBlur(v)
+                          }}
                           disabled={isDataLoading}
+                          init={{
+                            height: 500,
+                            menubar: 'insert',
+                            menu: {
+                              insert: {
+                                title: 'Insert',
+                                items: 'link charmap insertdatetime',
+                              },
+                            },
+                            plugins: [
+                              // 'advlist',
+                              'autolink',
+                              'lists',
+                              'link',
+                              'charmap',
+                              'insertdatetime',
+                              'help',
+                              'wordcount',
+                            ],
+                            toolbar:
+                              'undo redo | ' +
+                              'bold italic underline | bullist numlist | ' +
+                              'removeformat | help',
+                            content_style:
+                              'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }',
+                          }}
+                          tinymceScriptSrc="/tinymce/tinymce.min.js"
+                          licenseKey="gpl"
                         />
                       )}
                     />
@@ -610,7 +646,7 @@ const main = api => {
                       <>
                         <img
                           className="product__cover-photo"
-                          src={fieldPropsPhotoCover.field.value.pathPublic}
+                          src={fieldPropsPhotoCover.field.value.pathsPublic.l}
                           alt={'обкладинка'}
                         />
                         <div className="flex-justify-end">
@@ -748,7 +784,7 @@ const main = api => {
     )
   }
 
-  return ProductNew
+  return Product
 }
 
 export default main

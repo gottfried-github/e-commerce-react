@@ -2,8 +2,10 @@ import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { register } from 'swiper/element/bundle'
 
-import { kopToHrn } from '../price.js'
+import { kopToHrnStr } from '../utils/price.js'
 import Notification from './notification.js'
+import IconInstagram from './icons/IconInstagram.js'
+import IconFacebook from './icons/IconFacebook.js'
 
 register()
 
@@ -23,7 +25,7 @@ export default api => {
         params.id,
         body => {
           console.log('Product, got product from api - body:', body)
-          setProduct({ ...body, priceHrn: kopToHrn(body.price) })
+          setProduct({ ...body, priceHrn: kopToHrnStr(body.price) })
         },
         (body, res) => {
           alert('something went wrong, please consult a technician')
@@ -123,9 +125,9 @@ export default api => {
     return product ? (
       <section id="product">
         <div className="photos">
-          <img className="photo" src={product.photo_cover.pathPublic} alt={product.name} />
+          <img className="photo" src={product.photo_cover.pathsPublic.l} alt={product.name} />
           {product.photos_all.map(photo =>
-            photo.cover ? null : <img className="photo" src={photo.pathPublic} key={photo.id} />
+            photo.cover ? null : <img className="photo" src={photo.pathsPublic.l} key={photo.id} />
           )}
         </div>
         <div className="photos-mobile-container">
@@ -137,14 +139,14 @@ export default api => {
               <swiper-slide>
                 <img
                   className="photo-mobile"
-                  src={product.photo_cover.pathPublic}
+                  src={product.photo_cover.pathsPublic.l}
                   alt={product.name}
                 />
               </swiper-slide>
               {product.photos_all.map(photo =>
                 photo.cover ? null : (
                   <swiper-slide key={photo.id}>
-                    <img className="photo-mobile" src={photo.pathPublic} />
+                    <img className="photo-mobile" src={photo.pathsPublic.l} />
                   </swiper-slide>
                 )
               )}
@@ -181,20 +183,23 @@ export default api => {
               {product.is_in_stock ? 'в наявності' : 'немає в наявності'}
             </span>
           </div>
-          <p className="info__description">{product.description}</p>
+          <p
+            className="info__description"
+            dangerouslySetInnerHTML={{ __html: product.description }}
+          ></p>
           <div className="info__social-links-container">
             <h2 className="info__social-links-heading">Написати:</h2>
-            <div className="info__social-links">
+            <div className="social-links">
+              <a className="social-link" href="https://ig.me/m/animato_jewelry" target="_blank">
+                <IconInstagram className="social-icon" />
+              </a>
               <a
-                className="info__social-link info__social-link-instagram"
-                href="https://ig.me/m/animato_jewelry"
-                target="_blank"
-              ></a>
-              <a
-                className="info__social-link info__social-link-facebook"
+                className="social-link"
                 href={`https://m.me/bySophiaSalo?text=${encodeURIComponent(`Вітаю. \n \n Мене цікавить ${product.name} (${product._id}). \n \n`)}`}
                 target="_blank"
-              ></a>
+              >
+                <IconFacebook className="social-icon" />
+              </a>
             </div>
           </div>
           <Notification hidden={!isCopiedNotificationVisible}>

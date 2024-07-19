@@ -156,6 +156,11 @@
   
       .social-links {
         display: flex;
+
+        .social-icon_light {
+          width: 24px;
+          height: 24px;
+        }
       }
     }
   
